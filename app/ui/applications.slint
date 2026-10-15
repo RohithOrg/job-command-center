@@ -1,0 +1,135 @@
+// Every application as a full-width list; a row opens the application page.
+import {ListView, TextEdit } from "std-widgets.slint";
+import { Theme, StageChip, Monogram } from "theme.slint";
+import { CompactTrack } from "track.slint";
+import { App, JobRow, ProfileRow } from "state.slint";
+import { FitScore, AtsScore } from "common.slint";
+import { ActionButton, LinkButton, SearchField, TextArea, Working, SectionTitle, Card, Select, Pager, RowAction, Checkbox } from "widgets.slint";
+
+component ListRow inherits Rectangle {
+    in property <JobRow> job;
+    callback clicked;
+    height: 72px;
+    border-radius: Theme.r-panel;
+    background: touch.has-hover ? Theme.surface : transparent;
+    touch := TouchArea { clicked => { root.clicked(); } mouse-cursor: pointer; }
+    HorizontalLayout {
+        padding-left: 12px; padding-right: 16px; spacing: 14px;
+        VerticalLayout { alignment: center; Checkbox { checked: job.selected; toggled => { App.toggle-select(job.id); } } }
+        Monogram { initial: job.initial; hue-seed: job.hue; size: 40px; y: (parent.height - 40px) / 2; }
+        VerticalLayout {
+            alignment: center; spacing: 4px; horizontal-stretch: 1;
+            Text { text: job.title; font-family: Theme.body; font-size: Theme.fs-md; font-weight: 700; color: Theme.ink; overflow: elide; }
+            Text { text: job.location == "" ? job.company : job.company + ", " + job.location; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; overflow: elide; }
+        }
+        VerticalLayout { width: 150px; alignment: center;
+            if job.working : HorizontalLayout { spacing: 8px; Working { } Text { text: job.stage-label; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.accent; vertical-alignment: center; overflow: elide; } }
+            if !job.working : CompactTrack { position: job.position; ended: job.ended; } }
+        VerticalLayout { width: 120px; alignment: center; StageChip { position: job.position; ended: job.ended; ended-label: job.status; } }
+        VerticalLayout { width: 64px; alignment: center; FitScore { value: job.fit; } }
+        VerticalLayout { width: 70px; alignment: center; AtsScore { value: job.ats; } }
+        // Updated date, swapped for a quick Close while hovered.
+        Rectangle { width: 70px;
+            Text { width: parent.width; text: job.updated; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.faint;
+                   vertical-alignment: center; horizontal-alignment: right; opacity: ra.showing && ra.visible ? 0 : 1; }
+            ra := RowAction { x: parent.width - self.width; y: (parent.height - self.height) / 2; text: "Close";
+                visible: !job.ended && !job.working; show: touch.has-hover;
+                clicked => { App.closing-job = job.id; App.closing = true; } } }
+    }
+    Rectangle { x: 16px; width: parent.width - 32px; y: parent.height - 1px; height: 1px; background: Theme.line; }
+}
+
+export component ApplicationsPage inherits Rectangle {
+    background: Theme.paper;
+    VerticalLayout {
+        padding: 36px; padding-bottom: 0; spacing: 16px;
+        HorizontalLayout {
+            spacing: 10px;
+            Text { text: "Applications"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xxl; color: Theme.ink; letter-spacing: -0.5px; horizontal-stretch: 1; }
+        }
+        HorizontalLayout {
+            spacing: 10px;
+            search := SearchField { width: 360px; placeholder: "Search role, company or place"; edited(t) => { App.filter-changed(t, status.current-value); } }
+            status := Select { width: 150px; model: ["Active", "Closed", "All", "New", "Evaluated", "Ready", "Applied", "Interview", "Offer"];
+                                 selected(v) => { App.filter-changed(search.text, v); } }
+            Rectangle { horizontal-stretch: 1; }
+            Text { text: (App.jobs-total == 1 ? "1 application" : App.jobs-total + " applications") + (App.working-count > 0 ? ", " + App.working-count + " with agents working" : "");
+                   font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; vertical-alignment: center; }
+        }
+        HorizontalLayout {
+            padding-left: 12px; padding-right: 16px; spacing: 14px; height: 20px;
+            Rectangle { width: 20px; }
+            Rectangle { width: 40px; }
+            Text { horizontal-stretch: 1; text: "Role"; font-family: Theme.body; font-size: 12px; font-weight: 700; color: Theme.faint; }
+            Text { width: 150px; text: "Line"; font-family: Theme.body; font-size: 12px; font-weight: 700; color: Theme.faint; }
+            Text { width: 120px; text: "Stage"; font-family: Theme.body; font-size: 12px; font-weight: 700; color: Theme.faint; }
+            Text { width: 64px; text: "Fit"; horizontal-alignment: right; font-family: Theme.body; font-size: 12px; font-weight: 700; color: Theme.faint; }
+            Text { width: 70px; text: "ATS"; horizontal-alignment: right; font-family: Theme.body; font-size: 12px; font-weight: 700; color: Theme.faint; }
+            Text { width: 70px; text: "Updated"; horizontal-alignment: right; font-family: Theme.body; font-size: 12px; font-weight: 700; color: Theme.faint; }
+        }
+        ListView {
+            vertical-stretch: 1;
+            for job in App.jobs : ListRow { job: job; clicked => { App.open-job-page(job.id); } }
+        }
+        Pager { page: App.jobs-page; pages: App.jobs-pages; go(p) => { App.go-page("jobs", p); } }
+    }
+    // Floats over the list, so ticking a row never moves the rows under the pointer.
+    if App.selected-count > 0 : Rectangle {
+        width: min(520px, parent.width - 72px);
+        height: 56px;
+        x: (parent.width - self.width) / 2;
+        y: parent.height - self.height - 76px;   // above the page buttons
+        border-radius: 28px;
+        background: Theme.dark ? #E7EFED : #0F2A2E;
+        drop-shadow-blur: 20px; drop-shadow-color: #00000050; drop-shadow-offset-y: 6px;
+        TouchArea { }   // clicks on the bar never reach the row underneath
+        HorizontalLayout { padding-left: 22px; padding-right: 10px; spacing: 10px;
+            Text { text: App.selected-count + " selected"; font-family: Theme.body; font-size: Theme.fs-sm; font-weight: 700;
+                   color: Theme.dark ? #0F2A2E : #E7EFED; vertical-alignment: center; horizontal-stretch: 1; }
+            VerticalLayout { alignment: center; ActionButton { text: "Close selected"; small: true; primary: true; clicked => { App.closing-many = true; App.closing = true; } } }
+            VerticalLayout { alignment: center; ActionButton { text: "Clear"; small: true; clicked => { App.clear-selection(); } } } }
+    }
+}
+
+// Modal: paste a link or the posting text; the agents take it from there.
+export component NewApplication inherits Rectangle {
+    in-out property <string> url;
+    in-out property <string> text;
+    in-out property <int> profile-index: App.active-profile-index;
+    background: #0008;
+    TouchArea { }   // swallow clicks behind the dialog
+    Card {
+        width: min(640px, parent.width - 80px);
+        height: col.preferred-height;
+        x: (parent.width - self.width) / 2;
+        y: max(40px, (parent.height - self.height) / 2);
+        col := VerticalLayout {
+            padding: 28px; spacing: 16px;
+            Text { text: "New application"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xl; color: Theme.ink; }
+            Text { text: "Paste the job link. The agents read the posting, score the fit, tailor a resume and write a cover letter. If the site blocks reading, paste the description text instead.";
+                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; }
+            VerticalLayout { spacing: 6px;
+                Text { text: "Job link"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
+                SearchField { text <=> root.url; placeholder: "https://…"; } }
+            TextArea { label: "Or the job description"; text <=> root.text; area-height: 150px; }
+            if App.profiles.length > 1 : VerticalLayout { spacing: 6px;
+                Text { text: "Apply with profile"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
+                Select { model: App.profile-names; current-index <=> root.profile-index; } }
+            if App.duplicate-job >= 0 : Rectangle {
+                background: Theme.marigold-soft; border-radius: Theme.r-control; height: dup.preferred-height;
+                dup := VerticalLayout { padding: 14px; spacing: 10px;
+                    Text { text: App.duplicate-note; wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.marigold-ink; }
+                    HorizontalLayout { spacing: 8px; alignment: start;
+                        ActionButton { text: "Open the earlier one"; small: true; primary: true;
+                                       clicked => { App.adding = false; App.open-job-page(App.duplicate-job); App.duplicate-job = -1; } }
+                        ActionButton { text: "Add it anyway"; small: true; clicked => { App.add-anyway(); root.url = ""; root.text = ""; } } } }
+            }
+            HorizontalLayout {
+                spacing: 10px; alignment: end;
+                ActionButton { text: "Cancel"; clicked => { App.adding = false; App.duplicate-job = -1; } }
+                ActionButton { text: "Start the agents"; primary: true; enabled: root.url != "" || root.text != "";
+                    clicked => { App.add-application(root.url, root.text, App.profiles.length > 0 ? App.profiles[root.profile-index].id : -1); } }
+            }
+        }
+    }
+}

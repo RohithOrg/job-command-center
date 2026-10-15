@@ -1,0 +1,71 @@
+// Full-window resume viewer: the real pages at print resolution, with zoom.
+import { Theme } from "theme.slint";
+import { App } from "state.slint";
+import { ActionButton, Working } from "widgets.slint";
+
+component ZoomButton inherits Rectangle {
+    in property <string> text;
+    callback clicked;
+    width: max(36px, t.preferred-width + 20px); height: 34px; border-radius: 8px;
+    background: touch.has-hover ? #ffffff26 : #ffffff14;
+    t := Text { text: root.text; color: white; font-family: Theme.body; font-size: Theme.fs-sm; font-weight: 700; }
+    touch := TouchArea { clicked => { root.clicked(); } mouse-cursor: pointer; }
+    accessible-role: button;
+    accessible-label: root.text;
+}
+
+export component Viewer inherits Rectangle {
+    property <[image]> pages: App.viewer-pages.length > 0 ? App.viewer-pages : App.preview-pages;
+    property <length> base-w: min(self.width - 120px, 900px);
+    property <length> page-w: base-w * App.viewer-zoom;
+    property <float> ratio: pages.length > 0 ? pages[0].height / max(1, pages[0].width) : 1.414;
+    property <length> page-h: page-w * ratio;
+    background: #0B1213F2;
+    TouchArea { }   // keep clicks off the app underneath
+    keys := FocusScope {
+        focus-on-click: false;   // clicks go to the viewer; the scope only listens for keys
+        key-pressed(e) => {
+            if e.text == Key.Escape { App.viewer-open = false; return accept; }
+            if e.text == "+" || e.text == "=" { App.viewer-zoom = min(3.0, App.viewer-zoom + 0.25); return accept; }
+            if e.text == "-" { App.viewer-zoom = max(0.5, App.viewer-zoom - 0.25); return accept; }
+            if e.text == "0" { App.viewer-zoom = 1.0; return accept; }
+            reject
+        }
+    }
+    init => { keys.focus(); }
+    VerticalLayout {
+        Rectangle {
+            height: 60px; background: #0B1213;
+            HorizontalLayout {
+                padding-left: 20px; padding-right: 16px; spacing: 8px;
+                Text { text: App.job.title + ", " + App.version.label; color: white; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-md;
+                       vertical-alignment: center; overflow: elide; horizontal-stretch: 1; }
+                if App.viewer-pages.length == 0 : HorizontalLayout { spacing: 6px; Working { color: white; }
+                    Text { text: "Sharpening"; color: #ffffffa0; font-size: Theme.fs-xs; vertical-alignment: center; } }
+                Text { text: root.pages.length + (root.pages.length == 1 ? " page" : " pages"); color: #ffffffa0; font-family: Theme.body; font-size: Theme.fs-xs; vertical-alignment: center; }
+                Rectangle { width: 12px; }
+                VerticalLayout { alignment: center; ZoomButton { text: "−"; clicked => { App.viewer-zoom = max(0.5, App.viewer-zoom - 0.25); } } }
+                VerticalLayout { alignment: center; ZoomButton { text: round(App.viewer-zoom * 100) + "%"; clicked => { App.viewer-zoom = 1.0; } } }
+                VerticalLayout { alignment: center; ZoomButton { text: "+"; clicked => { App.viewer-zoom = min(3.0, App.viewer-zoom + 0.25); } } }
+                Rectangle { width: 12px; }
+                VerticalLayout { alignment: center; ActionButton { text: "Open PDF"; small: true; clicked => { App.open-file(App.version.pdf); } } }
+                VerticalLayout { alignment: center; ZoomButton { text: "Close"; clicked => { App.viewer-open = false; } } }
+            }
+        }
+        flick := Flickable {
+            vertical-stretch: 1;
+            content-width: max(self.width, root.page-w + 80px);
+            content-height: root.pages.length * (root.page-h + 24px) + 48px;
+            for p[i] in root.pages : Rectangle {
+                x: max(40px, (flick.width - root.page-w) / 2);
+                y: 24px + i * (root.page-h + 24px);
+                width: root.page-w;
+                height: root.page-h;
+                background: white;
+                drop-shadow-blur: 24px;
+                drop-shadow-color: #00000080;
+                Image { source: p; width: parent.width; height: parent.height; image-fit: fill; }
+            }
+        }
+    }
+}

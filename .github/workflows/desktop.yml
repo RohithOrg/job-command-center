@@ -1,0 +1,63 @@
+# Builds the desktop installers on each platform: .dmg (macOS), .exe installer (Windows),
+# .deb and .AppImage (Linux). Tag a commit "v0.1.0" to publish them as a GitHub release.
+name: Desktop installers
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            formats: dmg
+          - os: windows-latest
+            formats: nsis
+          - os: ubuntu-22.04
+            formats: deb,appimage
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: app
+      - name: Linux build libraries
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libxkbcommon-dev libfontconfig1-dev libdbus-1-dev libwayland-dev libxcursor-dev libxrandr-dev libxi-dev libgl1-mesa-dev
+      - name: Tests
+        run: cargo test --locked
+      - name: Install cargo-packager
+        run: cargo install cargo-packager --locked
+      - name: Package
+        run: cargo packager --release --formats ${{ matrix.formats }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: job-command-center-${{ runner.os }}
+          path: |
+            app/dist/*.dmg
+            app/dist/*-setup.exe
+            app/dist/*.deb
+            app/dist/*.AppImage
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*

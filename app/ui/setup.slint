@@ -1,0 +1,182 @@
+// First launch: show what's being set up on this computer, then a short guided setup.
+// Nothing is downloaded: the search model, fonts and PDF engine ship inside the app.
+import { ScrollView, ListView } from "std-widgets.slint";
+import { Theme, Monogram } from "theme.slint";
+import { App, SetupStep, CompanyRow } from "state.slint";
+import { ActionButton, LinkButton, Field, TextArea, Toggle, Select, Working, SectionTitle, Card, ChipInput } from "widgets.slint";
+
+component StepLine inherits HorizontalLayout {
+    in property <SetupStep> s;
+    spacing: 14px;
+    Rectangle {
+        width: 26px; height: 26px; y: 2px; border-radius: 13px;
+        background: s.state == "done" ? Theme.good : s.state == "failed" ? Theme.risk : s.state == "working" ? Theme.accent-soft : Theme.sunken;
+        if s.state == "done" : Text { text: "✓"; color: white; font-weight: 700; font-size: 14px; }
+        if s.state == "failed" : Text { text: "!"; color: white; font-weight: 700; font-size: 14px; }
+        if s.state == "working" : Working { color: Theme.accent; x: 3px; }
+    }
+    VerticalLayout {
+        spacing: 2px; horizontal-stretch: 1;
+        Text { text: s.title; font-family: Theme.body; font-size: Theme.fs-md; font-weight: 700;
+               color: s.state == "waiting" ? Theme.faint : Theme.ink; }
+        if s.detail != "" : Text { text: s.detail; wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-xs; color: s.state == "failed" ? Theme.risk : Theme.muted; }
+    }
+}
+
+component Progress inherits Rectangle {
+    in property <float> value;
+    height: 8px; border-radius: 4px; background: Theme.sunken;
+    Rectangle { x: 0; width: parent.width * clamp(root.value, 0, 1); border-radius: 4px; background: Theme.accent; animate width { duration: 250ms; } }
+}
+
+// The line of five stops across the top of the guided steps (setup is a journey too).
+component Steps inherits HorizontalLayout {
+    in property <int> current;
+    spacing: 8px;
+    for name[i] in ["Getting ready", "Your AI", "Your resume", "What you want", "Your companies"] : HorizontalLayout {
+        spacing: 8px;
+        Rectangle { width: 10px; height: 10px; y: 5px; border-radius: 5px;
+                    background: i < root.current ? Theme.good : i == root.current ? Theme.marigold : Theme.line; }
+        Text { text: name; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: i == root.current ? 700 : 400;
+               color: i == root.current ? Theme.ink : Theme.muted; }
+    }
+}
+
+component CompanyPick inherits Rectangle {
+    in property <CompanyRow> c;
+    height: 52px;
+    border-radius: Theme.r-control;
+    background: c.favorite ? Theme.accent-soft : touch.has-hover ? Theme.selected : transparent;
+    touch := TouchArea { clicked => { App.toggle-favorite(c.id); } mouse-cursor: pointer; }
+    HorizontalLayout {
+        padding-left: 10px; padding-right: 12px; spacing: 10px;
+        Monogram { initial: c.initial; hue-seed: c.hue; size: 30px; y: (parent.height - 30px) / 2; }
+        Text { text: c.name; font-family: Theme.body; font-size: Theme.fs-sm; font-weight: 700; color: Theme.ink; vertical-alignment: center; horizontal-stretch: 1; overflow: elide; }
+        Text { text: c.favorite ? "★" : "☆"; font-size: 18px; color: c.favorite ? Theme.marigold : Theme.faint; vertical-alignment: center; }
+    }
+    accessible-role: checkbox;
+    accessible-checked: c.favorite;
+    accessible-label: c.name;
+}
+
+component SetupChips inherits ChipInput {
+    in property <string> field;
+    suggestions: App.suggest-field == root.field ? App.suggestions : [];
+    add(v) => { App.chip-add(root.field, v); }
+    remove(i) => { App.chip-remove(root.field, i); }
+    typed(t) => { App.chip-typed(root.field, t); }
+}
+
+export component SetupPage inherits Rectangle {
+    in-out property <string> company-filter;
+    background: Theme.paper;
+    TouchArea { }
+    VerticalLayout {
+        alignment: center;
+        HorizontalLayout {
+            alignment: center;
+            Card {
+                width: min(760px, root.width - 80px);
+                col := VerticalLayout {
+                    padding: 36px; spacing: 20px;
+                    HorizontalLayout {
+                        spacing: 12px;
+                        Rectangle {
+                            width: 40px; height: 40px; border-radius: 12px; background: Theme.rail;
+                            Rectangle { x: 9px; y: 19px; width: 22px; height: 3px; border-radius: 1.5px; background: #ffffff60; }
+                            Rectangle { x: 6px; y: 16px; width: 9px; height: 9px; border-radius: 4.5px; background: #1F9D6E; }
+                            Rectangle { x: 15px; y: 16px; width: 9px; height: 9px; border-radius: 4.5px; background: #3B7DD8; }
+                            Rectangle { x: 23px; y: 13px; width: 14px; height: 14px; border-radius: 7px; background: Theme.marigold; }
+                        }
+                        VerticalLayout { alignment: center;
+                            Text { text: "Job Command Center"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-lg; color: Theme.ink; } }
+                    }
+                    Steps { current: App.setup-stage; }
+
+                    if App.setup-stage == 0 : VerticalLayout {
+                        spacing: 18px;
+                        VerticalLayout { spacing: 6px;
+                            Text { text: App.setup-ready ? "All set" : "Getting things ready"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xxl; color: Theme.ink; letter-spacing: -0.5px; }
+                            Text { text: "This takes about a minute. Nothing needs to be downloaded, and your information stays on this computer. The only thing that goes online is the AI service you connect in the next step.";
+                                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
+                        Progress { value: App.setup-progress; }
+                        VerticalLayout { spacing: 14px; for s in App.setup-steps : StepLine { s: s; } }
+                        HorizontalLayout { alignment: end;
+                            ActionButton { text: "Continue"; primary: true; enabled: App.setup-ready; clicked => { App.setup-stage = 1; } } }
+                    }
+
+                    if App.setup-stage == 1 : VerticalLayout {
+                        spacing: 16px;
+                        VerticalLayout { spacing: 6px;
+                            Text { text: "Connect your AI"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xxl; color: Theme.ink; letter-spacing: -0.5px; }
+                            Text { text: "The assistant uses an AI service to read job posts and write your resumes. Pick the one you have an account with and paste its key (a long password the service gives you). The key is stored safely in this computer's password store.";
+                                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
+                        VerticalLayout { spacing: 6px;
+                            Text { text: "Provider"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
+                            Select { model: App.provider-labels; current-index: App.ai.provider-index; selected => { App.provider-changed(self.current-index); } } }
+                        if App.providers.length > 0 && App.providers[App.ai.provider-index].needs-key : Field {
+                            label: "API key"; password: true; text <=> App.ai.new-key;
+                            placeholder: App.ai.key-status != "" ? "Saved (" + App.ai.key-status + ")" : App.providers[App.ai.provider-index].key-hint; }
+                        if App.providers.length > 0 && App.providers[App.ai.provider-index].key-url == "" : Field { label: "Endpoint URL"; text <=> App.ai.base-url; }
+                        Field { label: "Model"; hint: "Add fallbacks after a comma."; text <=> App.ai.models; }
+                        HorizontalLayout { spacing: 10px;
+                            if App.ai-busy : Working { }
+                            Text { text: App.ai-status; wrap: word-wrap; horizontal-stretch: 1; vertical-alignment: center; font-family: Theme.body; font-size: Theme.fs-xs;
+                                   color: App.ai-ok ? Theme.good : Theme.risk; } }
+                        Text { text: "The app needs a working AI to read postings and write; this step can't be skipped. No key yet? Choose Ollama to run a free model on this computer.";
+                               wrap: word-wrap; font-family: Theme.body; font-size: 12px; color: Theme.faint; }
+                        HorizontalLayout { alignment: end;
+                            ActionButton { text: App.ai-busy ? "Checking…" : "Check and continue"; primary: true; enabled: !App.ai-busy;
+                                           clicked => { App.setup-connect-ai(); } } }
+                    }
+
+                    if App.setup-stage == 2 : VerticalLayout {
+                        spacing: 16px;
+                        VerticalLayout { spacing: 6px;
+                            Text { text: "Your resume"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xxl; color: Theme.ink; letter-spacing: -0.5px; }
+                            Text { text: "Every resume the app writes uses only facts from here, so start with your full, current resume. The app reads it and fills in your details; you can correct anything.";
+                                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
+                        HorizontalLayout { spacing: 10px; alignment: start;
+                            ActionButton { text: "Import a PDF or text file"; primary: App.profile.cv-md == ""; clicked => { App.import-cv(); } }
+                            if App.profile-busy : Working { } }
+                        if App.profile.cv-md != "" : TextArea { label: "Your CV, as the agents will see it"; text <=> App.profile.cv-md; area-height: 220px; }
+                        if App.profile.cv-md != "" : HorizontalLayout { spacing: 16px;
+                            Field { label: "Full name"; text <=> App.profile.full-name; }
+                            Field { label: "Email"; text <=> App.profile.email; } }
+                        HorizontalLayout { alignment: end; spacing: 10px;
+                            LinkButton { text: "Skip for now"; clicked => { App.setup-stage = 3; } }
+                            ActionButton { text: "Save and continue"; primary: true; clicked => { App.save-profile(); App.setup-stage = 3; } } }
+                    }
+
+                    if App.setup-stage == 3 : VerticalLayout {
+                        spacing: 16px;
+                        VerticalLayout { spacing: 6px;
+                            Text { text: "What you want"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xxl; color: Theme.ink; letter-spacing: -0.5px; }
+                            Text { text: "The app looks for jobs with these titles in these places. You can change this any time in your profile.";
+                                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
+                        SetupChips { field: "target-roles"; label: "Job titles"; placeholder: "e.g. Data Scientist"; items: App.profile.target-roles; }
+                        SetupChips { field: "countries"; label: "Countries"; placeholder: "e.g. Netherlands"; hint: "Leave empty to keep every place."; items: App.profile.countries; }
+                        SetupChips { field: "exclude-words"; label: "Words that rule a job out"; placeholder: "e.g. Intern"; items: App.profile.exclude-words; }
+                        HorizontalLayout { alignment: end; spacing: 10px;
+                            LinkButton { text: "Skip for now"; clicked => { App.setup-stage = 4; } }
+                            ActionButton { text: "Save and continue"; primary: true; clicked => { App.save-profile(); App.setup-stage = 4; } } }
+                    }
+
+                    if App.setup-stage == 4 : VerticalLayout {
+                        spacing: 14px;
+                        VerticalLayout { spacing: 6px;
+                            Text { text: "Your companies"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xxl; color: Theme.ink; letter-spacing: -0.5px; }
+                            Text { text: "Star the companies you'd like to work for. The app checks their job pages and shows matching jobs in Discover. You can add any other company later.";
+                                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
+                        ListView {
+                            height: 300px;
+                            for c in App.setup-companies : CompanyPick { c: c; }
+                        }
+                        HorizontalLayout { alignment: end; spacing: 10px;
+                            ActionButton { text: "Start using the app"; primary: true; clicked => { App.finish-setup(); } } }
+                    }
+                }
+            }
+        }
+    }
+}

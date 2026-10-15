@@ -1,0 +1,241 @@
+// The candidate's profiles. Everything here is what the agents treat as fact, so it's
+// collected as structured answers (pickers and short fields), not free-form notes.
+import { ScrollView } from "std-widgets.slint";
+import { Theme } from "theme.slint";
+import { App, DocRow } from "state.slint";
+import { ActionButton, LinkButton, Field, TextArea, Toggle, Tabs, SectionTitle, Card, Working, ChipInput, SelectField } from "widgets.slint";
+
+component ProfileChip inherits Rectangle {
+    in property <string> text;
+    in property <bool> selected;
+    in property <bool> active;
+    callback clicked;
+    height: 36px;
+    width: row.preferred-width + 28px;
+    border-radius: 18px;
+    background: selected ? Theme.ink : touch.has-hover ? Theme.selected : Theme.surface;
+    border-width: selected ? 0px : 1px;
+    border-color: Theme.line;
+    row := HorizontalLayout {
+        x: 14px; spacing: 8px;
+        if root.active : Rectangle { width: 8px; height: 8px; y: (parent.height - 8px) / 2; border-radius: 4px; background: Theme.marigold; }
+        Text { text: root.text; font-family: Theme.body; font-size: Theme.fs-sm; font-weight: 700;
+               color: root.selected ? Theme.paper : Theme.ink; vertical-alignment: center; }
+    }
+    touch := TouchArea { clicked => { root.clicked(); } mouse-cursor: pointer; }
+    accessible-role: tab;
+    accessible-label: root.text;
+}
+
+component Section inherits Card {
+    in property <string> title;
+    in property <string> lead;
+    height: col.preferred-height;
+    col := VerticalLayout {
+        padding: 24px; spacing: 16px;
+        VerticalLayout { spacing: 4px;
+            SectionTitle { text: root.title; }
+            if root.lead != "" : Text { text: root.lead; wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; } }
+        @children
+    }
+}
+
+component DocItem inherits Rectangle {
+    in property <DocRow> d;
+    height: row.preferred-height;
+    row := HorizontalLayout {
+        padding-top: 10px; padding-bottom: 10px; spacing: 12px;
+        VerticalLayout {
+            horizontal-stretch: 1; spacing: 2px;
+            Text { text: d.title; font-family: Theme.body; font-size: Theme.fs-sm; font-weight: 700; color: Theme.ink; overflow: elide; }
+            Text { text: d.preview; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; overflow: elide; }
+            Text { text: "Added " + d.updated; font-family: Theme.body; font-size: 12px; color: Theme.faint; }
+        }
+        VerticalLayout { alignment: center; LinkButton { text: "Remove"; ink: Theme.risk; clicked => { App.delete-document(d.id); } } }
+    }
+    Rectangle { y: parent.height - 1px; height: 1px; background: Theme.line; }
+}
+
+// A chip picker wired to one of the profile's lists.
+component ProfileChips inherits ChipInput {
+    in property <string> field;
+    suggestions: App.suggest-field == root.field ? App.suggestions : [];
+    add(v) => { App.chip-add(root.field, v); }
+    remove(i) => { App.chip-remove(root.field, i); }
+    typed(t) => { App.chip-typed(root.field, t); }
+}
+
+component AboutTab inherits VerticalLayout {
+    spacing: 16px; alignment: start;
+    Section {
+        title: "About you";
+        lead: "Printed at the top of every resume.";
+        Field { width: 320px; label: "Profile name"; hint: "Only you see this, e.g. “Data science” or “ML engineering”."; text <=> App.profile.name; }
+        HorizontalLayout { spacing: 16px;
+            Field { label: "Full name"; text <=> App.profile.full-name; }
+            Field { label: "Headline"; placeholder: "Data Scientist building agentic AI systems"; text <=> App.profile.headline; } }
+        HorizontalLayout { spacing: 16px;
+            Field { label: "Email"; placeholder: "you@example.com"; text <=> App.profile.email; }
+            Field { label: "Phone"; placeholder: "+31 6 1234 5678"; text <=> App.profile.phone; } }
+        HorizontalLayout { spacing: 16px;
+            Field { label: "City"; placeholder: "Amsterdam"; text <=> App.profile.city; }
+            SelectField { label: "Country you live in"; options: App.country-options; value <=> App.profile.country; } }
+    }
+    Section {
+        title: "Links";
+        lead: "Shown on your resume and used when a form asks for them.";
+        HorizontalLayout { spacing: 16px;
+            Field { label: "LinkedIn"; placeholder: "linkedin.com/in/yourname"; text <=> App.profile.linkedin; }
+            Field { label: "GitHub"; placeholder: "github.com/yourname"; text <=> App.profile.github; } }
+        HorizontalLayout { spacing: 16px;
+            Field { label: "Personal website or portfolio"; placeholder: "yourname.dev"; text <=> App.profile.website; }
+            Field { label: "Other link"; placeholder: "Google Scholar, Kaggle, Behance…"; text <=> App.profile.other-link; } }
+    }
+}
+
+component CvTab inherits VerticalLayout {
+    spacing: 16px; alignment: start;
+    Section {
+        title: "Your CV";
+        lead: "Every claim in a tailored resume must trace back to this or to your documents, so keep it complete: all roles, dates and results.";
+        HorizontalLayout { alignment: start; spacing: 10px;
+            ActionButton { text: "Import from a PDF or text file"; primary: App.profile.cv-md == ""; small: true; clicked => { App.import-cv(); } }
+            if App.profile-busy : Working { }
+            Text { text: "Reads your existing resume and fills in empty details."; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.faint; vertical-alignment: center; } }
+        TextArea { text <=> App.profile.cv-md; area-height: 480px; }
+    }
+}
+
+component WantTab inherits VerticalLayout {
+    spacing: 16px; alignment: start;
+    Section {
+        title: "The roles you want";
+        lead: "The company scanner looks for these titles, and each posting is scored against them.";
+        ProfileChips { field: "target-roles"; label: "Job titles"; placeholder: "Start typing, e.g. Data Scientist"; items: App.profile.target-roles; }
+        ProfileChips { field: "exclude-words"; label: "Words that rule a job out"; placeholder: "e.g. Intern"; items: App.profile.exclude-words;
+                       hint: "“Intern” also rules out “Internship”."; }
+        HorizontalLayout { spacing: 16px;
+            SelectField { label: "Level"; options: App.seniority-options; value <=> App.profile.seniority; }
+            SelectField { label: "Way of working"; options: App.work-mode-options; value <=> App.profile.work-mode; } }
+    }
+    Section {
+        title: "Where";
+        lead: "The scanner keeps jobs in these places; postings elsewhere are scored lower and flagged.";
+        ProfileChips { field: "countries"; label: "Countries"; placeholder: "Start typing a country"; items: App.profile.countries; }
+        ProfileChips { field: "cities"; label: "Cities (optional)"; placeholder: "Type a city and press Enter"; items: App.profile.cities; }
+        ProfileChips { field: "avoid-places"; label: "Places to leave out (optional)"; placeholder: "Country or city"; items: App.profile.avoid-places; }
+        Toggle { text: "Open to relocating"; checked <=> App.profile.relocate; }
+    }
+    Section {
+        title: "Pay";
+        lead: "Used to judge postings and to answer salary questions. Never sent anywhere else.";
+        HorizontalLayout { spacing: 16px;
+            Field { label: "Target (per year)"; placeholder: "75,000 – 90,000"; text <=> App.profile.salary-target; }
+            Field { label: "Lowest you'd accept"; placeholder: "70,000"; text <=> App.profile.salary-minimum; }
+            SelectField { width: 140px; label: "Currency"; options: App.currency-options; value <=> App.profile.currency; } }
+    }
+}
+
+component VisaTab inherits VerticalLayout {
+    spacing: 16px; alignment: start;
+    Section {
+        title: "Right to work";
+        lead: "Application forms ask about this; the assistant answers only from what you set here and never guesses.";
+        ProfileChips { field: "authorized-in"; label: "Countries where you can already work"; placeholder: "Start typing a country"; items: App.profile.authorized-in; }
+        Toggle { text: "I need visa sponsorship for the countries I want"; checked <=> App.profile.needs-sponsorship; }
+        if App.profile.needs-sponsorship : Field { label: "Visa details"; placeholder: "e.g. Eligible for the Dutch highly skilled migrant visa"; text <=> App.profile.visa-notes; }
+    }
+    Section {
+        title: "Availability and languages";
+        HorizontalLayout { spacing: 16px;
+            SelectField { label: "Notice period"; options: App.notice-options; value <=> App.profile.notice; }
+            Rectangle { } }
+        ProfileChips { field: "languages"; label: "Languages"; placeholder: "e.g. English (fluent), Dutch (basic)"; items: App.profile.languages;
+                       hint: "Add the level in brackets."; }
+    }
+}
+
+component AiTab inherits VerticalLayout {
+    spacing: 16px; alignment: start;
+    Section {
+        title: "Your story";
+        lead: "How the assistant should frame you in summaries, cover letters and answers.";
+        TextArea { label: "In two or three sentences: what you do, and where you're heading"; area-height: 90px; text <=> App.profile.story;
+                   hint: "e.g. I build production AI systems at a bank and want to move to an applied AI team in Amsterdam."; }
+        ProfileChips { field: "strengths"; label: "Strengths to highlight"; placeholder: "e.g. Production RAG systems"; items: App.profile.strengths; }
+        Field { label: "Never mention"; placeholder: "e.g. my current salary, the gap in 2019"; text <=> App.profile.avoid; }
+        HorizontalLayout { spacing: 16px;
+            SelectField { label: "Tone"; options: App.tone-options; value <=> App.profile.tone; }
+            Rectangle { } }
+    }
+    Section {
+        title: "Anything else";
+        lead: "Optional. Anything the assistant should know that doesn't fit above.";
+        TextArea { text <=> App.profile.notes-md; area-height: 200px; }
+    }
+}
+
+component DocsTab inherits VerticalLayout {
+    in-out property <string> doc-title;
+    in-out property <string> doc-text;
+    spacing: 16px; alignment: start;
+    Section {
+        title: "Documents";
+        lead: "Extra material the assistant may draw on: a longer CV, project write-ups, reviews, publications.";
+        if App.library.length == 0 : Text { text: "No documents yet."; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.faint; }
+        VerticalLayout { for d in App.library : DocItem { d: d; } }
+        HorizontalLayout { spacing: 8px; alignment: start;
+            ActionButton { text: "Add a file"; primary: true; small: true; clicked => { App.import-document(); } } }
+        Field { label: "Or paste text: title"; placeholder: "Project write-up: RAG platform"; text <=> root.doc-title; }
+        TextArea { text <=> root.doc-text; area-height: 120px; }
+        HorizontalLayout { alignment: start;
+            ActionButton { text: "Add to documents"; small: true; enabled: root.doc-title != "" && root.doc-text != "";
+                           clicked => { App.add-document(root.doc-title, root.doc-text); root.doc-title = ""; root.doc-text = ""; } } }
+    }
+    Section {
+        title: "Saved answers";
+        lead: "Answers you saved from an application's Q&A. The assistant reuses them, re-tailored, when a similar question comes up.";
+        if App.answers.length == 0 : Text { text: "None saved yet."; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.faint; }
+        VerticalLayout { for d in App.answers : DocItem { d: d; } }
+    }
+}
+
+export component ProfilePage inherits Rectangle {
+    background: Theme.paper;
+    VerticalLayout {
+        padding: 36px; padding-bottom: 0; spacing: 14px;
+        HorizontalLayout {
+            spacing: 10px;
+            VerticalLayout {
+                horizontal-stretch: 1; spacing: 4px;
+                Text { text: "Profile"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xxl; color: Theme.ink; letter-spacing: -0.5px; }
+                Text { text: "The assistant only states what's here. Keep a profile for each direction you apply in.";
+                       wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; }
+            }
+            VerticalLayout { alignment: center;
+                ActionButton { text: "Save profile"; primary: true; clicked => { App.save-profile(); } } }
+        }
+        HorizontalLayout {
+            spacing: 8px; alignment: start;
+            for p in App.profiles : ProfileChip { text: p.name; active: p.active; selected: p.id == App.profile.id; clicked => { App.select-profile(p.id); } }
+            LinkButton { text: "New profile"; clicked => { App.new-profile(); } }
+            LinkButton { text: "Duplicate"; clicked => { App.duplicate-profile(); } }
+            Rectangle { horizontal-stretch: 1; }
+            LinkButton { text: "Use for new applications"; clicked => { App.activate-profile(); } }
+            if App.profiles.length > 1 : LinkButton { text: "Delete"; ink: Theme.risk; clicked => { App.delete-profile(); } }
+        }
+        Tabs { labels: ["About you", "Your CV", "What you want", "Work and visa", "For the AI", "Documents"]; current <=> App.profile-tab; }
+        ScrollView {
+            vertical-stretch: 1;
+            VerticalLayout {
+                padding-top: 16px; padding-bottom: 32px; padding-right: 8px;
+                if App.profile-tab == 0 : AboutTab { }
+                if App.profile-tab == 1 : CvTab { }
+                if App.profile-tab == 2 : WantTab { }
+                if App.profile-tab == 3 : VisaTab { }
+                if App.profile-tab == 4 : AiTab { }
+                if App.profile-tab == 5 : DocsTab { }
+            }
+        }
+    }
+}

@@ -1,0 +1,165 @@
+// Connect an AI provider; choose models and how document search works.
+import {ScrollView } from "std-widgets.slint";
+import { Theme } from "theme.slint";
+import { App } from "state.slint";
+import { ActionButton, LinkButton, Field, SectionTitle, Card, Working, Chip, Select, Toggle, Tabs } from "widgets.slint";
+
+export component SettingsPage inherits Rectangle {
+    in-out property <int> tab <=> App.settings-tab;
+    property <bool> needs-key: App.providers.length > 0 && App.providers[App.ai.provider-index].needs-key;
+    property <bool> custom-url: App.providers.length > 0 && App.providers[App.ai.provider-index].base-url != "https://api.anthropic.com/v1"
+        && App.providers[App.ai.provider-index].base-url != "https://api.openai.com/v1"
+        && App.providers[App.ai.provider-index].base-url != "https://generativelanguage.googleapis.com/v1beta";
+    background: Theme.paper;
+    ScrollView {
+        VerticalLayout {
+            padding: 36px; spacing: 16px; alignment: start;
+            Text { text: "Settings"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xxl; color: Theme.ink; letter-spacing: -0.5px; }
+            Tabs { labels: ["AI service", "Automatic job search", "Phone and web", "Files and appearance"]; current <=> root.tab; }
+            if root.tab == 0 : VerticalLayout { spacing: 16px;
+            Card {
+                height: ai.preferred-height;
+                ai := VerticalLayout {
+                    padding: 24px; spacing: 16px;
+                    VerticalLayout { spacing: 4px;
+                        SectionTitle { text: "AI provider"; }
+                        Text { text: "The assistant uses this AI service to read job posts and write. Your key is kept in this computer's password store, not in the app's files.";
+                               wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; } }
+                    VerticalLayout { spacing: 6px;
+                        Text { text: "Provider"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
+                        Select {
+                            width: 360px;
+                            model: App.provider-labels;
+                            current-index: App.ai.provider-index;
+                            selected => { App.provider-changed(self.current-index); }
+                        } }
+                    if root.needs-key : HorizontalLayout { spacing: 12px;
+                        Field { width: 420px; label: "API key"; password: true; text <=> App.ai.new-key;
+                                placeholder: App.ai.key-status != "" ? "Saved (" + App.ai.key-status + "). Type to replace." : App.providers[App.ai.provider-index].key-hint; }
+                        VerticalLayout { alignment: end; padding-bottom: 6px;
+                            if App.providers[App.ai.provider-index].key-url != "" : LinkButton { text: "Get a key"; clicked => { App.open-url(App.providers[App.ai.provider-index].key-url); } } } }
+                    if root.custom-url : Field { label: "Endpoint URL"; hint: "OpenAI-compatible base URL, ending in /v1"; text <=> App.ai.base-url; }
+                    HorizontalLayout { spacing: 12px;
+                        Field { label: "Model"; hint: "Add backups after a comma; they're used if the first one fails."; text <=> App.ai.models; }
+                        VerticalLayout { alignment: start; padding-top: 22px;
+                            ActionButton { text: "Load models"; clicked => { App.load-models(); } } } }
+                    if App.model-options.length > 0 : VerticalLayout { spacing: 6px;
+                        Text { text: "Available models (click to add)"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
+                        Rectangle {
+                            height: min(220px, (ceil(App.model-options.length / 3) * 34px));
+                            ScrollView {
+                                VerticalLayout { spacing: 2px;
+                                    for m in App.model-options : LinkButton { text: m; ink: Theme.ink;
+                                        clicked => { App.ai.models = App.ai.models == "" ? m : App.ai.models + ", " + m; } } } } } }
+                    VerticalLayout { spacing: 6px;
+                        Text { text: "Smart search"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
+                        Select { width: 420px; model: ["On: built in, works offline (recommended)", "Off: match exact words only"];
+                                   current-index <=> App.ai.search; }
+                        Text { text: App.index-status; font-family: Theme.body; font-size: 12px; color: Theme.faint; } }
+                    HorizontalLayout { spacing: 10px; alignment: start;
+                        ActionButton { text: "Save"; primary: true; clicked => { App.save-ai(); } }
+                        ActionButton { text: "Test connection"; clicked => { App.test-ai(); } }
+                        if App.ai-busy : Working { }
+                        Text { text: App.ai-status; wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; vertical-alignment: center; horizontal-stretch: 1;
+                               color: App.ai-ok ? Theme.good : Theme.risk; } }
+                }
+            }
+            }
+            if root.tab == 1 : VerticalLayout { spacing: 16px;
+            Card {
+                height: js.preferred-height;
+                js := VerticalLayout {
+                    padding: 24px; spacing: 16px;
+                    VerticalLayout { spacing: 4px;
+                        SectionTitle { text: "Automatic job search"; }
+                        Text { text: "What to look for (titles, places, words to avoid) is set in your profile under What you want.";
+                               wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; } }
+                    Toggle { text: "Tailor new matches automatically"; checked <=> App.search.auto; }
+                    HorizontalLayout { spacing: 16px; alignment: start;
+                        Field { width: 220px; label: "At most per scan"; hint: "New matches tailored each time."; text <=> App.search.limit; }
+                        Field { width: 220px; label: "Scan every (hours)"; hint: "0 means only when you ask."; text <=> App.search.interval; } }
+                    HorizontalLayout { alignment: start; ActionButton { text: "Save"; primary: true; clicked => { App.save-search(); } }
+                        LinkButton { text: "Edit what to look for"; clicked => { App.profile-tab = 2; App.go(4); } } }
+                }
+            }
+            }
+            if root.tab == 2 : HorizontalLayout { spacing: 16px; alignment: start;
+                VerticalLayout { spacing: 16px; horizontal-stretch: 1; alignment: start;
+                    Card {
+                        height: lan.preferred-height;
+                        lan := VerticalLayout { padding: 24px; spacing: 12px;
+                            SectionTitle { text: "Use on your phone"; }
+                            Text { text: "Open Job Command Center in the browser of your phone or another computer. It runs from this computer, so keep the app open.";
+                                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; }
+                            Toggle { text: "On this Wi-Fi"; checked: App.web-on; toggled(v) => { App.web-toggle(v); } }
+                            Toggle { text: "From anywhere, through ngrok"; checked: App.web-remote-on; toggled(v) => { App.web-remote-toggle(v); } }
+                            if App.web-busy : Working { }
+                            if App.web-status != "" : Text { text: App.web-status; wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.risk; }
+                        }
+                    }
+                    Card {
+                        height: ng.preferred-height;
+                        ng := VerticalLayout { padding: 24px; spacing: 12px;
+                            SectionTitle { text: "From anywhere (ngrok)"; font-size: Theme.fs-md; }
+                            Text { text: "ngrok gives this computer a private https address that works from any network. Create a free account at ngrok.com and paste your authtoken. It's kept in this computer's password store.";
+                                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; }
+                            Field { label: "ngrok authtoken"; password: true; text <=> App.ngrok-new-key;
+                                    placeholder: App.ngrok-key-status != "" ? "Saved (" + App.ngrok-key-status + "). Type to replace." : "2abc…"; }
+                            Field { label: "Only let in this Google account (optional)"; placeholder: "you@gmail.com"; text <=> App.web-google-email;
+                                    hint: "ngrok asks visitors to sign in with Google first. Needs an ngrok plan that includes OAuth."; }
+                            HorizontalLayout { alignment: start; LinkButton { text: "Get an ngrok authtoken"; clicked => { App.open-url("https://dashboard.ngrok.com/get-started/your-authtoken"); } } }
+                        }
+                    }
+                }
+                if App.web-on || App.web-remote-on : Card {
+                    width: 300px;
+                    height: qr.preferred-height;
+                    qr := VerticalLayout { padding: 24px; spacing: 10px;
+                        SectionTitle { text: "Open it"; font-size: Theme.fs-md; }
+                        Rectangle { height: 220px; background: white; border-radius: Theme.r-control;
+                            Image { source: App.web-qr; width: 200px; height: 200px; image-rendering: pixelated; } }
+                        Text { text: "Scan with your phone's camera, or type:"; font-family: Theme.body; font-size: 12px; color: Theme.muted; }
+                        Text { text: App.web-remote-on && App.web-remote-url != "" ? App.web-remote-url : App.web-local-url; wrap: word-wrap;
+                               font-family: Theme.body; font-size: Theme.fs-sm; font-weight: 700; color: Theme.ink; }
+                        Rectangle { height: 1px; background: Theme.line; }
+                        Text { text: "Passcode"; font-family: Theme.body; font-size: 12px; color: Theme.muted; }
+                        Text { text: App.web-pin; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xl; color: Theme.ink; letter-spacing: 2px; }
+                        Text { text: App.web-pin-age; wrap: word-wrap; font-family: Theme.body; font-size: 12px; color: Theme.faint; }
+                        HorizontalLayout { spacing: 8px; alignment: start;
+                            ActionButton { text: "New passcode"; small: true; clicked => { App.web-new-pin(); } }
+                            ActionButton { text: "Open here"; small: true; clicked => { App.web-open-here(); } } }
+                    }
+                }
+            }
+            if root.tab == 3 : VerticalLayout { spacing: 16px;
+            Card {
+                height: fl.preferred-height;
+                fl := VerticalLayout { padding: 24px; spacing: 10px;
+                    SectionTitle { text: "Your files"; }
+                    Text { text: "Your resumes (in the Resumes folder) and the app's data are kept here. Copy this folder to back everything up.";
+                           wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; }
+                    Text { text: App.data-dir; wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; font-weight: 700; color: Theme.ink; }
+                    HorizontalLayout { spacing: 10px; alignment: start;
+                        ActionButton { text: "Show in Finder"; small: true; clicked => { App.show-data-folder(); } }
+                        ActionButton { text: "Move to another folder…"; small: true; clicked => { App.move-data-folder(); } } } }
+            }
+            Card {
+                height: ap.preferred-height;
+                ap := VerticalLayout { padding: 24px; spacing: 10px;
+                    SectionTitle { text: "Appearance"; }
+                    HorizontalLayout { spacing: 16px; alignment: start;
+                        Select { width: 220px; model: ["System", "Light", "Dark"]; by-value: true; value: App.appearance;
+                                 selected(v) => { App.set-appearance(v); } } } }
+            }
+            Card {
+                height: ix.preferred-height;
+                ix := VerticalLayout { padding: 24px; spacing: 10px;
+                    SectionTitle { text: "Your documents"; }
+                    Text { text: "So the assistant can find the right part of your CV, documents and saved answers for each question. Everything stays on this computer.";
+                           wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; }
+                    HorizontalLayout { alignment: start; ActionButton { text: "Re-read everything"; clicked => { App.reindex(); } } } }
+            }
+            }
+        }
+    }
+}

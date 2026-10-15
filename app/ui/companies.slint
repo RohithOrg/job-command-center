@@ -1,0 +1,115 @@
+// Companies: the career sites the scanner watches, and what each scan found.
+import { ListView, ScrollView } from "std-widgets.slint";
+import { Theme, Monogram } from "theme.slint";
+import { App, CompanyRow, PostingRow } from "state.slint";
+import { ActionButton, LinkButton, SearchField, Toggle, SectionTitle, Card, Chip, Pager } from "widgets.slint";
+import { ScanBar } from "discover.slint";
+
+component Star inherits Rectangle {
+    in property <bool> on;
+    callback clicked;
+    width: 28px; height: 28px; border-radius: 14px;
+    background: touch.has-hover ? Theme.selected : transparent;
+    Text { text: root.on ? "★" : "☆"; font-size: 18px; color: root.on ? Theme.marigold : Theme.faint;
+           horizontal-alignment: center; vertical-alignment: center; }
+    touch := TouchArea { clicked => { root.clicked(); } mouse-cursor: pointer; }
+    accessible-role: checkbox;
+    accessible-checked: root.on;
+    accessible-label: "Favourite";
+}
+
+component CompanyItem inherits Rectangle {
+    in property <CompanyRow> c;
+    in property <bool> selected;
+    height: 60px;
+    border-radius: Theme.r-control;
+    background: selected ? Theme.surface : touch.has-hover ? Theme.surface.with-alpha(0.6) : transparent;
+    border-width: selected ? 1px : 0px; border-color: Theme.line;
+    touch := TouchArea { clicked => { App.select-company(c.id); } mouse-cursor: pointer; }
+    HorizontalLayout {
+        padding-left: 10px; padding-right: 8px; spacing: 10px;
+        Monogram { initial: c.initial; hue-seed: c.hue; size: 32px; y: (parent.height - 32px) / 2; }
+        VerticalLayout { alignment: center; spacing: 2px; horizontal-stretch: 1;
+            Text { text: c.name; font-family: Theme.body; font-size: Theme.fs-sm; font-weight: 700; color: Theme.ink; overflow: elide; }
+            Text { text: c.last-scan == "" ? "Never scanned" : c.matched + " match" + (c.matched == 1 ? "" : "es") + " of " + c.found + ", " + c.last-scan;
+                   font-family: Theme.body; font-size: 12px; color: c.status == "error" ? Theme.risk : Theme.muted; overflow: elide; } }
+        VerticalLayout { alignment: center; Star { on: c.favorite; clicked => { App.toggle-favorite(c.id); } } }
+    }
+}
+
+component PostingItem inherits Rectangle {
+    in property <PostingRow> p;
+    height: row.preferred-height;
+    row := HorizontalLayout {
+        padding-top: 10px; padding-bottom: 10px; padding-right: 16px; spacing: 12px;
+        Text { width: 18px; text: p.matched ? "✓" : "–"; font-family: Theme.body; font-weight: 700; font-size: Theme.fs-sm; color: p.matched ? Theme.good : Theme.faint; }
+        VerticalLayout { horizontal-stretch: 1; spacing: 2px;
+            Text { text: p.title; font-family: Theme.body; font-size: Theme.fs-sm; font-weight: 700; color: p.matched ? Theme.ink : Theme.muted; wrap: word-wrap; }
+            Text { text: p.location + (p.matched ? "" : ". " + p.reason); font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.faint; wrap: word-wrap; } }
+        if p.url != "" : VerticalLayout { alignment: center; LinkButton { text: "View"; clicked => { App.open-url(p.url); } } }
+    }
+    Rectangle { y: parent.height - 1px; height: 1px; background: Theme.line; }
+}
+
+export component CompaniesPage inherits Rectangle {
+    in-out property <string> new-name;
+    in-out property <string> new-url;
+    property <CompanyRow> sel: App.open-company >= 0 && App.open-company < App.companies.length ? App.companies[App.open-company] : { id: -1 };
+    background: Theme.paper;
+    HorizontalLayout {
+        Rectangle {
+            width: 360px; background: Theme.sunken;
+            VerticalLayout {
+                padding: 24px; padding-bottom: 12px; spacing: 12px;
+                Text { text: "Companies"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xl; color: Theme.ink; }
+                Toggle { text: "Favourites only"; checked: App.favorites-only; toggled(v) => { App.set-favorites-only(v); } }
+                Text { text: App.companies.length + " companies"; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; }
+                ListView { vertical-stretch: 1;
+                    for c[i] in App.companies : CompanyItem { c: c; selected: i == App.open-company; } }
+                Card {
+                    height: add.preferred-height;
+                    add := VerticalLayout { padding: 14px; spacing: 8px;
+                        Text { text: "Add a company"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
+                        SearchField { placeholder: "Name"; text <=> root.new-name; }
+                        SearchField { placeholder: "Careers page URL"; text <=> root.new-url; }
+                        ActionButton { text: "Add and scan"; small: true; primary: true; enabled: root.new-name != "" && root.new-url != "";
+                            clicked => { App.add-company(root.new-name, root.new-url); root.new-name = ""; root.new-url = ""; } } }
+                }
+            }
+        }
+        Rectangle {
+            horizontal-stretch: 1;
+            if root.sel.id < 0 : VerticalLayout { alignment: center; spacing: 8px;
+                Text { text: "Choose a company"; horizontal-alignment: center; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xl; color: Theme.ink; }
+                Text { text: "See when it was last scanned, every open role, and why each one did or didn't match.";
+                       horizontal-alignment: center; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
+            if root.sel.id >= 0 : VerticalLayout {
+                padding: 32px; padding-bottom: 0; spacing: 14px;
+                HorizontalLayout {
+                    spacing: 14px;
+                    Monogram { initial: root.sel.initial; hue-seed: root.sel.hue; size: 52px; }
+                    VerticalLayout { horizontal-stretch: 1; min-width: 120px; alignment: center; spacing: 2px;
+                        Text { text: root.sel.name; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xl; color: Theme.ink; overflow: elide; }
+                        HorizontalLayout { alignment: start; LinkButton { text: root.sel.url; clicked => { App.open-url(root.sel.url); } } } }
+                    VerticalLayout { alignment: center;
+                        HorizontalLayout { spacing: 8px;
+                            ActionButton { text: "Remove"; small: true; danger: true; clicked => { App.delete-company(root.sel.id); } }
+                            ActionButton { text: "Scan now"; small: true; primary: true; enabled: !App.scanning; clicked => { App.scan(root.sel.id); } } } }
+                }
+                ScanBar { }
+                HorizontalLayout { spacing: 28px; alignment: start;
+                    VerticalLayout { Text { text: root.sel.found; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xl; color: Theme.ink; }
+                                     Text { text: "open roles"; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; } }
+                    VerticalLayout { Text { text: root.sel.matched; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xl; color: Theme.good; }
+                                     Text { text: "match your places and roles"; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; } }
+                    VerticalLayout { Text { text: root.sel.last-scan == "" ? "–" : root.sel.last-scan; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xl; color: Theme.ink; }
+                                     Text { text: "last scan"; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; } }
+                }
+                if root.sel.status != "" : Text { text: root.sel.status; wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-xs;
+                                                  color: root.sel.status == "error" || root.sel.status-failed ? Theme.risk : Theme.muted; }
+                ListView { vertical-stretch: 1; for p in App.postings : PostingItem { p: p; } }
+                Pager { page: App.postings-page; pages: App.postings-pages; go(p) => { App.go-page("postings", p); } }
+            }
+        }
+    }
+}

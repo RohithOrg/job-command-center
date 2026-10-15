@@ -1,0 +1,10 @@
+# Only the desktop app and its CI go in the repository.
+# Never commit personal data: data/, .env, databases, generated resumes.
+/*
+!/app/
+!/.github/
+!/README.md
+!/.gitignore
+*.db
+*.db-*
+.env

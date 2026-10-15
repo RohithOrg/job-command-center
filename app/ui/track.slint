@@ -1,0 +1,96 @@
+// The application track drawn as a metro line: Found → Fit checked → Tailored → Applied → Interview → Offer.
+// Each leg takes its destination station's line colour once travelled; the current station glows
+// marigold. A closed application (rejected / discarded) ends with a risk-coloured stop.
+import { Theme, Stages } from "theme.slint";
+
+export component Track inherits Rectangle {
+    in property <int> position;      // 0..5
+    in property <bool> ended;
+    in property <string> ended-label: "Closed";
+    in property <bool> on-dark: false;   // drawn on a coloured ticket band
+    height: 70px;
+    property <length> pad: 14px;
+    property <length> step: (self.width - 2 * pad) / 5;
+    property <length> cy: 16px;
+
+    for i in 5 : Rectangle {        // legs
+        x: root.pad + root.step * i;
+        y: root.cy - 3px;
+        width: root.step;
+        height: 6px;
+        border-radius: 3px;
+        background: i < root.position
+            ? (root.ended ? Theme.faint : Theme.stage-colors[i + 1])
+            : (root.on-dark ? #ffffff30 : Theme.line);
+    }
+
+    for name[i] in Stages.names : Rectangle {
+        property <bool> done: i < root.position;
+        property <bool> current: i == root.position;
+        property <color> c: root.ended && current ? Theme.risk : Theme.stage-colors[i];
+        x: root.pad + root.step * i - 20px;
+        y: 0;
+        width: 40px;
+        height: root.height;
+
+        if current && !root.ended : Rectangle {        // glow
+            width: 34px; height: 34px; x: 3px; y: root.cy - 17px; border-radius: 17px;
+            background: Theme.marigold.with-alpha(0.28);
+        }
+        Rectangle {                                     // station
+            width: current ? 22px : 14px;
+            height: self.width;
+            x: (parent.width - self.width) / 2;
+            y: root.cy - self.height / 2;
+            border-radius: self.width / 2;
+            background: current ? (root.ended ? Theme.risk : Theme.marigold) : done ? Theme.surface : (root.on-dark ? #0F3A3E : Theme.surface);
+            border-width: current ? 0px : 3px;
+            border-color: done ? (root.ended ? Theme.faint : parent.c) : (root.on-dark ? #ffffff40 : Theme.line);
+        }
+        if current && root.ended : Text {
+            text: "×"; font-size: 15px; font-weight: 700; color: white;
+            x: (parent.width - self.width) / 2; y: root.cy - self.height / 2;
+        }
+        Text {
+            y: root.cy + 18px;
+            width: 96px;
+            x: (parent.width - self.width) / 2;
+            horizontal-alignment: center;
+            text: current && root.ended ? root.ended-label : name;
+            font-family: Theme.body;
+            font-size: Theme.fs-xs;
+            font-weight: current ? 700 : 500;
+            color: root.on-dark ? (current ? #ffffff : done ? #ffffffc0 : #ffffff70)
+                 : current ? (root.ended ? Theme.risk : Theme.ink) : done ? Theme.muted : Theme.faint;
+        }
+    }
+    accessible-role: text;
+    accessible-label: root.ended ? "Stage: " + root.ended-label : "Stage: " + Stages.names[root.position];
+}
+
+// Compact line for list rows.
+export component CompactTrack inherits Rectangle {
+    in property <int> position;
+    in property <bool> ended;
+    width: 92px;
+    height: 14px;
+    property <length> step: (self.width - 10px) / 5;
+    for i in 5 : Rectangle {
+        x: 5px + root.step * i; y: 5px; width: root.step; height: 4px; border-radius: 2px;
+        background: i < root.position ? (root.ended ? Theme.faint : Theme.stage-colors[i + 1]) : Theme.line;
+    }
+    for i in 6 : Rectangle {
+        property <bool> done: i < root.position;
+        property <bool> current: i == root.position;
+        width: current ? 12px : 8px;
+        height: self.width;
+        x: 5px + root.step * i - self.width / 2;
+        y: (root.height - self.height) / 2;
+        border-radius: self.width / 2;
+        background: current ? (root.ended ? Theme.risk : Theme.marigold) : Theme.surface;
+        border-width: current ? 0px : 2px;
+        border-color: done ? (root.ended ? Theme.faint : Theme.stage-colors[i]) : Theme.line;
+    }
+    accessible-role: text;
+    accessible-label: root.ended ? "Stage: closed" : "Stage: " + Stages.names[root.position];
+}

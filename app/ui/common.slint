@@ -1,0 +1,32 @@
+import { Theme } from "theme.slint";
+
+export component FitScore inherits HorizontalLayout {
+    in property <string> value;
+    spacing: 2px;
+    alignment: end;
+    Text { text: value == "" ? "–" : value; font-family: Theme.display; font-size: Theme.fs-md; font-weight: 700;
+           color: value == "" ? Theme.faint : value.to-float() >= 4.0 ? Theme.good : value.to-float() >= 3.5 ? Theme.marigold-ink : Theme.risk; }
+    if value != "" : Text { text: "/5"; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.faint; vertical-alignment: bottom; }
+}
+
+export component AtsScore inherits HorizontalLayout {
+    in property <string> value;
+    spacing: 2px;
+    alignment: end;
+    Text { text: value == "" ? "–" : value; font-family: Theme.display; font-size: Theme.fs-md; font-weight: 700;
+           color: value == "" ? Theme.faint : value.to-float() >= 85 ? Theme.good : value.to-float() >= 70 ? Theme.marigold-ink : Theme.risk; }
+    if value != "" : Text { text: "ATS"; font-family: Theme.body; font-size: 11px; color: Theme.faint; vertical-alignment: bottom; }
+}
+
+export component BoardFlag inherits Rectangle {
+    in property <string> state;   // Boarding | Delayed | Working | Stopped
+    property <color> fg: state == "Delayed" || state == "Stopped" ? Theme.risk : state == "Boarding" ? Theme.marigold-ink : Theme.accent;
+    property <color> bg: state == "Delayed" || state == "Stopped" ? Theme.risk-soft : state == "Boarding" ? Theme.marigold-soft : Theme.accent-soft;
+    visible: state != "";
+    height: 26px;
+    width: t.preferred-width + 20px;
+    border-radius: 13px;
+    background: bg;
+    t := Text { text: root.state; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: root.fg;
+                horizontal-alignment: center; vertical-alignment: center; }
+}

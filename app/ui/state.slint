@@ -1,0 +1,292 @@
+// Everything the window shows, and everything it can ask the app to do.
+// Rust fills the properties and handles the callbacks (see src/ui.rs).
+
+export struct JobRow {
+    id: int, title: string, company: string, location: string, initial: string, hue: int,
+    status: string, fit: string, ats: string, position: int, ended: bool,
+    next-step: string, when: string, board: string, reason: string, has-pdf: bool,
+    working: bool, stage-label: string, updated: string, selected: bool,
+}
+
+export struct JobDetail {
+    id: int, title: string, company: string, location: string, initial: string, hue: int, url: string,
+    status: string, status-index: int, position: int, ended: bool,
+    fit: string, recommendation: string, fit-summary: string, archetype: string, work-auth: string,
+    strengths: [string], gaps: [string], red-flags: [string],
+    ats: string, job-summary: string, salary: string, remote: string, seniority: string,
+    next-step: string, next-step-date: string, applied: string, notes: string,
+    has-pdf: bool, has-resume: bool, has-jd: bool, cover-letter: string,
+    working: bool, stage-label: string, error: string, duplicate-note: string, profile-name: string,
+}
+
+export struct VersionRow {
+    id: int, label: string, kind: string, note: string, ats: int, has-ats: bool,
+    template-name: string, created: string, current: bool,
+}
+
+export struct CheckRow { name: string, ok: bool, detail: string }
+
+export struct VersionDetail {
+    id: int, label: string, note: string, model: string, created: string,
+    ats: int, coverage: int, structure: int, pages: int, template: string, template-name: string,
+    pdf: string, current: bool,
+    matched: [string], missing: [string], gaps: [string], unsupported: [string], checks: [CheckRow], changes: [string],
+}
+
+// One ATS round of the latest tailoring run (drawn as a card while agents work).
+export struct RoundRow { round: int, score: int, coverage: int, pages: int, missing: string, issues: string, state: string }
+
+export struct WorkLine { agent: string, level: string, message: string, time: string }
+
+export struct ChatRow { id: int, role: string, content: string, meta: string, saved: bool }
+
+export struct TemplateRow { id: string, name: string, description: string }
+
+export struct EventRow { time: string, text: string }
+
+export struct ProfileRow { id: int, name: string, active: bool }
+
+export struct ProfileForm {
+    id: int, name: string,
+    // about you
+    full-name: string, headline: string, email: string, phone: string, city: string, country: string,
+    linkedin: string, github: string, website: string, other-link: string,
+    // what you want
+    target-roles: [string], seniority: string, work-mode: string,
+    countries: [string], cities: [string], relocate: bool, avoid-places: [string], exclude-words: [string],
+    salary-target: string, salary-minimum: string, currency: string,
+    // work and visa
+    authorized-in: [string], needs-sponsorship: bool, visa-notes: string, notice: string, languages: [string],
+    // for the AI
+    story: string, strengths: [string], avoid: string, tone: string, notes-md: string,
+    // cv + design
+    cv-md: string, template: string,
+}
+
+export struct DocRow { id: int, kind: string, title: string, preview: string, chunks: int, updated: string }
+
+export struct ProviderRow { id: string, label: string, needs-key: bool, base-url: string, key-hint: string, key-url: string, default-model: string }
+
+export struct AiForm {
+    provider-index: int, base-url: string, models: string, key-status: string, new-key: string, search: int,
+}
+
+// Settings > Job search: only the automation. What to search for lives in the profile.
+export struct SearchForm { auto: bool, limit: string, interval: string }
+
+// One line of the first-launch "Setting up" screen.
+export struct SetupStep { title: string, detail: string, state: string }   // waiting | working | done | failed
+
+export struct CompanyRow {
+    id: int, name: string, url: string, initial: string, hue: int, favorite: bool,
+    last-scan: string, status: string, status-failed: bool, found: int, matched: int,
+}
+
+export struct PostingRow { title: string, location: string, url: string, matched: bool, reason: string }
+
+export struct DiscoverRow {
+    id: int, title: string, company: string, location: string, country: string, url: string,
+    initial: string, hue: int, seen: string, state: string, job-id: int,
+}
+
+export global App {
+    // shell
+    in-out property <string> appearance: "System";   // System | Light | Dark
+    in property <string> data-dir;
+    callback show-data-folder();
+    // phone and web access (served by the app itself)
+    in-out property <int> settings-tab;
+    in property <bool> web-on;
+    in property <bool> web-remote-on;
+    in property <bool> web-busy;
+    in property <string> web-local-url;
+    in property <string> web-remote-url;
+    in property <string> web-pin;
+    in property <string> web-pin-age;
+    in property <image> web-qr;
+    in property <string> web-status;
+    in property <string> ngrok-key-status;
+    in-out property <string> ngrok-new-key;
+    in-out property <string> web-google-email;
+    callback web-toggle(bool);
+    callback web-remote-toggle(bool);
+    callback web-new-pin();
+    callback web-open-here();
+    callback move-data-folder();
+    callback set-appearance(string);
+    in property <string> user-first-name;
+    in property <string> date-line;
+    in property <string> status-line;
+    in property <string> toast;
+    in-out property <int> page: 0;            // 0 Today, 1 Applications, 2 Discover, 3 Companies, 4 Profile, 5 Settings
+    in property <bool> ai-connected;
+
+    // lists
+    in property <[JobRow]> today;
+    in property <[JobRow]> jobs;
+    in property <int> working-count;
+
+    // one application, full page
+    in-out property <int> open-job: -1;
+    in-out property <int> job-tab: 0;          // 0 Overview, 1 Resume, 2 Cover letter, 3 Q&A, 4 Activity
+    in property <JobDetail> job;
+    in property <[VersionRow]> versions;
+    in property <VersionDetail> version;
+    in property <[RoundRow]> rounds;
+    in property <[WorkLine]> work;
+    in property <[EventRow]> events;
+    in property <[ChatRow]> chat;
+    in property <bool> chat-busy;
+    in property <[TemplateRow]> templates;
+    // live preview of the selected version: real page images from the same engine that writes the PDF
+    in property <[image]> preview-pages;
+    in property <[image]> design-thumbs;            // page 1 of this version in each design, same order as templates
+    in-out property <string> preview-template;
+    in property <bool> preview-busy;
+    callback preview-design(string);
+    // full-window viewer
+    in-out property <bool> viewer-open;
+    in-out property <float> viewer-zoom: 1.0;
+    in property <[image]> viewer-pages;
+    callback open-viewer();
+    in property <[string]> statuses: ["New", "Evaluated", "Ready", "Applied", "Interview", "Offer", "Rejected", "Discarded", "Closed"];
+    // closing applications (kept in history): one (closing-job) or every selected one (closing-many)
+    in-out property <bool> closing;
+    in-out property <int> closing-job: -1;
+    in-out property <bool> closing-many;
+    in property <int> selected-count;
+    callback toggle-select(int);
+    callback clear-selection();
+    callback close-selected(string, string);           // reason, note
+    in property <[string]> close-reasons: ["I'm not interested", "The posting closed", "They turned me down", "I withdrew", "I took another offer", "Other"];
+    callback close-application(int, string, string);   // job, reason, note
+    callback reopen-application(int);
+
+    // new application dialog
+    in-out property <bool> adding: false;
+    in-out property <string> duplicate-note;     // set when the link matches an earlier application
+    in-out property <int> duplicate-job: -1;
+    callback add-anyway();
+    // pagination (0-based pages)
+    in property <int> jobs-page;
+    in property <int> jobs-pages;
+    in property <int> jobs-total;
+    in property <int> discover-page;
+    in property <int> discover-pages;
+    in property <int> discover-total;
+    in property <int> postings-page;
+    in property <int> postings-pages;
+    callback go-page(string, int);                // list name, page
+
+    // profile
+    in property <[ProfileRow]> profiles;
+    in property <[string]> profile-names;
+    in property <int> active-profile-index;
+    in-out property <ProfileForm> profile;
+    in property <[DocRow]> library;
+    in property <[DocRow]> answers;
+    in property <bool> profile-busy;
+
+    // settings
+    in property <[ProviderRow]> providers;
+    in-out property <AiForm> ai;
+    in property <[string]> model-options;
+    in property <[string]> provider-labels;
+    in property <string> ai-status;
+    in property <bool> ai-ok;
+    in property <bool> ai-busy;
+    in property <string> index-status;
+    in-out property <SearchForm> search;
+
+    // discover + companies
+    in property <[DiscoverRow]> discovered;
+    in property <[string]> countries;
+    in property <[CompanyRow]> companies;
+    in property <[PostingRow]> postings;
+    in-out property <int> open-company: -1;
+    in property <bool> scanning;
+    in property <float> scan-progress;
+    in property <string> scan-line;
+    in property <bool> favorites-only;
+
+    // first launch
+    in-out property <int> setup-stage: -1;        // -1 hidden, 0 setting up, 1 AI, 2 CV, 3 search, 4 companies
+    in property <[SetupStep]> setup-steps;
+    in property <float> setup-progress;
+    in property <bool> setup-ready;
+    in property <[CompanyRow]> setup-companies;
+    in property <string> index-line;
+    callback finish-setup();
+    callback setup-connect-ai();              // save + test the AI; moves to the next step only if it answers
+    in property <string> ai-problem;          // why the saved AI isn't working right now ("" when fine)
+
+    // navigation
+    callback go(int);
+    callback open-job-page(int);
+    callback close-job();
+
+    // applications
+    callback filter-changed(string, string);
+    callback add-application(string, string, int);  // url, pasted text, profile id
+    callback open-url(string);
+    callback open-file(string);
+    callback show-file(string);
+    callback copy(string);
+    callback set-status(int, string);
+    callback save-progress(int, string, string, string);   // id, next step, date, notes
+    callback delete-job(int);
+    callback rerun(int);
+    callback tailor(int);
+    callback revise(int, string);
+    callback restyle(int, int, string);       // job, version, template
+    callback make-current(int, int);
+    callback select-version(int);
+    callback revise-cover(int, string);
+    callback save-cover(int, string);
+    callback ask(int, string);
+    callback toggle-saved(int);
+
+    // profile
+    callback select-profile(int);
+    callback new-profile();
+    callback duplicate-profile();
+    callback delete-profile();
+    callback activate-profile();
+    callback save-profile();
+    callback import-cv();
+    callback add-document(string, string);
+    callback import-document();
+    callback delete-document(int);
+    in-out property <int> profile-tab: 0;
+    // chip pickers: `field` names the list (e.g. "countries"); Rust keeps the lists and suggestions
+    in property <string> suggest-field;
+    in property <[string]> suggestions;
+    callback chip-add(string, string);
+    callback chip-remove(string, int);
+    callback chip-typed(string, string);
+    in property <[string]> country-options;
+    in property <[string]> currency-options: ["EUR", "USD", "GBP", "CHF", "INR", "CAD", "AUD", "SEK", "DKK", "NOK", "PLN", "SGD", "AED", "JPY"];
+    in property <[string]> seniority-options: ["Any level", "Entry level", "Mid level", "Senior", "Staff / Principal", "Lead / Manager", "Director and above"];
+    in property <[string]> work-mode-options: ["Any", "Remote", "Hybrid", "On-site"];
+    in property <[string]> notice-options: ["Can start now", "1 week", "2 weeks", "1 month", "2 months", "3 months", "More than 3 months"];
+    in property <[string]> tone-options: ["Professional", "Warm", "Direct", "Enthusiastic"];
+
+    // settings
+    callback provider-changed(int);
+    callback load-models();
+    callback test-ai();
+    callback save-ai();
+    callback reindex();
+    callback save-search();
+
+    // discover + companies
+    callback discover-filter(string, string, string);    // search, country, state
+    callback queue-discovered(int);
+    callback dismiss-discovered(int);
+    callback scan(int);                      // company id, or -1 for all favourites
+    callback select-company(int);
+    callback toggle-favorite(int);
+    callback add-company(string, string);
+    callback delete-company(int);
+    callback set-favorites-only(bool);
+}

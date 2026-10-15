@@ -1,0 +1,1774 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F3A3E" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B2629" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#0F3A3E">
+<meta name="color-scheme" content="light dark">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Job Command Center">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icon.png">
+<link rel="apple-touch-icon" href="/icon.png">
+<title>Job Command Center</title>
+<style>
+@font-face { font-family: "Bricolage Grotesque"; src: url("/fonts/BricolageGrotesque.ttf") format("truetype"); font-weight: 200 800; font-display: swap; }
+@font-face { font-family: "Atkinson Hyperlegible Next"; src: url("/fonts/AtkinsonHyperlegibleNext.ttf") format("truetype"); font-weight: 200 800; font-display: swap; }
+
+/* ---------- tokens (mirror app/ui/theme.slint) ---------- */
+:root {
+  --rail: #0F3A3E; --rail-ink: #E8F1EF; --rail-muted: #8FB3AE; --rail-active: #1A5257;
+  --paper: #EEF2F0; --surface: #FFFFFF; --sunken: #E4EAE7;
+  --ink: #0F2A2E; --muted: #55706F; --faint: #8EA3A1; --line: #D3DDDA;
+  --accent: #0F7A66; --accent-soft: #D7EEE8; --selected: #E2EEEA; --on-accent: #FFFFFF;
+  --marigold: #E3A83B; --marigold-soft: #FCEFD3; --marigold-ink: #8A5A0B;
+  --risk: #B4413C; --risk-soft: #F8E1DE; --good: #1F8F63; --good-soft: #DCF0E6;
+  --shadow: 0 1px 2px rgba(15,42,46,.06), 0 4px 16px rgba(15,42,46,.06);
+  --shadow-up: 0 -1px 0 var(--line), 0 -6px 24px rgba(15,42,46,.06);
+  --display: "Bricolage Grotesque", ui-rounded, system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r-ticket: 16px; --r-panel: 12px; --r-control: 8px;
+  --tabbar: 64px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --rail: #0B2629; --rail-active: #154347;
+    --paper: #111B1C; --surface: #182425; --sunken: #142021;
+    --ink: #E7EFED; --muted: #93A8A5; --faint: #637A78; --line: #263738;
+    --accent: #4FC1A6; --accent-soft: #173A35; --selected: #1F3233; --on-accent: #0B2629;
+    --marigold-soft: #3A2E14; --marigold-ink: #F2C66E;
+    --risk: #F08A80; --risk-soft: #3A1F1D; --good: #5ED39E; --good-soft: #163327;
+    --shadow: 0 1px 2px rgba(0,0,0,.3);
+    --shadow-up: 0 -1px 0 var(--line);
+    color-scheme: dark;
+  }
+}
+
+/* ---------- base ---------- */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.45 var(--body); -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+h1, h2, h3 { font-family: var(--display); margin: 0; letter-spacing: -0.01em; }
+p { margin: 0; }
+a { color: var(--accent); }
+button, input, select, textarea { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ico { display: inline-flex; width: 22px; height: 22px; flex: none; }
+.ico svg { width: 100%; height: 100%; }
+
+/* ---------- buttons & fields ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: var(--r-control);
+       border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 700; font-size: 15px; cursor: pointer; text-decoration: none; white-space: nowrap; }
+.btn:hover { background: var(--selected); }
+.btn:active { transform: translateY(1px); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover { filter: brightness(1.06); }
+.btn.danger { background: var(--risk); border-color: var(--risk); color: #fff; }
+@media (prefers-color-scheme: dark) { .btn.danger { color: #2a0f0d; } }
+.btn.ghost { background: transparent; border-color: transparent; color: var(--accent); padding: 0 10px; }
+.btn.ghost:hover { background: var(--accent-soft); }
+.btn.small { min-height: 36px; padding: 0 12px; font-size: 14px; }
+.btn.block { width: 100%; }
+.btn[disabled], .btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; transform: none; filter: none; }
+.btn .ico { width: 18px; height: 18px; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field > span { font-size: 14px; font-weight: 700; color: var(--muted); }
+.input, .select, .textarea { width: 100%; min-height: 46px; padding: 10px 12px; border-radius: var(--r-control); border: 1px solid var(--line);
+       background: var(--surface); font-size: 16px; color: var(--ink); }
+.textarea { min-height: 96px; resize: vertical; line-height: 1.45; }
+.input:focus, .select:focus, .textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.select { appearance: none; -webkit-appearance: none; padding-right: 36px; cursor: pointer;
+          background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+          background-position: calc(100% - 18px) 52%, calc(100% - 13px) 52%; background-size: 5px 5px; background-repeat: no-repeat; }
+.hint { font-size: 14px; color: var(--muted); }
+
+/* ---------- PIN screen ---------- */
+#login { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: calc(24px + env(safe-area-inset-top, 0px)) calc(16px + env(safe-area-inset-right, 0px)) calc(24px + var(--safe-b)) calc(16px + env(safe-area-inset-left, 0px));
+         background: radial-gradient(120% 70% at 50% 0%, #1A5257 0%, var(--rail) 60%); color: var(--rail-ink); }
+.login-card { width: 100%; max-width: 380px; display: grid; gap: 22px; justify-items: center; text-align: center; }
+.login-card img { width: 72px; height: 72px; border-radius: 18px; box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+.login-card h1 { font-size: 30px; font-weight: 800; }
+.login-card .lead { color: var(--rail-muted); font-size: 16px; max-width: 30ch; }
+.pin { display: grid; gap: 8px; width: 100%; max-width: 336px; text-align: left; }
+.pin label { font-weight: 700; color: var(--rail-ink); font-size: 15px; }
+.pin input { width: 100%; height: 60px; border-radius: 12px; background: rgba(255,255,255,.08); border: 2px solid rgba(255,255,255,.2); color: #fff;
+             font: 700 26px var(--display); letter-spacing: .08em; text-align: center; padding: 0 12px; }
+.pin input::placeholder { color: rgba(255,255,255,.28); }
+.pin input:focus { outline: none; border-color: var(--marigold); box-shadow: 0 0 0 4px rgba(227,168,59,.25); }
+.pin p { color: var(--rail-muted); font-size: 14px; text-align: center; }
+.pin.shake { animation: shake .35s; }
+@keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+.login-error { min-height: 24px; color: #FFB4AB; font-weight: 700; }
+.login-card .btn.primary { background: var(--marigold); border-color: var(--marigold); color: #2B1D02; width: 100%; max-width: 336px; min-height: 52px; font-size: 17px; }
+.login-foot { color: var(--rail-muted); font-size: 14px; }
+
+/* ---------- shell ---------- */
+#app { min-height: 100vh; }
+.rail { display: none; }
+.topbar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 10px; padding: calc(8px + env(safe-area-inset-top, 0px)) calc(8px + env(safe-area-inset-right, 0px)) 8px calc(16px + env(safe-area-inset-left, 0px));
+          background: var(--rail); color: var(--rail-ink); min-height: 56px; }
+.topbar img { width: 28px; height: 28px; border-radius: 8px; }
+.topbar .brand { font: 700 18px var(--display); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 420px) { .topbar:has(.working-pill) .brand { visibility: hidden; } }
+.icon-btn { width: 44px; height: 44px; display: inline-grid; place-items: center; border: 0; border-radius: 10px; background: transparent; color: inherit; cursor: pointer; }
+.icon-btn:hover { background: rgba(127,127,127,.15); }
+.working-pill { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px 4px 8px; border-radius: 999px; background: rgba(255,255,255,.12); font-size: 13px; font-weight: 700; white-space: nowrap; }
+main { padding: 16px calc(16px + env(safe-area-inset-right, 0px)) calc(var(--tabbar) + 96px + var(--safe-b)) calc(16px + env(safe-area-inset-left, 0px)); max-width: 1120px; margin: 0 auto; }
+.tabbar { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; height: calc(var(--tabbar) + var(--safe-b)); padding: 0 env(safe-area-inset-right, 0px) var(--safe-b) env(safe-area-inset-left, 0px);
+          display: grid; grid-template-columns: repeat(4, 1fr); background: var(--surface); box-shadow: var(--shadow-up); }
+.tabbar a { display: grid; justify-items: center; align-content: center; gap: 3px; color: var(--muted); text-decoration: none; font-size: 12.5px; font-weight: 700; position: relative; }
+.tabbar a .ico { width: 24px; height: 24px; }
+.tabbar a[aria-current="page"] { color: var(--accent); }
+.tabbar a[aria-current="page"]::before { content: ""; position: absolute; top: 0; left: 30%; right: 30%; height: 3px; border-radius: 0 0 3px 3px; background: var(--accent); }
+.badge { position: absolute; top: 5px; left: calc(50% + 9px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; box-shadow: 0 0 0 2px var(--surface); background: var(--marigold); color: #2B1D02; font-size: 12px; font-weight: 800; display: grid; place-items: center; }
+.fab { position: fixed; z-index: 31; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(var(--tabbar) + 16px + var(--safe-b)); width: 60px; height: 60px; border-radius: 20px; border: 0;
+       background: var(--accent); color: var(--on-accent); box-shadow: 0 6px 20px rgba(15,58,62,.35); display: grid; place-items: center; cursor: pointer; }
+.fab .ico { width: 30px; height: 30px; }
+.fab:active { transform: scale(.96); }
+
+@media (min-width: 900px) {
+  #app { display: grid; grid-template-columns: 236px 1fr; }
+  .topbar, .tabbar, .fab { display: none; }
+  .rail { display: flex; flex-direction: column; gap: 4px; position: sticky; top: 0; height: 100vh; padding: 20px 14px; background: var(--rail); color: var(--rail-ink); }
+  .rail .brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 20px; font: 800 18px/1.15 var(--display); }
+  .rail .brand img { width: 36px; height: 36px; border-radius: 10px; }
+  .rail nav { display: grid; gap: 4px; }
+  .rail nav a { display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 12px; border-radius: 10px; color: var(--rail-muted); text-decoration: none; font-weight: 700; }
+  .rail nav a:hover { background: rgba(255,255,255,.06); color: var(--rail-ink); }
+  .rail nav a[aria-current="page"] { background: var(--rail-active); color: var(--rail-ink); }
+  .rail nav a .count { margin-left: auto; background: var(--marigold); color: #2B1D02; border-radius: 10px; font-size: 12px; padding: 1px 8px; font-weight: 800; }
+  .rail .add { margin: 16px 0 8px; background: var(--marigold); border-color: var(--marigold); color: #2B1D02; }
+  .rail .spacer { flex: 1; }
+  .rail .working-pill { align-self: flex-start; margin: 0 8px 12px; }
+  .rail .signout { color: var(--rail-muted); justify-content: flex-start; padding: 0 12px; }
+  .rail .signout:hover { background: rgba(255,255,255,.06); color: var(--rail-ink); }
+  main { padding: 36px 40px 64px; width: 100%; min-width: 0; }
+}
+
+/* ---------- common bits ---------- */
+.page-head { display: grid; gap: 6px; margin: 4px 0 18px; }
+.page-head .eyebrow { color: var(--accent); font-weight: 700; font-size: 15px; }
+.page-head h1 { font-size: clamp(28px, 7.4vw, 40px); font-weight: 800; line-height: 1.08; letter-spacing: -0.02em; }
+.page-head .sub { color: var(--muted); font-size: 16px; }
+.page-head .head-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-panel); padding: 18px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.card h2 { font-size: 19px; font-weight: 700; }
+.card h3 { font-size: 15px; font-family: var(--body); font-weight: 700; color: var(--muted); }
+.banner { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: var(--r-panel); font-size: 15px; margin-bottom: 16px; }
+.banner .ico { width: 20px; height: 20px; margin-top: 1px; }
+.banner.warn { background: var(--marigold-soft); color: var(--marigold-ink); }
+.banner.risk { background: var(--risk-soft); color: var(--risk); }
+.banner .grow { flex: 1; min-width: 0; }
+.mono { flex: none; display: grid; place-items: center; width: var(--s, 40px); height: var(--s, 40px); border-radius: calc(var(--s, 40px) * .28);
+        background: var(--ml); color: #fff; font: 700 calc(var(--s, 40px) * .46) / 1 var(--display); }
+@media (prefers-color-scheme: dark) { .mono { background: var(--md); } }
+.mono.inverted { background: #fff; color: var(--ml); }
+.flag { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 13px; font-size: 13px; font-weight: 700; white-space: nowrap; background: var(--accent-soft); color: var(--accent); }
+.flag.Boarding { background: var(--marigold-soft); color: var(--marigold-ink); }
+.flag.Delayed, .flag.Stopped { background: var(--risk-soft); color: var(--risk); }
+.score { font: 700 17px var(--display); white-space: nowrap; }
+.score small { font: 400 12px var(--body); color: var(--faint); margin-left: 2px; }
+.score.none { color: var(--faint); }
+.good { color: var(--good); } .mid { color: var(--marigold-ink); } .bad { color: var(--risk); }
+.spinner { width: 16px; height: 16px; border-radius: 50%; border: 2.5px solid currentColor; border-right-color: transparent; animation: spin .8s linear infinite; flex: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.working { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-size: 14px; font-weight: 700; min-width: 0; }
+.working span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-ticket); overflow: hidden; }
+.list-head { background: var(--rail); color: var(--rail-muted); font-size: 13px; font-weight: 700; padding: 12px 16px; display: flex; justify-content: space-between; }
+.empty { padding: 36px 20px; text-align: center; color: var(--muted); display: grid; gap: 14px; justify-items: center; }
+.empty strong { color: var(--ink); font: 700 19px var(--display); }
+.pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
+.pager .where { color: var(--muted); font-size: 14px; text-align: center; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; min-height: 30px; padding: 4px 12px; border-radius: 15px; background: var(--sunken); font-size: 14px; }
+.chip.good { background: var(--good-soft); color: var(--good); }
+.chip.bad { background: var(--risk-soft); color: var(--risk); }
+.chip.mid { background: var(--marigold-soft); color: var(--marigold-ink); }
+.bullets { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.bullets li { position: relative; padding-left: 20px; }
+.bullets li::before { content: ""; position: absolute; left: 2px; top: .55em; width: 8px; height: 8px; border-radius: 50%; background: var(--dot, var(--faint)); }
+.skel { height: 76px; border-bottom: 1px solid var(--line); background: linear-gradient(90deg, transparent, var(--sunken), transparent) 0 0 / 200% 100%; animation: shimmer 1.2s infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+.toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.toolbar .search { flex: 1 1 220px; position: relative; }
+.toolbar .search .ico { position: absolute; left: 12px; top: 12px; width: 20px; height: 20px; color: var(--faint); pointer-events: none; }
+.toolbar .search .input { padding-left: 40px; }
+.toolbar .select { flex: 0 1 200px; width: auto; }
+.toolbar .btn { flex: none; }
+
+/* ---------- rows ---------- */
+.swipe { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); }
+.swipe:last-child { border-bottom: 0; }
+.swipe-act { position: absolute; top: 0; right: 0; bottom: 0; width: 104px; border: 0; background: var(--risk); color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; display: grid; place-items: center; gap: 2px; }
+@media (prefers-color-scheme: dark) { .swipe-act { color: #2a0f0d; } }
+.row { position: relative; display: flex; gap: 12px; align-items: center; padding: 14px 16px; min-height: 76px; background: var(--surface); cursor: pointer; touch-action: pan-y;
+       transition: transform .2s ease; color: inherit; text-decoration: none; }
+.row:hover { background: var(--selected); }
+.row.selected { background: var(--accent-soft); }
+.row .main { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.row .title { font-weight: 700; font-size: 16.5px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.row .meta { font-size: 14px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .reason { font-size: 14px; color: var(--muted); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.row .side { display: grid; justify-items: end; gap: 6px; flex: none; }
+.row .when { flex: none; width: 64px; font: 700 17px/1.15 var(--display); }
+.row .when.Delayed { color: var(--risk); } .row .when.today { color: var(--marigold-ink); }
+.row .when-col { display: none; }
+.row .when-inline { width: auto; font-size: 14px; line-height: 1.2; }
+.today-row { align-items: flex-start; }
+.today-row .mono { margin-top: 2px; }
+.row .bottom { display: flex; align-items: center; gap: 10px; margin-top: 4px; flex-wrap: wrap; }
+.row .quick { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .row .quick { display: inline-flex; visibility: hidden; }
+  .row:hover .quick, .row:focus-within .quick { visibility: visible; }
+}
+.check { flex: none; width: 26px; height: 26px; border-radius: 7px; border: 2px solid var(--faint); display: grid; place-items: center; color: var(--on-accent); background: var(--surface); }
+.check.on { background: var(--accent); border-color: var(--accent); }
+.check .ico { width: 16px; height: 16px; }
+.today-row .company { font-size: 14px; font-weight: 700; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+@media (min-width: 700px) {
+  .today-row { align-items: center; }
+  .today-row .mono { margin-top: 0; }
+  .row .when-col { display: block; width: 92px; font-size: 20px; }
+  .row .when-inline { display: none; }
+  .app-row .side { min-width: 150px; }
+}
+.select-bar { position: fixed; z-index: 32; left: 0; right: 0; bottom: calc(var(--tabbar) + var(--safe-b)); display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+              background: var(--rail); color: var(--rail-ink); box-shadow: 0 -6px 24px rgba(0,0,0,.18); }
+.select-bar .n { flex: 1; font-weight: 700; }
+.select-bar .btn.ghost { color: var(--rail-ink); }
+@media (min-width: 900px) { .select-bar { left: 236px; bottom: 0; padding: 14px 40px; } }
+.disc-row { display: grid; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.disc-row:last-child { border-bottom: 0; }
+.disc-row .top { display: flex; gap: 12px; align-items: flex-start; }
+.disc-row .acts { display: flex; gap: 8px; flex-wrap: wrap; padding-left: 52px; }
+.disc-row .acts .btn { flex: 1 1 auto; }
+@media (min-width: 700px) { .disc-row { grid-template-columns: 1fr auto; align-items: center; } .disc-row .acts { padding-left: 0; flex-wrap: nowrap; } .disc-row .acts .btn { flex: none; } }
+
+/* ---------- track ---------- */
+.track { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); --dot: 14px; --cur: 22px; --cy: 14px; padding-top: 0; }
+.track .leg { position: absolute; top: calc(var(--cy) - 3px); height: 6px; border-radius: 3px; background: var(--line); }
+.track .leg.done { background: var(--c); }
+.track.ended .leg.done { background: var(--faint); }
+.track .stop { display: grid; justify-items: center; gap: 6px; min-width: 0; position: relative; }
+.track .dot { width: var(--dot); height: var(--dot); margin-top: calc(var(--cy) - var(--dot) / 2); border-radius: 50%; background: var(--surface); border: 3px solid var(--line); position: relative; z-index: 1; }
+.track .done .dot { border-color: var(--c); }
+.track.ended .done .dot { border-color: var(--faint); }
+.track .cur .dot { width: var(--cur); height: var(--cur); margin-top: calc(var(--cy) - var(--cur) / 2); border: 0; background: var(--marigold); box-shadow: 0 0 0 7px rgba(227,168,59,.28); }
+.track.ended .cur .dot { background: var(--risk); box-shadow: none; color: #fff; display: grid; place-items: center; font: 700 15px/1 var(--body); }
+.track .lbl { font-size: 12.5px; line-height: 1.2; text-align: center; color: var(--faint); padding: 0 1px; overflow-wrap: normal; hyphens: none; }
+@media (max-width: 420px) { .track .lbl { font-size: 11.5px; } .ticket .track { margin: 0 -10px; } }
+.track .done .lbl { color: var(--muted); }
+.track .cur .lbl { color: var(--ink); font-weight: 700; }
+.track.ended .cur .lbl { color: var(--risk); }
+.track.on-dark .leg { background: rgba(255,255,255,.19); }
+.track.on-dark .dot { background: rgba(15,58,62,.6); border-color: rgba(255,255,255,.3); }
+.track.on-dark .done .dot { background: var(--band); border-color: var(--c); }
+.track.on-dark.ended .done .dot { border-color: rgba(255,255,255,.55); }
+.track.on-dark.ended .leg.done { background: rgba(255,255,255,.55); }
+.track.on-dark .lbl { color: rgba(255,255,255,.5); }
+.track.on-dark .done .lbl { color: rgba(255,255,255,.78); }
+.track.on-dark .cur .lbl { color: #fff; }
+.track.on-dark .cur .dot { background: var(--marigold); border: 0; }
+.track.on-dark.ended .cur .dot { background: #F08A80; color: #3A1F1D; }
+.track.compact { --dot: 9px; --cur: 13px; --cy: 7px; width: 96px; height: 14px; }
+.track.compact .leg { height: 4px; top: calc(var(--cy) - 2px); }
+.track.compact .dot { border-width: 2px; }
+.track.compact .cur .dot { box-shadow: 0 0 0 3px rgba(227,168,59,.3); font-size: 0; }
+.track.compact .lbl { display: none; }
+
+/* ---------- application page ---------- */
+.back { display: inline-flex; align-items: center; gap: 4px; margin: -6px 0 10px -10px; }
+.ticket { --band: #3B7DD8; background: var(--band); color: #fff; border-radius: var(--r-ticket); padding: 20px 18px 14px; display: grid; gap: 16px; position: relative; overflow: hidden; }
+.ticket::after { content: ""; position: absolute; right: -40px; top: -40px; width: 160px; height: 160px; border-radius: 50%; border: 18px solid rgba(255,255,255,.06); pointer-events: none; }
+.ticket .head { display: flex; gap: 14px; align-items: flex-start; }
+.ticket h1 { font-size: clamp(22px, 5.8vw, 30px); font-weight: 800; line-height: 1.15; overflow-wrap: anywhere; }
+.ticket .co { color: rgba(255,255,255,.8); font-size: 16px; margin-top: 4px; }
+.ticket .nums { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.ticket .num { background: rgba(255,255,255,.14); border-radius: 10px; padding: 6px 12px; font: 700 16px var(--display); }
+.ticket .num small { font: 400 13px var(--body); opacity: .8; }
+.ticket .working { color: #fff; background: rgba(0,0,0,.18); border-radius: 10px; padding: 6px 12px; }
+.tabs { position: sticky; top: calc(60px + env(safe-area-inset-top, 0px)); z-index: 10; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 14px -16px 16px; padding: 6px 16px; background: var(--paper); }
+.tabs::-webkit-scrollbar { display: none; }
+@media (max-width: 899px) { .tabs { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); padding-right: 40px; } }
+.tabs a { flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 22px; text-decoration: none; color: var(--muted); font-weight: 700; font-size: 15px; }
+.tabs a[aria-current="page"] { background: var(--ink); color: var(--paper); }
+@media (min-width: 900px) { .tabs { top: 0; margin: 18px 0 18px; padding: 6px 0; } .ticket { padding: 24px 24px 16px; } }
+.grid2 { display: grid; gap: 14px; }
+@media (min-width: 1000px) { .grid2 { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: start; } }
+.stack { display: grid; gap: 14px; align-content: start; min-width: 0; }
+.prose { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.55; }
+.kv { display: flex; flex-wrap: wrap; gap: 8px 16px; color: var(--muted); font-size: 14px; }
+.kv b { color: var(--ink); }
+.big-score { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.big-score .n { font: 800 44px/1 var(--display); }
+.meter { height: 8px; border-radius: 4px; background: var(--sunken); overflow: hidden; }
+.meter > i { display: block; height: 100%; background: currentColor; border-radius: 4px; }
+.versions { display: grid; }
+.version { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.version:first-child { border-top: 0; }
+.version .main { flex: 1; min-width: 0; }
+.version .main div:last-child { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+.in-use { font-size: 12px; font-weight: 800; background: var(--accent-soft); color: var(--accent); border-radius: 10px; padding: 2px 8px; margin-left: 6px; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.ai-note { font-size: 14px; color: var(--marigold-ink); }
+
+/* chat */
+.chat { display: grid; gap: 12px; }
+.bubble { max-width: 88%; padding: 12px 14px; border-radius: 16px; overflow-wrap: anywhere; white-space: pre-wrap; line-height: 1.5; }
+.bubble.user { justify-self: end; background: var(--accent); color: var(--on-accent); border-bottom-right-radius: 5px; }
+.bubble.assistant { justify-self: start; background: var(--surface); border: 1px solid var(--line); border-bottom-left-radius: 5px; }
+.bubble .tools { display: flex; gap: 6px; margin: 8px -6px -6px; white-space: normal; flex-wrap: wrap; align-items: center; }
+.bubble .tools .meta { color: var(--faint); font-size: 13px; margin-left: auto; padding-right: 6px; }
+.bubble .tools .btn.saved { color: var(--good); }
+.thinking { display: inline-flex; gap: 10px; align-items: center; color: var(--muted); }
+.dots { display: inline-flex; gap: 4px; }
+.dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: blink 1.2s infinite; }
+.dots i:nth-child(2) { animation-delay: .2s; } .dots i:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+.suggest { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -18px; padding: 2px 18px; }
+.suggest::-webkit-scrollbar { display: none; }
+.suggest .btn { flex: none; border-radius: 22px; font-weight: 500; }
+.composer { display: grid; gap: 10px; }
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; }
+.timeline li { display: grid; grid-template-columns: 92px 1fr; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 15px; }
+.timeline li:first-child { border-top: 0; }
+.timeline time { color: var(--faint); font-size: 13px; padding-top: 2px; }
+.timeline .agent { font-weight: 700; }
+.timeline .warn { color: var(--marigold-ink); } .timeline .error { color: var(--risk); }
+
+/* ---------- settings ---------- */
+.status-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.good-dot { background: var(--good); box-shadow: 0 0 0 4px var(--good-soft); }
+.topbar a.icon-btn { color: inherit; }
+.topbar a.icon-btn[aria-current="page"] { background: rgba(255,255,255,.14); }
+
+/* ---------- profile ---------- */
+.profile-pick { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.profile-pick .select { width: auto; min-width: 200px; }
+.in-use-note { font-size: 13px; font-weight: 700; color: var(--accent); }
+.form-grid { display: grid; gap: 14px; }
+@media (min-width: 700px) { .form-grid.two { grid-template-columns: 1fr 1fr; } }
+.chipbox { min-width: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; min-height: 48px; padding: 7px 8px; border-radius: var(--r-control); border: 1px solid var(--line); background: var(--surface); cursor: text; }
+.chipbox:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.chipbox .chip { background: var(--accent-soft); color: var(--ink); padding: 0 2px 0 12px; gap: 2px; font-weight: 700; max-width: 100%; }
+.chipbox .chip span { min-width: 0; overflow-wrap: anywhere; padding: 4px 0; line-height: 1.3; }
+.chipbox .chip button { width: 32px; height: 32px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1; flex: none; }
+.chipbox .chip button:hover { background: rgba(127,127,127,.18); color: var(--ink); }
+.chipbox input { flex: 1 1 140px; min-width: 120px; min-height: 34px; border: 0; outline: none; background: transparent; font-size: 16px; padding: 0 4px; }
+.chipfield { position: relative; }
+.sugg { list-style: none; margin: 0; padding: 6px; display: grid; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-control); box-shadow: var(--shadow); max-height: 260px; overflow-y: auto; }
+.sugg button { width: 100%; min-height: 44px; text-align: left; padding: 0 12px; border: 0; border-radius: 6px; background: transparent; cursor: pointer; font-size: 16px; }
+.sugg button:hover, .sugg button.hl { background: var(--selected); }
+.sugg .loading { padding: 10px 12px; color: var(--muted); font-size: 14px; display: flex; gap: 8px; align-items: center; }
+.switch { display: flex; align-items: center; gap: 12px; min-height: 48px; cursor: pointer; font-weight: 700; }
+.switch input { appearance: none; -webkit-appearance: none; flex: none; width: 50px; height: 30px; border-radius: 15px; background: var(--line); position: relative; cursor: pointer; transition: background .15s; margin: 0; }
+.switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .15s; }
+.switch input:checked { background: var(--accent); }
+.switch input:checked::after { transform: translateX(20px); }
+.cv-area { min-height: 55vh; font-size: 15px; line-height: 1.5; }
+.save-bar { position: sticky; z-index: 15; bottom: calc(var(--tabbar) + var(--safe-b) + 12px); margin-top: 16px; display: flex; align-items: center; gap: 12px;
+            padding: 10px 10px 10px 16px; border-radius: 14px; background: var(--rail); color: var(--rail-ink); box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+.save-bar .state { flex: 1; font-size: 15px; font-weight: 700; min-width: 0; }
+.save-bar .state.dirty::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--marigold); margin-right: 8px; vertical-align: 1px; }
+.save-bar .btn.primary { background: var(--marigold); border-color: var(--marigold); color: #2B1D02; }
+@media (min-width: 900px) { .save-bar { bottom: 16px; } }
+@media (prefers-color-scheme: dark) { .save-bar, .select-bar { border: 1px solid var(--line); } }
+
+/* ---------- sheets, toast ---------- */
+.overlay { position: fixed; inset: 0; z-index: 50; background: rgba(6,20,22,.5); display: flex; align-items: flex-end; justify-content: center; animation: fade .15s; }
+.sheet { width: 100%; max-width: 560px; max-height: 92vh; max-height: 92dvh; overflow-y: auto; background: var(--surface); border-radius: 20px 20px 0 0; padding: 10px 18px calc(18px + var(--safe-b));
+         display: grid; gap: 16px; animation: up .22s ease; }
+.sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); justify-self: center; }
+.sheet h2 { font-size: 24px; font-weight: 800; }
+.sheet .actions { justify-content: flex-end; }
+@media (max-width: 520px) { .sheet .actions .btn { flex: 1; } }
+@media (min-width: 700px) { .overlay { align-items: center; } .sheet { border-radius: 20px; padding: 24px; } .sheet .grab { display: none; } }
+@keyframes up { from { transform: translateY(40px); opacity: .5; } }
+@keyframes fade { from { opacity: 0; } }
+.dup { background: var(--marigold-soft); color: var(--marigold-ink); border-radius: var(--r-panel); padding: 14px; display: grid; gap: 12px; }
+.dup .actions .btn { flex: 1 1 auto; }
+.toast { position: fixed; z-index: 60; left: 16px; right: 16px; bottom: calc(var(--tabbar) + 88px + var(--safe-b)); margin: 0 auto; max-width: 520px; background: var(--ink); color: var(--paper);
+         border-radius: 12px; padding: 10px 10px 10px 16px; display: flex; align-items: center; gap: 10px; min-height: 52px; box-shadow: 0 8px 24px rgba(0,0,0,.25); animation: up .2s; }
+.toast .msg { flex: 1; font-size: 15px; }
+.toast .btn.ghost { color: var(--marigold); }
+.toast.error { background: var(--risk); color: #fff; }
+.toast.error .btn.ghost { color: #fff; }
+@media (min-width: 900px) { .toast { bottom: 24px; left: 260px; } }
+</style>
+</head>
+<body>
+
+<section id="login" hidden>
+  <form class="login-card" id="login-form" autocomplete="off" novalidate>
+    <img src="/icon.png" alt="">
+    <h1>Job Command Center</h1>
+    <p class="lead">Enter the passcode shown on your computer, in Settings → Phone and web.</p>
+    <div class="pin" id="pin">
+      <label for="pin-input">Passcode</label>
+      <input id="pin-input" type="text" inputmode="text" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" maxlength="64"
+             enterkeyhint="go" aria-describedby="login-error pin-help">
+      <p id="pin-help">At home it’s 6 digits. Away from home it’s a longer code, like k7mq-x4tn-9vbr.</p>
+    </div>
+    <p class="login-error" id="login-error" role="alert"></p>
+    <button class="btn primary" type="submit" id="login-btn">Sign in</button>
+    <p class="login-foot">Your computer needs to be on and on the same Wi-Fi.</p>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <aside class="rail" aria-label="Main">
+    <div class="brand"><img src="/icon.png" alt="">Job Command Center</div>
+    <nav id="rail-nav"></nav>
+    <button class="btn add" type="button" data-action="add"></button>
+    <div class="spacer"></div>
+    <div id="rail-working"></div>
+    <button class="btn ghost signout" type="button" data-action="signout"></button>
+  </aside>
+  <header class="topbar">
+    <img src="/icon.png" alt="">
+    <span class="brand">Job Command Center</span>
+    <span id="top-working"></span>
+    <a class="icon-btn" id="top-settings" href="#/settings" aria-label="Settings" title="Settings"></a>
+  </header>
+  <main id="main">
+    <div id="ai-banner"></div>
+    <div id="view"></div>
+  </main>
+  <button class="fab" type="button" data-action="add" aria-label="Add a job"></button>
+  <nav class="tabbar" id="tabbar" aria-label="Main"></nav>
+</div>
+
+<div id="layer"></div>
+<div id="toast-host" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   Job Command Center: web companion. Vanilla JS, no build step.
+   All data is inserted with textContent / DOM nodes (never innerHTML);
+   innerHTML is only used for the constant SVG icons below.
+   ===================================================================== */
+
+// ---------------------------------------------------------------- constants
+const STAGES = ['Found', 'Fit checked', 'Tailored', 'Applied', 'Interview', 'Offer'];
+const STAGE_COLORS = ['#8592A0', '#3B7DD8', '#7A5AF0', '#1F9D6E', '#E3A83B', '#E4572E'];
+const STATUS_FILTERS = ['Active', 'Closed', 'All', 'New', 'Evaluated', 'Ready', 'Applied', 'Interview', 'Offer', 'Rejected', 'Discarded'];
+const DEFAULT_CLOSE_REASONS = ["I'm not interested", 'The role is closed', 'They turned me down', 'Something else'];
+const SUGGESTIONS = ['Why do you want to work here?', 'Do you need visa sponsorship?', 'Salary expectations?', 'Notice period?'];
+const AI_OFF = "Your AI isn't connected. Open Job Command Center on your computer → Settings to connect it.";
+const AI_OFF_SHORT = 'Connect your AI on your computer first (Settings).';
+const POLL_MS = 3000;
+
+const S = (p) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const ICONS = {
+  today: S('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+  apps: S('<path d="M3 7h2M3 12h2M3 17h2M8 7h13M8 12h13M8 17h13"/>'),
+  discover: S('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>'),
+  plus: S('<path d="M12 5v14M5 12h14"/>'),
+  back: S('<path d="M15 18l-6-6 6-6"/>'),
+  check: S('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
+  search: S('<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>'),
+  signout: S('<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/>'),
+  ext: S('<path d="M14 4h6v6M20 4l-9 9M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/>'),
+  copy: S('<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>'),
+  star: S('<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>'),
+  starOn: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>',
+  warn: S('<path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17.5v.5"/>'),
+  profile: S('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>'),
+  gear: S('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'),
+  doc: S('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>'),
+};
+
+// ---------------------------------------------------------------- state
+const state = {
+  me: null,                 // { name, working, ai_connected }
+  route: { view: 'today' },
+  today: null,              // { date, items }
+  apps: { status: 'Active', q: '', page: 0, data: null, selecting: false, selected: new Set() },
+  disc: { country: '', q: '', page: 0, data: null },
+  job: null,                // JobDetail of the open application
+  jobError: null,
+  viewError: null,
+  profile: { data: null, form: null, dirty: false, saving: false, section: 'about' },
+  settings: { data: null, form: null, dirty: false },
+  closeReasons: null,
+  drafts: {},               // unsaved form text, keyed so polling never wipes it
+  asking: {},               // jobId -> question while /ask is pending
+  busy: new Set(),          // keys of buttons with a request in flight
+  navDepth: 0,
+  pollTimer: null,
+  lastSig: '',
+};
+
+// ---------------------------------------------------------------- DOM helpers
+function h(tag, props, ...kids) {
+  const el = document.createElement(tag);
+  if (props) {
+    for (const [k, v] of Object.entries(props)) {
+      if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k === 'style') for (const [sk, sv] of Object.entries(v)) el.style.setProperty(sk, sv);
+      else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2), v);
+      else if (k === 'value' || k === 'checked' || k === 'disabled' || k === 'selected') el[k] = v;
+      else el.setAttribute(k, v === true ? '' : String(v));
+    }
+  }
+  append(el, kids);
+  return el;
+}
+function append(el, kids) {
+  for (const k of kids.flat(Infinity)) {
+    if (k == null || k === false || k === '') continue;
+    el.append(k instanceof Node ? k : document.createTextNode(String(k)));
+  }
+  return el;
+}
+function icon(name) { const s = document.createElement('span'); s.className = 'ico'; s.innerHTML = ICONS[name]; return s; } // constant SVG only
+const $ = (sel, root = document) => root.querySelector(sel);
+
+function btn(label, opts = {}) {
+  const { kind = '', onclick, disabled, ico, small, title, type = 'button', busyKey, block } = opts;
+  const busy = busyKey && state.busy.has(busyKey);
+  const cls = ['btn', kind, small && 'small', block && 'block'].filter(Boolean).join(' ');
+  return h('button', { class: cls, type, title, disabled: disabled || busy, 'aria-busy': busy ? 'true' : null, onclick },
+    busy ? h('span', { class: 'spinner' }) : ico && icon(ico), label);
+}
+function linkBtn(label, href, opts = {}) {
+  const cls = ['btn', opts.kind, opts.small && 'small'].filter(Boolean).join(' ');
+  return h('a', { class: cls, href, target: '_blank', rel: 'noopener noreferrer' }, opts.ico && icon(opts.ico), label);
+}
+
+// ---------------------------------------------------------------- API
+class ApiError extends Error {
+  constructor(status, message, data) { super(message); this.status = status; this.data = data || {}; }
+}
+async function api(path, body) {
+  const post = body !== undefined;
+  const opt = { method: post ? 'POST' : 'GET', credentials: 'same-origin', headers: { Accept: 'application/json' } };
+  if (post) { opt.headers['X-JCC'] = '1'; opt.headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
+  let res;
+  try { res = await fetch(path, opt); }
+  catch { throw new ApiError(0, "Can't reach your computer. Check that Job Command Center is open and you're on the same Wi-Fi."); }
+  let data = null;
+  try { data = await res.json(); } catch { /* empty or non-JSON body */ }
+  if (res.status === 401 && path !== '/api/login') {
+    showLogin(state.me ? 'You were signed out. Enter the passcode to carry on.' : '');
+    throw new ApiError(401, '', data);
+  }
+  if (!res.ok) {
+    const fallback = res.status === 429 ? 'Too many tries, wait a minute.' : `Something went wrong (error ${res.status}). Try again.`;
+    throw new ApiError(res.status, (data && typeof data.error === 'string' && data.error) || fallback, data);
+  }
+  return data || {};
+}
+/** Run a write: marks the button busy, shows errors as a toast. Returns the response or null. */
+async function act(busyKey, fn) {
+  if (busyKey) { state.busy.add(busyKey); renderView(); }
+  try { return await fn(); }
+  catch (e) { if (e.status !== 401) toast(e.message, { error: true }); return null; }
+  finally { if (busyKey) { state.busy.delete(busyKey); renderView(); } }
+}
+
+// ---------------------------------------------------------------- small components
+function hsvHex(hue, s, v) {
+  const f = (n) => { const k = (n + hue / 60) % 6; return v - v * s * Math.max(0, Math.min(k, 4 - k, 1)); };
+  return '#' + [f(5), f(3), f(1)].map((x) => Math.round(x * 255).toString(16).padStart(2, '0')).join('');
+}
+function mono(initial, hue, size = 40, inverted = false) {
+  const deg = ((Number(hue) || 0) * 47) % 360;
+  return h('span', { class: 'mono' + (inverted ? ' inverted' : ''), 'aria-hidden': 'true',
+    style: { '--s': size + 'px', '--ml': hsvHex(deg, .55, .62), '--md': hsvHex(deg, .45, .55) } }, (initial || '?').slice(0, 2));
+}
+function shade(hex, f) {
+  const n = parseInt(hex.slice(1), 16);
+  return '#' + [n >> 16, (n >> 8) & 255, n & 255].map((c) => Math.round(c * f).toString(16).padStart(2, '0')).join('');
+}
+function scoreClass(v, hi, mid) { const n = parseFloat(v); return isNaN(n) ? '' : n >= hi ? 'good' : n >= mid ? 'mid' : 'bad'; }
+function fitScore(v) {
+  if (!v) return h('span', { class: 'score none', title: 'No fit score yet' }, '–');
+  return h('span', { class: 'score ' + scoreClass(v, 4, 3.5), title: 'Fit score' }, v, h('small', null, '/5'));
+}
+function atsScore(v) {
+  if (v === '' || v == null) return null;
+  return h('span', { class: 'score ' + scoreClass(v, 85, 70), title: 'How well the resume reads to hiring software' }, String(v), h('small', null, 'ATS'));
+}
+function flag(board) { return board ? h('span', { class: 'flag ' + board }, board) : null; }
+function working(label) { return h('span', { class: 'working' }, h('span', { class: 'spinner' }), h('span', null, label || 'Working')); }
+
+function track(pos, ended, endedLabel, opts = {}) {
+  pos = Math.max(0, Math.min(5, Number(pos) || 0));
+  const cls = 'track' + (opts.compact ? ' compact' : '') + (opts.onDark ? ' on-dark' : '') + (ended ? ' ended' : '');
+  const el = h('div', { class: cls, role: 'img', 'aria-label': ended ? `Stage: ${endedLabel || 'Closed'}` : `Stage: ${STAGES[pos]}` });
+  for (let i = 0; i < 5; i++) {
+    el.append(h('i', { class: 'leg' + (i < pos ? ' done' : ''), style: { left: `${(i + .5) / 6 * 100}%`, width: `${100 / 6}%`, '--c': STAGE_COLORS[i + 1] } }));
+  }
+  STAGES.forEach((name, i) => {
+    const c = i < pos ? ' done' : i === pos ? ' cur' : '';
+    el.append(h('div', { class: 'stop' + c, style: { '--c': STAGE_COLORS[i] } },
+      h('span', { class: 'dot' }, ended && i === pos && !opts.compact ? '×' : ''),
+      h('span', { class: 'lbl' }, ended && i === pos ? (endedLabel || 'Closed') : name)));
+  });
+  return el;
+}
+
+function pager(data, go) {
+  if (!data || data.pages <= 1) return null;
+  return h('div', { class: 'pager' },
+    btn('Previous', { disabled: data.page <= 0, onclick: () => go(data.page - 1) }),
+    h('span', { class: 'where' }, `Page ${data.page + 1} of ${data.pages}`, h('br'), `${data.total} in all`),
+    btn('Next', { disabled: data.page >= data.pages - 1, onclick: () => go(data.page + 1) }));
+}
+function empty(title, text, action) {
+  return h('div', { class: 'empty' }, h('strong', null, title), text && h('p', null, text), action);
+}
+function errorCard(msg, retry) {
+  return h('div', { class: 'card' }, h('div', { class: 'empty' },
+    h('strong', null, "That didn't load"), h('p', null, msg), btn('Try again', { kind: 'primary', onclick: retry })));
+}
+function skeleton(n = 5) { return h('div', { class: 'list' }, Array.from({ length: n }, () => h('div', { class: 'skel' }))); }
+function plural(n, one, many) { return n === 1 ? one : `${n} ${many}`; }
+const aiOn = () => !state.me || state.me.ai_connected !== false;
+
+// ---------------------------------------------------------------- toast
+let toastTimer;
+function toast(msg, { error = false, action, onAction, ms = 4500 } = {}) {
+  const host = $('#toast-host');
+  clearTimeout(toastTimer);
+  const t = h('div', { class: 'toast' + (error ? ' error' : ''), role: error ? 'alert' : 'status' },
+    h('span', { class: 'msg' }, msg),
+    action && btn(action, { kind: 'ghost small', onclick: () => { host.replaceChildren(); onAction(); } }));
+  host.replaceChildren(t);
+  toastTimer = setTimeout(() => host.replaceChildren(), error ? 7000 : ms);
+}
+
+// ---------------------------------------------------------------- copy
+async function copyText(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; }
+  } catch { /* fall through to the legacy path */ }
+  // Plain http on the home network is not a "secure context", so the clipboard API is often missing.
+  const ta = h('textarea', { readonly: true, style: { position: 'fixed', top: '0', left: '0', opacity: '0', 'font-size': '16px' } });
+  ta.value = text;
+  document.body.append(ta);
+  ta.focus(); ta.select(); ta.setSelectionRange(0, text.length);
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch { ok = false; }
+  ta.remove();
+  return ok;
+}
+async function copyWithFeedback(text) {
+  if (await copyText(text)) { toast('Copied.'); return; }
+  // Last resort: show the text so the user can press-and-hold to copy it.
+  openSheet((close) => [
+    h('h2', null, 'Copy this text'),
+    h('p', { class: 'hint' }, "Your browser blocked copying. Press and hold the text, then choose Select all and Copy."),
+    h('textarea', { class: 'textarea', readonly: true, rows: 10, value: text }),
+    h('div', { class: 'actions' }, btn('Done', { kind: 'primary', onclick: close })),
+  ]);
+}
+
+// ---------------------------------------------------------------- sign in
+function showLogin(message) {
+  stopPoll();
+  state.me = null; state.today = null; state.job = null; state.apps.data = null; state.disc.data = null;
+  closeSheet();
+  $('#app').hidden = true;
+  $('#login').hidden = false;
+  const input = $('#pin-input');
+  input.value = '';
+  setLoginError(message || '');
+  setTimeout(() => input.focus(), 50);
+}
+function setLoginError(msg) { $('#login-error').textContent = msg; }
+let lockUntil = 0, lockTimer;
+async function submitPin() {
+  const input = $('#pin-input');
+  const pin = input.value.trim();
+  if (Date.now() < lockUntil) return;
+  if (pin.length < 6) { setLoginError(pin ? 'That passcode is too short. It has at least 6 characters.' : 'Enter the passcode first.'); return; }
+  const b = $('#login-btn');
+  b.disabled = true; b.textContent = 'Checking…';
+  try {
+    await api('/api/login', { pin });
+    $('#login').hidden = true;
+    await boot();
+  } catch (e) {
+    input.select();
+    const pinBox = $('#pin');
+    pinBox.classList.remove('shake'); void pinBox.offsetWidth; pinBox.classList.add('shake');
+    if (e.status === 429) {
+      lockUntil = Date.now() + 60000;
+      const tick = () => {
+        const left = Math.ceil((lockUntil - Date.now()) / 1000);
+        if (left <= 0) { clearInterval(lockTimer); setLoginError('You can try again now.'); b.disabled = false; b.textContent = 'Sign in'; return; }
+        setLoginError(`Too many tries, wait a minute. (${left} s)`);
+      };
+      clearInterval(lockTimer); tick(); lockTimer = setInterval(tick, 1000);
+      return;
+    }
+    setLoginError(e.status === 401 ? "That passcode didn't match. Check Settings on your computer and try again." : e.message);
+  }
+  if (Date.now() >= lockUntil) { b.disabled = false; b.textContent = 'Sign in'; }
+  input.focus();
+}
+function initLogin() {
+  const input = $('#pin-input');
+  input.addEventListener('input', () => {
+    // Letters, digits and dashes only (6-digit home code, or a longer code like k7mq-x4tn-9vbr).
+    const clean = input.value.replace(/[^A-Za-z0-9-]/g, '');
+    if (clean !== input.value) input.value = clean;
+    setLoginError(Date.now() < lockUntil ? $('#login-error').textContent : '');
+    // Long codes come in groups of four, so six straight digits can only be the home code: sign in right away.
+    if (/^\d{6}$/.test(clean)) submitPin();
+  });
+  $('#login-form').addEventListener('submit', (e) => { e.preventDefault(); submitPin(); });
+}
+
+// ---------------------------------------------------------------- shell
+const NAV = [
+  { view: 'today', href: '#/today', label: 'Today', ico: 'today' },
+  { view: 'apps', href: '#/applications', label: 'Applications', ico: 'apps' },
+  { view: 'discover', href: '#/discover', label: 'Discover', ico: 'discover' },
+  { view: 'profile', href: '#/profile', label: 'Profile', ico: 'profile' },
+  { view: 'settings', href: '#/settings', label: 'Settings', ico: 'gear', railOnly: true },
+];
+function renderShell() {
+  const v = state.route.view === 'job' ? 'apps' : state.route.view;
+  const count = state.today ? state.today.items.length : 0;
+  $('#rail-nav').replaceChildren(...NAV.map((n) => h('a', { href: n.href, 'aria-current': n.view === v ? 'page' : null },
+    icon(n.ico), n.label, n.view === 'today' && count > 0 && h('span', { class: 'count', 'aria-label': `${count} waiting` }, count))));
+  $('#top-settings').setAttribute('aria-current', v === 'settings' ? 'page' : 'false');
+  $('#tabbar').replaceChildren(...NAV.filter((n) => !n.railOnly).map((n) => h('a', { href: n.href, 'aria-current': n.view === v ? 'page' : null },
+    icon(n.ico), n.label, n.view === 'today' && count > 0 && h('span', { class: 'badge', 'aria-label': `${count} waiting` }, count))));
+  const w = state.me && state.me.working > 0 ? state.me.working : 0;
+  const pill = () => w ? h('span', { class: 'working-pill', title: 'The agents are working' }, h('span', { class: 'spinner' }), `${w} working`) : '';
+  $('#rail-working').replaceChildren(pill());
+  $('#top-working').replaceChildren(pill());
+  $('#ai-banner').replaceChildren(aiOn() ? '' : h('div', { class: 'banner warn', role: 'status' }, icon('warn'), h('span', { class: 'grow' }, AI_OFF)));
+  $('.fab').hidden = noFab();
+}
+function noFab() { return ['job', 'profile', 'settings'].includes(state.route.view); }
+function initShell() {
+  document.querySelectorAll('[data-action="add"]').forEach((b) => {
+    if (b.classList.contains('fab')) b.replaceChildren(icon('plus')); else b.replaceChildren(icon('plus'), 'Add a job');
+    b.addEventListener('click', () => openAddSheet());
+  });
+  $('#top-settings').replaceChildren(icon('gear'));
+  document.querySelectorAll('[data-action="signout"]').forEach((b) => {
+    if (b.classList.contains('icon-btn')) b.replaceChildren(icon('signout')); else b.replaceChildren(icon('signout'), 'Sign out');
+    b.addEventListener('click', signOut);
+  });
+}
+async function signOut() {
+  try { await api('/api/logout', {}); } catch { /* signing out locally anyway */ }
+  showLogin('Signed out.');
+}
+
+// ---------------------------------------------------------------- routing
+function parseRoute() {
+  const parts = location.hash.replace(/^#\/?/, '').split('/');
+  if (parts[0] === 'applications') return { view: 'apps' };
+  if (parts[0] === 'discover') return { view: 'discover' };
+  if (parts[0] === 'settings') return { view: 'settings' };
+  if (parts[0] === 'profile') return { view: 'profile', section: PROFILE_SECTIONS.some(([k]) => k === parts[1]) ? parts[1] : null };
+  if (parts[0] === 'job' && /^\d+$/.test(parts[1] || '')) {
+    const tab = ['overview', 'resume', 'cover', 'qa', 'activity'].includes(parts[2]) ? parts[2] : 'overview';
+    return { view: 'job', id: Number(parts[1]), tab };
+  }
+  return { view: 'today' };
+}
+function go(hash) { if (location.hash !== hash) { state.navDepth++; location.hash = hash; } }
+function openJob(id, tab) { go(`#/job/${id}${tab ? '/' + tab : ''}`); }
+async function onRoute() {
+  const prev = state.route;
+  state.route = parseRoute();
+  const sameJob = prev.view === 'job' && state.route.view === 'job' && prev.id === state.route.id;
+  if (!sameJob) {
+    window.scrollTo(0, 0);
+    if (state.route.view === 'job' && (!state.job || state.job.id !== state.route.id)) { state.job = null; state.jobError = null; }
+  }
+  state.viewError = null;
+  renderShell();
+  renderView();
+  if (!sameJob) await refresh();
+}
+
+// ---------------------------------------------------------------- loading & polling
+async function loadMe() { state.me = await api('/api/me'); }
+async function loadView(silent) {
+  const r = state.route;
+  if (r.view === 'settings') { await loadSettings(); return; }
+  if (r.view === 'profile') {
+    // Never overwrite edits in progress; polling only refreshes an untouched form.
+    if (!state.profile.form || (!state.profile.dirty && !silent)) await loadProfile();
+    return;
+  }
+  if (r.view === 'today') state.today = await api('/api/today');
+  else if (r.view === 'apps') {
+    const a = state.apps;
+    const qs = new URLSearchParams({ status: a.status, q: a.q, page: String(a.page) });
+    const data = await api('/api/jobs?' + qs);
+    if (a.page > 0 && data.items.length === 0 && data.pages > 0 && a.page >= data.pages) { a.page = data.pages - 1; return loadView(); }
+    a.data = data;
+    if (!state.today) state.today = await api('/api/today'); // for the badge
+  } else if (r.view === 'discover') {
+    const d = state.disc;
+    const qs = new URLSearchParams({ country: d.country, q: d.q, page: String(d.page) });
+    const data = await api('/api/discover?' + qs);
+    if (d.page > 0 && data.items.length === 0 && d.page >= data.pages) { d.page = Math.max(0, data.pages - 1); return loadView(); }
+    d.data = data;
+  } else if (r.view === 'job') {
+    try {
+      const j = await api(`/api/jobs/${r.id}`);
+      if (state.route.view === 'job' && state.route.id === r.id) { state.job = j; state.jobError = null; }
+      if (Array.isArray(j.close_reasons) && j.close_reasons.length) state.closeReasons = j.close_reasons;
+    } catch (e) { if (e.status === 401) throw e; state.jobError = e.message; }
+  }
+}
+let refreshing = null;
+async function refresh(silent = false) {
+  if (refreshing) return refreshing;
+  refreshing = (async () => {
+    try {
+      await Promise.all([loadMe(), loadView(silent)]);
+      state.viewError = null;
+    } catch (e) {
+      if (e.status === 401) return;
+      if (!silent) state.viewError = e.message;
+    } finally { refreshing = null; }
+    const sig = JSON.stringify([state.me, state.route, state.today, state.apps.data, state.disc.data, state.job, state.settings.data, state.profile.data, state.viewError, state.jobError]);
+    if (!silent || sig !== state.lastSig) { state.lastSig = sig; renderShell(); renderView(); }
+    schedulePoll();
+  })();
+  return refreshing;
+}
+function viewHasWorking() {
+  const r = state.route;
+  if (r.view === 'settings') return !!(state.settings.data && state.settings.data.scanning);
+  const rows = r.view === 'today' ? state.today && state.today.items
+    : r.view === 'apps' ? state.apps.data && state.apps.data.items
+    : r.view === 'job' ? state.job && [state.job] : null;
+  return !!(rows && rows.some((x) => x.working));
+}
+function schedulePoll() {
+  stopPoll();
+  if (!state.me) return;
+  if (!(state.me.working > 0 || viewHasWorking())) return;
+  state.pollTimer = setTimeout(() => { if (!document.hidden) refresh(true); }, POLL_MS);
+}
+function stopPoll() { clearTimeout(state.pollTimer); state.pollTimer = null; }
+document.addEventListener('visibilitychange', () => { if (!document.hidden && state.me) refresh(true); });
+
+// ---------------------------------------------------------------- render dispatcher
+function renderView() {
+  if (!state.me && $('#app').hidden) return;
+  // Keep focus and caret across re-renders (polling, busy buttons).
+  const active = document.activeElement;
+  const key = active && active.dataset ? active.dataset.k : null;
+  const sel = key && 'selectionStart' in active ? [active.selectionStart, active.selectionEnd] : null;
+  const r = state.route;
+  const view = r.view === 'today' ? viewToday() : r.view === 'apps' ? viewApps() : r.view === 'discover' ? viewDiscover() : r.view === 'profile' ? viewProfile() : r.view === 'settings' ? viewSettings() : viewJob();
+  $('#view').replaceChildren(view);
+  const curTab = document.querySelector('.tabs a[aria-current="page"]');
+  if (curTab) { const bar = curTab.parentElement; bar.scrollLeft = Math.max(0, curTab.offsetLeft - (bar.clientWidth - curTab.offsetWidth) / 2); }
+  if (key) {
+    const el = document.querySelector(`[data-k="${CSS.escape(key)}"]`);
+    if (el) { el.focus({ preventScroll: true }); if (sel && el.setSelectionRange) try { el.setSelectionRange(sel[0], sel[1]); } catch { /* not a text field */ } }
+  }
+  renderSelectBar();
+}
+
+// ---------------------------------------------------------------- swipe-to-close rows
+let openSwipe = null;
+/** Wraps a row so a left swipe reveals a Close action (touch). Mouse users get the inline Close button. */
+function swipeable(row, onClose, enabled = true) {
+  if (!enabled) return h('div', { class: 'swipe' }, row);
+  const action = h('button', { class: 'swipe-act', type: 'button', tabindex: '-1', 'aria-hidden': 'true', onclick: (e) => { e.stopPropagation(); reset(); onClose(); } }, 'Close');
+  const wrap = h('div', { class: 'swipe' }, action, row);
+  const W = 104;
+  let x0 = 0, y0 = 0, dx = 0, tracking = false, dragging = false, isOpen = false;
+  const set = (x, anim) => { row.style.transition = anim ? '' : 'none'; row.style.transform = x ? `translateX(${x}px)` : ''; };
+  const reset = () => { isOpen = false; set(0, true); if (openSwipe === reset) openSwipe = null; };
+  row.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse') return;
+    tracking = true; dragging = false; x0 = e.clientX; y0 = e.clientY; dx = 0;
+  });
+  row.addEventListener('pointermove', (e) => {
+    if (!tracking) return;
+    const mx = e.clientX - x0, my = e.clientY - y0;
+    if (!dragging) {
+      if (Math.abs(my) > 10 && Math.abs(my) > Math.abs(mx)) { tracking = false; return; }
+      if (Math.abs(mx) < 10) return;
+      dragging = true;
+      if (openSwipe && openSwipe !== reset) openSwipe();
+      try { row.setPointerCapture(e.pointerId); } catch { /* ignore */ }
+    }
+    dx = Math.max(-W - 30, Math.min(0, mx + (isOpen ? -W : 0)));
+    set(dx, false);
+  });
+  const end = () => {
+    if (!tracking) return;
+    tracking = false;
+    if (!dragging) return;
+    wrap.dataset.swiped = '1'; setTimeout(() => delete wrap.dataset.swiped, 50);
+    if (dx < -W / 2) { isOpen = true; set(-W, true); openSwipe = reset; } else reset();
+  };
+  row.addEventListener('pointerup', end);
+  row.addEventListener('pointercancel', () => { tracking = false; if (dragging) reset(); });
+  row.addEventListener('click', (e) => {
+    if (wrap.dataset.swiped) { e.preventDefault(); e.stopImmediatePropagation(); return; }
+    if (isOpen) { e.preventDefault(); e.stopImmediatePropagation(); reset(); }
+  }, true);
+  return wrap;
+}
+document.addEventListener('pointerdown', (e) => { if (openSwipe && !e.target.closest('.swipe')) openSwipe(); });
+function isTouch() { return window.matchMedia('(hover: none)').matches; }
+
+// ---------------------------------------------------------------- Today
+function viewToday() {
+  const t = state.today;
+  const n = t ? t.items.length : 0;
+  const first = state.me && state.me.name ? state.me.name.split(' ')[0] : '';
+  const head = h('div', { class: 'page-head' },
+    h('span', { class: 'eyebrow' }, t ? t.date : ' '),
+    h('h1', null, !t ? 'Today' : n === 0 ? 'Nothing is waiting on you' : n === 1 ? 'One thing is waiting on you' : `${n} things are waiting on you`),
+    t && n > 0 && h('p', { class: 'sub' }, first ? `Hi ${first}. Start with the top row; it has waited longest.` : 'Start with the top row; it has waited longest.'));
+  if (state.viewError && !t) return h('div', null, head, errorCard(state.viewError, () => refresh()));
+  if (!t) return h('div', null, head, skeleton());
+  const list = h('div', { class: 'list' },
+    h('div', { class: 'list-head' }, h('span', null, 'Next step'), h('span', null, n ? plural(n, '1 application', 'applications') : '')),
+    n === 0 ? empty('All clear', 'New matches from your companies arrive in Discover.', h('a', { class: 'btn primary', href: '#/discover' }, 'Open Discover'))
+      : t.items.map(todayRow));
+  return h('div', null, head, list, n > 0 && isTouch() && h('p', { class: 'hint', style: { 'margin-top': '12px', 'text-align': 'center' } }, 'Tip: swipe a row to the left to close it.'));
+}
+function todayRow(job) {
+  const whenCls = 'when ' + (job.board === 'Delayed' ? 'Delayed' : job.when === 'Today' || job.when === 'Now' ? 'today' : '');
+  const row = h('a', { class: 'row today-row', href: `#/job/${job.id}`, onclick: (e) => { e.preventDefault(); openJob(job.id); } },
+    h('span', { class: whenCls + ' when-col' }, job.when || '–'),
+    mono(job.initial, job.hue, 40),
+    h('div', { class: 'main' },
+      h('span', { class: whenCls + ' when-inline' }, job.when || '–'),
+      h('span', { class: 'title' }, job.title),
+      job.working ? working(job.stage_label) : job.reason && h('span', { class: 'reason' }, job.reason),
+      h('div', { class: 'bottom' }, h('span', { class: 'company' }, job.company), flag(job.board))),
+    !job.working && btn('Close', { kind: 'ghost small', onclick: (e) => { e.preventDefault(); e.stopPropagation(); openCloseSheet([job]); } }));
+  const q = row.querySelector(':scope > .btn'); if (q) q.classList.add('quick');
+  return swipeable(row, () => openCloseSheet([job]), !job.working);
+}
+
+// ---------------------------------------------------------------- Applications
+let searchTimer;
+function viewApps() {
+  const a = state.apps;
+  const d = a.data;
+  const head = h('div', { class: 'page-head' }, h('div', { class: 'head-row' },
+    h('div', null, h('h1', null, 'Applications'), h('p', { class: 'sub' }, d ? `${d.total} ${a.status === 'All' ? 'in all' : a.status.toLowerCase()}` : ' ')),
+    d && d.items.length > 0 && btn(a.selecting ? 'Done' : 'Select', { kind: a.selecting ? 'primary' : '', onclick: () => toggleSelecting() })));
+  const toolbar = h('div', { class: 'toolbar' },
+    h('label', { class: 'search' }, h('span', { class: 'sr-only' }, 'Search applications'), icon('search'),
+      h('input', { class: 'input', type: 'search', placeholder: 'Role or company', value: a.q, 'data-k': 'apps-q', enterkeyhint: 'search',
+        oninput: (e) => { a.q = e.target.value; clearTimeout(searchTimer); searchTimer = setTimeout(() => { a.page = 0; refresh(); }, 300); } })),
+    h('label', null, h('span', { class: 'sr-only' }, 'Show'),
+      h('select', { class: 'select', 'data-k': 'apps-status', onchange: (e) => { a.status = e.target.value; a.page = 0; a.selected.clear(); refresh(); } },
+        STATUS_FILTERS.map((s) => h('option', { value: s, selected: s === a.status }, s)))));
+  if (state.viewError && !d) return h('div', null, head, toolbar, errorCard(state.viewError, () => refresh()));
+  if (!d) return h('div', null, head, toolbar, skeleton(6));
+  const list = h('div', { class: 'list' }, d.items.length === 0
+    ? empty(a.q ? 'Nothing matches' : 'No applications here', a.q ? 'Try a different word, or show All.' : 'Add a job with the + button, or tailor one from Discover.')
+    : d.items.map(appRow));
+  return h('div', null, head, toolbar, list, pager(d, (p) => { a.page = p; window.scrollTo(0, 0); refresh(); }));
+}
+function appRow(job) {
+  const a = state.apps;
+  const sel = a.selected.has(job.id);
+  const row = h('a', { class: 'row app-row' + (sel ? ' selected' : ''), href: `#/job/${job.id}`, role: a.selecting ? 'checkbox' : null, 'aria-checked': a.selecting ? String(sel) : null,
+      onclick: (e) => { e.preventDefault(); if (a.selecting) { toggleSelected(job.id); } else openJob(job.id); } },
+    a.selecting && h('span', { class: 'check' + (sel ? ' on' : '') }, sel && icon('check')),
+    mono(job.initial, job.hue, 40),
+    h('div', { class: 'main' },
+      h('span', { class: 'title' }, job.title),
+      h('span', { class: 'meta' }, job.location ? `${job.company}, ${job.location}` : job.company),
+      h('div', { class: 'bottom' }, job.working ? working(job.stage_label) : track(job.position, job.ended, job.status, { compact: true }),
+        job.ended && h('span', { class: 'hint' }, job.status))),
+    h('div', { class: 'side' }, fitScore(job.fit), atsScore(job.ats)),
+    !a.selecting && !job.ended && !job.working && btn('Close', { kind: 'ghost small', onclick: (e) => { e.preventDefault(); e.stopPropagation(); openCloseSheet([job]); } }));
+  const q = row.querySelector(':scope > .btn'); if (q) q.classList.add('quick');
+  return swipeable(row, () => openCloseSheet([job]), !a.selecting && !job.ended && !job.working);
+}
+function toggleSelecting() { const a = state.apps; a.selecting = !a.selecting; a.selected.clear(); renderView(); }
+function toggleSelected(id) { const s = state.apps.selected; s.has(id) ? s.delete(id) : s.add(id); renderView(); }
+function renderSelectBar() {
+  let bar = $('#select-bar');
+  const a = state.apps;
+  const show = state.route.view === 'apps' && a.selecting;
+  if (!show) { if (bar) bar.remove(); $('.fab').hidden = noFab(); return; }
+  $('.fab').hidden = true;
+  const n = a.selected.size;
+  const rows = (a.data ? a.data.items : []).filter((j) => a.selected.has(j.id));
+  const content = [h('span', { class: 'n' }, n === 0 ? 'Tap rows to select' : `${n} selected`),
+    btn('Cancel', { kind: 'ghost', onclick: toggleSelecting }),
+    btn('Close selected', { kind: 'danger', disabled: n === 0, onclick: () => openCloseSheet(rows) })];
+  if (!bar) { bar = h('div', { id: 'select-bar', class: 'select-bar', role: 'region', 'aria-label': 'Selection' }); document.body.append(bar); }
+  bar.replaceChildren(...content);
+}
+
+// ---------------------------------------------------------------- Discover
+let discTimer;
+function viewDiscover() {
+  const d = state.disc;
+  const data = d.data;
+  const head = h('div', { class: 'page-head' }, h('h1', null, 'Discover'),
+    h('p', { class: 'sub' }, data ? `${data.total} new ${data.total === 1 ? 'role' : 'roles'} from the companies you follow` : 'New roles from the companies you follow'));
+  const countries = data && data.countries && data.countries.length ? data.countries : ['All countries'];
+  const toolbar = h('div', { class: 'toolbar' },
+    h('label', { class: 'search' }, h('span', { class: 'sr-only' }, 'Search roles'), icon('search'),
+      h('input', { class: 'input', type: 'search', placeholder: 'Search roles', value: d.q, 'data-k': 'disc-q', enterkeyhint: 'search',
+        oninput: (e) => { d.q = e.target.value; clearTimeout(discTimer); discTimer = setTimeout(() => { d.page = 0; refresh(); }, 300); } })),
+    h('label', null, h('span', { class: 'sr-only' }, 'Country'),
+      h('select', { class: 'select', 'data-k': 'disc-country', onchange: (e) => { d.country = e.target.value === 'All countries' ? '' : e.target.value; d.page = 0; refresh(); } },
+        countries.map((c) => h('option', { value: c, selected: (d.country || 'All countries') === c }, c)))));
+  if (state.viewError && !data) return h('div', null, head, toolbar, errorCard(state.viewError, () => refresh()));
+  if (!data) return h('div', null, head, toolbar, skeleton(6));
+  const list = h('div', { class: 'list' }, data.items.length === 0
+    ? empty('Nothing new here', d.q || d.country ? 'Try another search or country.' : 'The app checks your companies for new roles regularly.')
+    : data.items.map(discRow));
+  return h('div', null, head, toolbar, list, pager(data, (p) => { d.page = p; window.scrollTo(0, 0); refresh(); }));
+}
+function discRow(r) {
+  const tailorKey = `dtailor:${r.id}`;
+  return h('div', { class: 'disc-row' },
+    h('div', { class: 'top' }, mono(r.initial, r.hue, 40),
+      h('div', { class: 'main', style: { flex: '1', 'min-width': '0' } },
+        h('div', { class: 'title', style: { 'font-weight': '700', 'overflow-wrap': 'anywhere' } }, r.title),
+        h('div', { class: 'hint' }, [r.company, r.location].filter(Boolean).join(', ')),
+        r.seen && h('div', { class: 'hint', style: { 'font-size': '13px', color: 'var(--faint)' } }, `Found ${r.seen}`))),
+    h('div', { class: 'acts' },
+      r.url && linkBtn('View', r.url, { small: true, ico: 'ext' }),
+      r.job_id ? btn('Open application', { small: true, kind: 'primary', onclick: () => openJob(r.job_id) })
+        : btn('Tailor', { small: true, kind: 'primary', busyKey: tailorKey, disabled: !aiOn(), title: aiOn() ? 'Add it and tailor your resume' : AI_OFF_SHORT,
+            onclick: () => act(tailorKey, async () => {
+              const res = await api(`/api/discover/${r.id}/tailor`, {});
+              r.job_id = res.job_id;
+              toast('Added. The agents are reading it now.', { action: 'Open', onAction: () => openJob(res.job_id) });
+              refresh(true);
+            }) }),
+      !r.job_id && btn('Dismiss', { small: true, kind: 'ghost', busyKey: `ddismiss:${r.id}`,
+        onclick: () => act(`ddismiss:${r.id}`, async () => { await api(`/api/discover/${r.id}/dismiss`, {}); toast('Dismissed.'); await refresh(true); }) })));
+}
+
+// ---------------------------------------------------------------- Profile
+const PROFILE_SECTIONS = [['about', 'About you'], ['cv', 'Your CV'], ['want', 'What you want'], ['visa', 'Work and visa'], ['ai', 'For the AI']];
+async function loadProfile(id) {
+  const data = await api('/api/profile' + (id != null ? `?id=${encodeURIComponent(id)}` : ''));
+  const P = state.profile;
+  P.data = data;
+  P.form = JSON.parse(JSON.stringify(data.profile || {}));
+  P.dirty = false;
+}
+function markDirty() {
+  if (!state.profile.dirty) { state.profile.dirty = true; paintSaveBar(); }
+}
+function paintSaveBar() {
+  const bar = $('#save-bar');
+  if (!bar) return;
+  const P = state.profile;
+  bar.replaceChildren(
+    h('span', { class: 'state' + (P.dirty ? ' dirty' : ''), role: 'status' }, P.saving ? 'Saving…' : P.dirty ? 'Unsaved changes' : 'All changes saved'),
+    h('button', { class: 'btn primary', type: 'button', disabled: P.saving || !P.dirty, onclick: saveProfile }, P.saving && h('span', { class: 'spinner' }), 'Save profile'));
+}
+async function saveProfile() {
+  const P = state.profile;
+  if (P.saving) return;
+  // Text still sitting in a chip box counts as added.
+  document.querySelectorAll('.chipfield input').forEach((i) => i.dispatchEvent(new Event('commit')));
+  P.saving = true; paintSaveBar();
+  try {
+    await api('/api/profile', P.form);
+    P.dirty = false;
+    toast('Profile saved.');
+    await loadProfile(P.form.id);
+    renderView();
+  } catch (e) {
+    if (e.status !== 401) toast(e.message, { error: true });
+  } finally { P.saving = false; paintSaveBar(); }
+}
+window.addEventListener('beforeunload', (e) => { if (state.profile.dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+function viewProfile() {
+  const P = state.profile;
+  const head = h('div', { class: 'page-head' }, h('h1', null, 'Profile'),
+    h('p', { class: 'sub' }, 'The assistant only states what’s here. Keep it complete and true.'));
+  if (state.viewError && !P.form) return h('div', null, head, errorCard(state.viewError, () => refresh()));
+  if (!P.form) return h('div', null, head, skeleton(4));
+  const f = P.form, opts = (P.data && P.data.options) || {};
+  const sec = state.route.section || P.section;
+  P.section = sec;
+  const profiles = (P.data && P.data.profiles) || [];
+  const current = profiles.find((x) => x.id === f.id);
+  const picker = profiles.length > 1 && h('div', { class: 'profile-pick', style: { 'margin-bottom': '6px' } },
+    h('label', null, h('span', { class: 'sr-only' }, 'Profile'),
+      h('select', { class: 'select', 'data-k': 'profile-pick', onchange: async (e) => {
+        const id = e.target.value;
+        if (P.dirty && !confirm('You have unsaved changes. Switch profiles and lose them?')) { e.target.value = String(f.id); return; }
+        try { await loadProfile(id); renderView(); } catch (err) { if (err.status !== 401) toast(err.message, { error: true }); }
+      } }, profiles.map((x) => h('option', { value: String(x.id), selected: x.id === f.id }, x.name)))),
+    current && current.active && h('span', { class: 'in-use-note' }, 'Used for new applications'));
+  const tabs = h('nav', { class: 'tabs', 'aria-label': 'Profile sections' }, PROFILE_SECTIONS.map(([k, label]) =>
+    h('a', { href: `#/profile/${k}`, 'aria-current': sec === k ? 'page' : null,
+      onclick: (e) => { e.preventDefault(); history.replaceState(null, '', `#/profile/${k}`); state.route.section = k; P.section = k; renderView(); window.scrollTo(0, 0); } }, label)));
+  const body = sec === 'cv' ? profileCv(f) : sec === 'want' ? profileWant(f, opts) : sec === 'visa' ? profileVisa(f, opts) : sec === 'ai' ? profileAi(f, opts) : profileAbout(f, opts);
+  const bar = h('div', { id: 'save-bar', class: 'save-bar', role: 'region', 'aria-label': 'Save' });
+  queueMicrotask(paintSaveBar);
+  return h('div', null, head, picker, tabs, body, bar);
+}
+
+// Form controls bound to state.profile.form. They never re-render the page while typing.
+const pHint = (t) => t && h('span', { class: 'hint', style: { 'font-weight': '400', color: 'var(--faint)' } }, t);
+function pText(f, key, label, o = {}) {
+  return h('label', { class: 'field' }, h('span', null, label),
+    h(o.area ? 'textarea' : 'input', { class: o.area ? 'textarea' + (o.cls ? ' ' + o.cls : '') : 'input', type: o.area ? null : (o.type || 'text'), inputmode: o.inputmode,
+      autocomplete: o.autocomplete || 'off', autocapitalize: o.autocapitalize, rows: o.rows, placeholder: o.placeholder, value: f[key] == null ? '' : String(f[key]),
+      'data-k': `pf:${key}`, oninput: (e) => { f[key] = e.target.value; markDirty(); } }),
+    pHint(o.hint));
+}
+function pSelect(f, key, label, options) {
+  const list = (options || []).slice();
+  const cur = f[key] == null ? '' : String(f[key]);
+  if (cur && !list.includes(cur)) list.unshift(cur);
+  return h('label', { class: 'field' }, h('span', null, label),
+    h('select', { class: 'select', 'data-k': `pf:${key}`, onchange: (e) => { f[key] = e.target.value; markDirty(); } },
+      !cur && h('option', { value: '', selected: true }, 'Choose…'),
+      list.map((o) => h('option', { value: o, selected: o === cur }, o))));
+}
+function pSwitch(f, key, label, onChange) {
+  return h('label', { class: 'switch' },
+    h('input', { type: 'checkbox', role: 'switch', checked: !!f[key], 'data-k': `pf:${key}`, onchange: (e) => { f[key] = e.target.checked; markDirty(); if (onChange) onChange(); } }),
+    h('span', null, label));
+}
+/** A list field edited as chips, with suggestions from /api/suggest (debounced 250 ms). Repaints itself, not the page. */
+function pChips(f, key, label, o = {}) {
+  if (!Array.isArray(f[key])) f[key] = [];
+  const items = f[key];
+  const listId = `sugg-${key}`;
+  const input = h('input', { type: 'text', placeholder: o.placeholder || 'Type and press Enter', 'data-k': `chip:${key}`, autocomplete: 'off',
+    enterkeyhint: 'enter', role: o.suggest ? 'combobox' : null, 'aria-autocomplete': o.suggest ? 'list' : null, 'aria-expanded': 'false',
+    'aria-controls': o.suggest ? listId : null, 'aria-label': label });
+  const chips = h('span', { style: { display: 'contents' } });
+  const box = h('div', { class: 'chipbox', onclick: (e) => { if (e.target === box) input.focus(); } }, chips, input);
+  const sugg = h('ul', { class: 'sugg', id: listId, role: 'listbox', hidden: true });
+  let found = [], hl = -1, seq = 0, timer;
+  const has = (v) => items.some((x) => x.toLowerCase() === v.toLowerCase());
+  const paintChips = () => chips.replaceChildren(...items.map((v, i) => h('span', { class: 'chip' }, h('span', null, v),
+    h('button', { type: 'button', 'aria-label': `Remove ${v}`, onclick: (e) => { e.stopPropagation(); items.splice(i, 1); markDirty(); paintChips(); input.focus(); } }, '×'))));
+  const add = (v) => {
+    v = (v || '').trim().replace(/\s+/g, ' ');
+    if (!v || has(v)) return false;
+    items.push(v); markDirty(); paintChips(); return true;
+  };
+  const closeSugg = () => { sugg.hidden = true; found = []; hl = -1; input.setAttribute('aria-expanded', 'false'); };
+  const paintSugg = (loading) => {
+    const show = loading || found.length > 0;
+    sugg.hidden = !show; input.setAttribute('aria-expanded', String(show));
+    sugg.replaceChildren(...(loading && !found.length ? [h('li', { class: 'loading' }, h('span', { class: 'spinner' }), 'Looking…')] :
+      found.map((v, i) => h('li', { role: 'option', 'aria-selected': String(i === hl) },
+        h('button', { type: 'button', class: i === hl ? 'hl' : '', tabindex: '-1', onclick: () => { add(v); input.value = ''; closeSugg(); input.focus(); } }, v)))));
+  };
+  const lookup = () => {
+    if (!o.suggest) return;
+    clearTimeout(timer);
+    const my = ++seq;
+    timer = setTimeout(async () => {
+      if (my !== seq) return;
+      paintSugg(true);
+      try {
+        const r = await api(`/api/suggest?field=${encodeURIComponent(o.suggest)}&q=${encodeURIComponent(input.value.trim())}`);
+        if (my !== seq || document.activeElement !== input) return;
+        found = (r.items || []).filter((x) => typeof x === 'string' && !has(x)).slice(0, 8); hl = -1; paintSugg(false);
+      } catch { if (my === seq) closeSugg(); }
+    }, 250);
+  };
+  sugg.addEventListener('pointerdown', (e) => e.preventDefault()); // keep focus in the input while tapping a suggestion
+  sugg.addEventListener('mousedown', (e) => e.preventDefault());
+  input.addEventListener('input', () => {
+    if (input.value.includes(',')) { const parts = input.value.split(','); input.value = parts.pop(); parts.forEach(add); }
+    lookup();
+  });
+  input.addEventListener('focus', lookup);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); if (hl >= 0 && found[hl]) add(found[hl]); else add(input.value); input.value = ''; closeSugg(); lookup(); }
+    else if (e.key === 'ArrowDown' && found.length) { e.preventDefault(); hl = (hl + 1) % found.length; paintSugg(false); }
+    else if (e.key === 'ArrowUp' && found.length) { e.preventDefault(); hl = (hl - 1 + found.length) % found.length; paintSugg(false); }
+    else if (e.key === 'Escape') closeSugg();
+    else if (e.key === 'Backspace' && !input.value && items.length) { items.pop(); markDirty(); paintChips(); }
+  });
+  const commit = () => { if (input.value.trim()) { add(input.value); input.value = ''; } };
+  input.addEventListener('commit', commit);
+  input.addEventListener('blur', () => { seq++; clearTimeout(timer); commit(); closeSugg(); });
+  paintChips();
+  return h('div', { class: 'field chipfield' }, h('span', null, label), box, sugg, pHint(o.hint));
+}
+function pCard(title, hint, ...kids) { return h('div', { class: 'card' }, h('h2', null, title), hint && h('p', { class: 'hint' }, hint), ...kids); }
+
+function profileAbout(f, opts) {
+  return h('div', { class: 'stack' },
+    pCard('About you', 'Printed at the top of every resume, and used when a form asks for them.',
+      pText(f, 'name', 'Profile name', { hint: 'Only you see this, e.g. “Data science” or “ML engineering”.' }),
+      h('div', { class: 'form-grid two' },
+        pText(f, 'full_name', 'Full name', { autocomplete: 'name' }),
+        pText(f, 'headline', 'Headline', { placeholder: 'Data Scientist building agentic AI systems' }),
+        pText(f, 'email', 'Email', { type: 'email', inputmode: 'email', autocapitalize: 'off', placeholder: 'you@example.com' }),
+        pText(f, 'phone', 'Phone', { type: 'tel', inputmode: 'tel', placeholder: '+31 6 1234 5678' }),
+        pText(f, 'city', 'City', { placeholder: 'Amsterdam' }),
+        pSelect(f, 'country', 'Country you live in', opts.countries))),
+    pCard('Links', 'Shown on your resume.',
+      h('div', { class: 'form-grid two' },
+        pText(f, 'linkedin', 'LinkedIn', { inputmode: 'url', autocapitalize: 'off', placeholder: 'linkedin.com/in/yourname' }),
+        pText(f, 'github', 'GitHub', { inputmode: 'url', autocapitalize: 'off', placeholder: 'github.com/yourname' }),
+        pText(f, 'website', 'Personal website or portfolio', { inputmode: 'url', autocapitalize: 'off', placeholder: 'yourname.dev' }),
+        pText(f, 'other_link', 'Other link', { inputmode: 'url', autocapitalize: 'off', placeholder: 'Google Scholar, Kaggle, Behance…' }))));
+}
+function profileCv(f) {
+  const text = (f.cv_md || '').trim();
+  const words = text ? text.split(/\s+/).length : 0;
+  return pCard('Your CV', 'Every claim in a tailored resume must trace back to this, so keep it complete: all roles, dates and results.',
+    pText(f, 'cv_md', 'Your full CV', { area: true, cls: 'cv-area', rows: 20, placeholder: 'Paste your CV here: roles, dates and results.' }),
+    h('p', { class: 'hint' }, `About ${words} words. To import a PDF, use Job Command Center on your computer.`));
+}
+function profileWant(f, opts) {
+  return h('div', { class: 'stack' },
+    pCard('The roles you want', 'The company scanner looks for these titles, and each posting is scored against them.',
+      pChips(f, 'target_roles', 'Job titles', { suggest: 'target-roles', placeholder: 'Start typing, e.g. Data Scientist' }),
+      pChips(f, 'exclude_words', 'Words that rule a job out', { placeholder: 'e.g. Intern', hint: '“Intern” also rules out “Internship”.' }),
+      h('div', { class: 'form-grid two' }, pSelect(f, 'seniority', 'Level', opts.seniority), pSelect(f, 'work_mode', 'Way of working', opts.work_modes))),
+    pCard('Where', 'The scanner keeps jobs in these places; postings elsewhere are scored lower and flagged.',
+      pChips(f, 'countries', 'Countries', { suggest: 'countries', placeholder: 'Start typing a country' }),
+      pChips(f, 'cities', 'Cities (optional)', { suggest: 'cities', placeholder: 'Type a city' }),
+      pChips(f, 'avoid_places', 'Places to leave out (optional)', { suggest: 'avoid-places', placeholder: 'Country or city' }),
+      pSwitch(f, 'relocate', 'Open to relocating')),
+    pCard('Pay', 'Used to judge postings and to answer salary questions. Never sent anywhere else.',
+      h('div', { class: 'form-grid two' },
+        pText(f, 'salary_target', 'Target (per year)', { placeholder: '75,000 – 90,000' }),
+        pText(f, 'salary_minimum', 'Lowest you’d accept', { placeholder: '70,000' }),
+        pSelect(f, 'currency', 'Currency', opts.currencies))));
+}
+function profileVisa(f, opts) {
+  return h('div', { class: 'stack' },
+    pCard('Right to work', 'Application forms ask about this; the assistant answers only from what you set here and never guesses.',
+      pChips(f, 'authorized_in', 'Countries where you can already work', { suggest: 'authorized-in', placeholder: 'Start typing a country' }),
+      pSwitch(f, 'needs_sponsorship', 'I need visa sponsorship for the countries I want', () => renderView()),
+      f.needs_sponsorship && pText(f, 'visa_notes', 'Visa details', { area: true, rows: 3, placeholder: 'e.g. Eligible for the Dutch highly skilled migrant visa' })),
+    pCard('Availability and languages', null,
+      pSelect(f, 'notice', 'Notice period', opts.notice),
+      pChips(f, 'languages', 'Languages', { suggest: 'languages', placeholder: 'e.g. English (fluent)', hint: 'Add the level in brackets.' })));
+}
+function profileAi(f, opts) {
+  return h('div', { class: 'stack' },
+    pCard('Your story', 'How the assistant should frame you in summaries, cover letters and answers.',
+      pText(f, 'story', 'In two or three sentences: what you do, and where you’re heading', { area: true, rows: 4,
+        placeholder: 'e.g. I build production AI systems at a bank and want to move to an applied AI team in Amsterdam.' }),
+      pChips(f, 'strengths', 'Strengths to highlight', { suggest: 'strengths', placeholder: 'e.g. Production RAG systems' }),
+      pText(f, 'avoid', 'Never mention', { placeholder: 'e.g. my current salary, the gap in 2019' }),
+      pSelect(f, 'tone', 'Tone', opts.tones)),
+    pCard('Anything else', 'Optional. Anything the assistant should know that doesn’t fit above.',
+      pText(f, 'notes_md', 'Notes for the assistant', { area: true, rows: 6 })));
+}
+
+// ---------------------------------------------------------------- Settings
+async function loadSettings(force) {
+  const data = await api('/api/settings');
+  const St = state.settings;
+  St.data = data;
+  if (!St.form || !St.dirty || force) {
+    const s = data.search || {};
+    St.form = { auto: !!s.auto, limit: s.limit == null ? '' : String(s.limit), interval: s.interval == null ? '' : String(s.interval) };
+    St.dirty = false;
+  }
+}
+function viewSettings() {
+  const St = state.settings;
+  const head = h('div', { class: 'page-head' }, h('h1', null, 'Settings'),
+    h('p', { class: 'sub' }, 'What you can change from here. Everything else lives on your computer.'));
+  if (state.viewError && !St.data) return h('div', null, head, errorCard(state.viewError, () => refresh()));
+  if (!St.data) return h('div', null, head, skeleton(3));
+  const d = St.data, f = St.form, ai = d.ai || {};
+  const favs = d.favourite_companies;
+  const favCount = Array.isArray(favs) ? favs.length : Number(favs) || 0;
+  const dirty = () => { St.dirty = true; const b = $('#save-search'); if (b) b.disabled = false; };
+
+  const aiCard = h('div', { class: 'card' }, h('h2', null, 'Your AI'),
+    ai.connected
+      ? h('p', { class: 'status-line' }, h('span', { class: 'dot good-dot', 'aria-hidden': 'true' }),
+          h('span', null, 'Connected to ', h('b', null, ai.provider || 'your AI service'), ai.model ? [' · ', h('span', null, ai.model)] : ''))
+      : h('div', { class: 'banner warn', style: { margin: '0' } }, icon('warn'),
+          h('span', { class: 'grow' }, "Not connected. Open Job Command Center on your computer → Settings to connect it.")));
+
+  const num = (key, label, min, max, hint) => h('label', { class: 'field' }, h('span', null, label),
+    h('input', { class: 'input', type: 'number', inputmode: 'numeric', min: String(min), max: String(max), step: '1', value: f[key], 'data-k': `set:${key}`,
+      oninput: (e) => { f[key] = e.target.value; dirty(); } }), pHint(hint));
+  const saveSearch = () => act('save-search', async () => {
+    const limit = parseInt(f.limit, 10), interval = parseInt(f.interval, 10);
+    if (!(limit >= 1 && limit <= 50)) throw new ApiError(400, '“At most per scan” should be a number from 1 to 50.');
+    if (!(interval >= 1 && interval <= 168)) throw new ApiError(400, '“Scan every” should be a number of hours from 1 to 168.');
+    await api('/api/settings/search', { auto: f.auto, limit, interval });
+    St.dirty = false;
+    toast('Search settings saved.');
+    await loadSettings(true);
+  });
+  const searchCard = h('div', { class: 'card' }, h('h2', null, 'Automatic job search'),
+    h('p', { class: 'hint' }, favCount
+      ? `The app checks the careers pages of your ${favCount === 1 ? 'favourite company' : `${favCount} favourite companies`} for new roles.`
+      : 'Add favourite companies on your computer, and the app checks their careers pages for new roles.'),
+    Array.isArray(favs) && favs.length > 0 && h('div', { class: 'chips' }, favs.slice(0, 12).map((c) => h('span', { class: 'chip' }, String(c))),
+      favs.length > 12 && h('span', { class: 'chip' }, `+${favs.length - 12} more`)),
+    h('label', { class: 'switch' }, h('input', { type: 'checkbox', role: 'switch', checked: f.auto, 'data-k': 'set:auto',
+      onchange: (e) => { f.auto = e.target.checked; dirty(); } }), h('span', null, 'Tailor new matches automatically')),
+    h('div', { class: 'form-grid two' },
+      num('limit', 'At most per scan', 1, 50, 'How many new matches get a tailored resume each time.'),
+      num('interval', 'Scan every (hours)', 1, 168, null)),
+    h('div', { class: 'actions' }, h('button', { id: 'save-search', class: 'btn primary', type: 'button', disabled: !St.dirty || state.busy.has('save-search'), onclick: saveSearch },
+      state.busy.has('save-search') && h('span', { class: 'spinner' }), 'Save search settings')));
+
+  const scanCard = h('div', { class: 'card' }, h('h2', null, 'Scan now'),
+    d.scanning
+      ? working('Scanning your companies… new roles show up in Discover.')
+      : h('p', { class: 'hint' }, 'Check your favourite companies for new roles right away instead of waiting for the next scan.'),
+    h('div', { class: 'actions' },
+      btn('Scan my companies now', { kind: d.scanning ? '' : 'primary', busyKey: 'scan', disabled: d.scanning || !favCount,
+        onclick: () => act('scan', async () => {
+          try { await api('/api/scan', {}); toast('Scanning. New roles will show up in Discover.'); }
+          catch (e) { if (e.status === 409) toast('A scan is already running.'); else throw e; }
+          await loadSettings(); renderView(); schedulePoll();
+        }) }),
+      d.scanning && h('a', { class: 'btn ghost', href: '#/discover' }, 'Open Discover')));
+
+  const only = (d.desktop_only || []).filter((x) => typeof x === 'string' && x);
+  const foot = h('div', { class: 'stack', style: { 'margin-top': '6px' } },
+    only.length > 0 && h('p', { class: 'hint' }, `Changed only on the computer: ${only.join(', ')}.`),
+    h('div', null, btn('Sign out', { ico: 'signout', onclick: signOut })));
+  return h('div', null, head, h('div', { class: 'grid2' }, h('div', { class: 'stack' }, aiCard, searchCard), h('div', { class: 'stack' }, scanCard)), foot);
+}
+
+// ---------------------------------------------------------------- Application page
+const TABS = [['overview', 'Overview'], ['resume', 'Resume'], ['cover', 'Cover letter'], ['qa', 'Q&A'], ['activity', 'Activity']];
+function viewJob() {
+  const r = state.route;
+  const j = state.job && state.job.id === r.id ? state.job : null;
+  const back = h('a', { class: 'btn ghost back', href: '#/applications',
+    onclick: (e) => { if (state.navDepth > 0) { e.preventDefault(); state.navDepth--; history.back(); } } }, icon('back'), 'Back');
+  if (!j) {
+    if (state.jobError) return h('div', null, back, errorCard(state.jobError, () => refresh()));
+    return h('div', null, back, h('div', { class: 'ticket', style: { '--band': '#5B6B6A', height: '180px' } }), skeleton(3));
+  }
+  const tabs = h('nav', { class: 'tabs', 'aria-label': 'Sections' }, TABS.map(([k, label]) =>
+    h('a', { href: `#/job/${j.id}/${k}`, 'aria-current': r.tab === k ? 'page' : null,
+      onclick: (e) => { e.preventDefault(); history.replaceState(null, '', `#/job/${j.id}/${k}`); state.route.tab = k; renderView(); } }, label)));
+  const body = r.tab === 'resume' ? tabResume(j) : r.tab === 'cover' ? tabCover(j) : r.tab === 'qa' ? tabQA(j) : r.tab === 'activity' ? tabActivity(j) : tabOverview(j);
+  return h('div', null, back, ticket(j), tabs, body);
+}
+function ticket(j) {
+  const base = STAGE_COLORS[Math.max(0, Math.min(5, j.position || 0))];
+  const band = j.ended ? '#5B6B6A' : shade(base, j.position === 4 ? 0.62 : 0.74);
+  return h('section', { class: 'ticket', style: { '--band': band }, 'aria-label': 'Application' },
+    h('div', { class: 'head' }, mono(j.initial, j.hue, 52, true),
+      h('div', { style: { flex: '1', 'min-width': '0' } }, h('h1', null, j.title),
+        h('p', { class: 'co' }, j.location ? `${j.company}, ${j.location}` : j.company))),
+    (j.working || j.fit || j.ats) && h('div', { class: 'nums' },
+      j.working && working(j.stage_label || 'Working'),
+      j.fit && h('span', { class: 'num' }, `Fit ${j.fit}`, h('small', null, ' / 5')),
+      j.ats && h('span', { class: 'num' }, `ATS ${j.ats}`)),
+    track(j.position, j.ended, j.status, { onDark: true }));
+}
+function aiNote() { return aiOn() ? null : h('p', { class: 'ai-note' }, AI_OFF_SHORT); }
+function draft(key, init) { if (!(key in state.drafts)) state.drafts[key] = init; return state.drafts[key]; }
+
+// -- Overview
+function tabOverview(j) {
+  const left = h('div', { class: 'stack' },
+    j.error && h('div', { class: 'banner risk', role: 'alert' }, icon('warn'), h('span', { class: 'grow' }, j.error)),
+    j.duplicate_note && h('div', { class: 'banner warn' }, icon('warn'), h('span', { class: 'grow' }, j.duplicate_note)),
+    fitCard(j), roleCard(j));
+  return h('div', { class: 'grid2' }, left, h('div', { class: 'stack' }, progressCard(j)));
+}
+function fitCard(j) {
+  const hasAny = j.fit_summary || (j.strengths || []).length || (j.gaps || []).length || (j.red_flags || []).length;
+  if (!hasAny) {
+    return h('div', { class: 'card' }, h('h2', null, 'Why it fits, or doesn’t'),
+      j.working ? working(j.stage_label || 'The agents are reading the posting') : h('p', { class: 'hint' }, "The agents haven't checked the fit yet."));
+  }
+  const listOf = (items, dot) => h('ul', { class: 'bullets', style: { '--dot': dot } }, items.map((x) => h('li', null, x)));
+  return h('div', { class: 'card' },
+    h('h2', null, 'Why it fits, or doesn’t'),
+    (j.recommendation || j.fit) && h('div', { class: 'kv' },
+      j.fit && h('span', null, 'Fit ', h('b', { class: scoreClass(j.fit, 4, 3.5) }, `${j.fit} / 5`)),
+      j.recommendation && h('span', null, 'Advice ', h('b', null, j.recommendation))),
+    j.fit_summary && h('p', { class: 'prose' }, j.fit_summary),
+    (j.strengths || []).length > 0 && [h('h3', null, 'Strengths'), listOf(j.strengths, 'var(--good)')],
+    (j.gaps || []).length > 0 && [h('h3', null, 'Gaps to handle'), listOf(j.gaps, 'var(--marigold)')],
+    (j.red_flags || []).length > 0 && [h('h3', null, 'Watch out for'), listOf(j.red_flags, 'var(--risk)')],
+    (j.archetype || j.work_auth) && h('div', { class: 'kv' },
+      j.archetype && h('span', null, 'Role type ', h('b', null, j.archetype)),
+      j.work_auth && h('span', null, 'Work authorization ', h('b', null, j.work_auth))));
+}
+function roleCard(j) {
+  const facts = [j.salary, j.remote, j.seniority].filter(Boolean);
+  let summary = j.job_summary || '';
+  const long = summary.length > 600;
+  const expanded = state.drafts[`role-more:${j.id}`];
+  return h('div', { class: 'card' },
+    h('h2', null, 'The role'),
+    facts.length > 0 && h('div', { class: 'chips' }, facts.map((f) => h('span', { class: 'chip' }, f))),
+    summary ? h('p', { class: 'prose' }, long && !expanded ? summary.slice(0, 600).trimEnd() + '…' : summary) : h('p', { class: 'hint' }, 'No description yet.'),
+    h('div', { class: 'actions' },
+      long && btn(expanded ? 'Show less' : 'Show more', { kind: 'ghost small', onclick: () => { state.drafts[`role-more:${j.id}`] = !expanded; renderView(); } }),
+      j.url && linkBtn('Open posting', j.url, { small: true, ico: 'ext' })));
+}
+function progressCard(j) {
+  const key = `progress:${j.id}`;
+  const d = draft(key, { next_step: j.next_step || '', date: /^\d{4}-\d{2}-\d{2}$/.test(j.next_step_date || '') ? j.next_step_date : '', notes: j.notes || '' });
+  const statuses = j.statuses && j.statuses.length ? j.statuses : STATUS_FILTERS.slice(3);
+  const opts = statuses.includes(j.status) ? statuses : [j.status, ...statuses];
+  const save = () => act(`save:${j.id}`, async () => {
+    if (d.date && !/^\d{4}-\d{2}-\d{2}$/.test(d.date)) throw new ApiError(400, 'Use a date like 2026-10-20.');
+    await api(`/api/jobs/${j.id}/progress`, { next_step: d.next_step, date: d.date, notes: d.notes });
+    delete state.drafts[key];
+    toast('Saved.');
+    await refresh(true);
+  });
+  return h('div', { class: 'card' },
+    h('h2', null, 'Your progress'),
+    h('label', { class: 'field' }, h('span', null, 'Status'),
+      h('select', { class: 'select', 'data-k': `status:${j.id}`, disabled: j.working,
+        onchange: (e) => { const s = e.target.value; act(`status:${j.id}`, async () => { await api(`/api/jobs/${j.id}/status`, { status: s }); toast(`Status set to ${s}.`); await refresh(true); }); } },
+        opts.map((s) => h('option', { value: s, selected: s === j.status }, s)))),
+    j.applied && h('p', null, `Applied on ${j.applied}`),
+    h('label', { class: 'field' }, h('span', null, 'Next step'),
+      h('input', { class: 'input', type: 'text', value: d.next_step, placeholder: 'e.g. Follow up with the recruiter', 'data-k': `ns:${j.id}`, oninput: (e) => { d.next_step = e.target.value; } })),
+    h('label', { class: 'field' }, h('span', null, 'When'),
+      h('input', { class: 'input', type: 'date', value: d.date, 'data-k': `nd:${j.id}`, oninput: (e) => { d.date = e.target.value; } })),
+    h('label', { class: 'field' }, h('span', null, 'Notes'),
+      h('textarea', { class: 'textarea', rows: 4, value: d.notes, 'data-k': `notes:${j.id}`, oninput: (e) => { d.notes = e.target.value; } })),
+    h('div', { class: 'actions' },
+      btn('Save progress', { kind: 'primary', busyKey: `save:${j.id}`, onclick: save }),
+      j.ended
+        ? btn('Reopen', { busyKey: `reopen:${j.id}`, onclick: () => act(`reopen:${j.id}`, async () => { await api(`/api/jobs/${j.id}/reopen`, {}); toast('Reopened.'); await refresh(true); }) })
+        : btn('Close this application', { kind: 'ghost', disabled: j.working, onclick: () => openCloseSheet([j]) })));
+}
+
+// -- Resume
+function tabResume(j) {
+  const versions = j.versions || [];
+  const cur = versions.find((v) => v.current) || versions.find((v) => v.id === j.current_version) || null;
+  const tailorBtn = (primary) => btn('Tailor a new version', { kind: primary ? 'primary' : '', busyKey: `tailor:${j.id}`, disabled: !aiOn() || j.working,
+    onclick: () => act(`tailor:${j.id}`, async () => { await api(`/api/jobs/${j.id}/tailor`, {}); toast('The writer is on it. This page updates by itself.'); await refresh(true); }) });
+  const workingCard = j.working && h('div', { class: 'card' }, working(j.stage_label || 'The writer is on it'),
+    h('p', { class: 'hint' }, 'You can leave this page; the work carries on on your computer.'));
+  if (!versions.length) {
+    return h('div', { class: 'stack' }, workingCard, h('div', { class: 'card' }, h('div', { class: 'empty' },
+      h('strong', null, 'No tailored resume yet'),
+      h('p', null, 'The writer makes a version of your resume for this job, using only facts from your profile.'),
+      !j.working && tailorBtn(true), aiNote())));
+  }
+  const pdf = (v) => `/api/jobs/${j.id}/pdf?key=${encodeURIComponent(j.pdf_key || '')}` + (v ? `&version=${encodeURIComponent(v.id)}` : '');
+  const left = h('div', { class: 'stack' }, workingCard, atsCard(j, cur, pdf), reviseCard(j));
+  const list = h('div', { class: 'card' }, h('h2', null, 'Versions'),
+    h('div', { class: 'versions' }, versions.slice().reverse().map((v) => h('div', { class: 'version' },
+      h('div', { class: 'main' },
+        h('div', null, h('b', null, v.label), v.current && h('span', { class: 'in-use' }, 'In use')),
+        h('div', null, [v.template_name && `${v.template_name} design`, v.created, v.note].filter(Boolean).join(' · '))),
+      v.ats != null && atsScore(v.ats),
+      linkBtn('PDF', pdf(v), { small: true, ico: 'doc' })))),
+    h('div', { class: 'actions' }, tailorBtn(false)), aiNote());
+  return h('div', { class: 'grid2' }, left, h('div', { class: 'stack' }, list));
+}
+function atsCard(j, cur, pdf) {
+  const rep = j.ats_report;
+  const head = h('div', { style: { display: 'flex', 'justify-content': 'space-between', gap: '12px', 'align-items': 'flex-start', 'flex-wrap': 'wrap' } },
+    h('div', null, h('h2', null, cur ? cur.label : 'Current version'), cur && h('p', { class: 'hint' }, [cur.template_name && `${cur.template_name} design`, cur.created].filter(Boolean).join(' · '))),
+    linkBtn('Open PDF', pdf(cur), { kind: 'primary', ico: 'doc' }));
+  if (!rep) return h('div', { class: 'card' }, head, h('p', { class: 'hint' }, 'No check from the hiring-software reader yet.'));
+  const cls = scoreClass(rep.score, 85, 70);
+  const chips = (items, c) => h('div', { class: 'chips' }, items.map((x) => h('span', { class: 'chip ' + c }, x)));
+  return h('div', { class: 'card' }, head,
+    h('h3', null, 'What hiring software sees'),
+    h('div', { class: 'big-score' }, h('span', { class: 'n ' + cls }, String(rep.score)), h('span', { class: 'hint' }, rep.score >= 85 ? 'Passes the target of 85.' : 'Below the target of 85.')),
+    h('div', { class: 'meter ' + cls, role: 'img', 'aria-label': `Score ${rep.score} of 100` }, h('i', { style: { width: Math.max(0, Math.min(100, rep.score)) + '%' } })),
+    h('div', { class: 'kv' },
+      h('span', null, 'Keywords ', h('b', null, `${rep.coverage}%`)),
+      h('span', null, 'Layout ', h('b', null, `${rep.structure}%`)),
+      h('span', null, 'Pages ', h('b', null, String(rep.pages)))),
+    (rep.matched || []).length > 0 && [h('h3', null, `Keywords in the PDF (${rep.matched.length})`), chips(rep.matched, 'good')],
+    (rep.missing || []).length > 0 && [h('h3', null, 'Missing, but backed by your experience'), chips(rep.missing, 'mid')],
+    (rep.gaps || []).length > 0 && [h('h3', null, 'Not claimed: your profile doesn’t show these'), chips(rep.gaps, '')],
+    (rep.unsupported || []).length > 0 && [h('h3', null, 'Check these claims'), chips(rep.unsupported, 'bad')]);
+}
+function reviseCard(j) {
+  const key = `revise:${j.id}`;
+  const d = draft(key, { text: '' });
+  return h('div', { class: 'card' },
+    h('h2', null, 'Change it'),
+    h('p', { class: 'hint' }, 'Tell the writer what to change. Facts still come only from your profile.'),
+    h('textarea', { class: 'textarea', rows: 3, placeholder: 'e.g. Make the summary shorter', value: d.text, 'data-k': key, disabled: !aiOn(),
+      oninput: (e) => { d.text = e.target.value; } }),
+    h('div', { class: 'actions' }, btn('Revise', { kind: 'primary', busyKey: `do-${key}`, disabled: !aiOn() || j.working,
+      onclick: () => {
+        if (!d.text.trim()) { toast('Write what you want changed first.'); return; }
+        act(`do-${key}`, async () => { await api(`/api/jobs/${j.id}/revise`, { instruction: d.text.trim() }); delete state.drafts[key]; toast('The writer is on it.'); await refresh(true); });
+      } })),
+    aiNote());
+}
+
+// -- Cover letter
+function tabCover(j) {
+  if (!j.cover_letter) {
+    return h('div', { class: 'card' }, h('div', { class: 'empty' }, h('strong', null, 'No cover letter yet'),
+      h('p', null, j.working ? 'The writer is working on this application.' : 'The writer drafts one after the resume is tailored.')));
+  }
+  return h('div', { class: 'card' },
+    h('div', { style: { display: 'flex', 'justify-content': 'space-between', 'align-items': 'center', gap: '12px' } },
+      h('h2', null, 'Cover letter'), btn('Copy', { ico: 'copy', onclick: () => copyWithFeedback(j.cover_letter) })),
+    h('div', { class: 'prose' }, j.cover_letter));
+}
+
+// -- Q&A
+function tabQA(j) {
+  const key = `ask:${j.id}`;
+  const d = draft(key, { text: '' });
+  const pending = state.asking[j.id];
+  const chat = j.chat || [];
+  const already = pending && chat.length && chat[chat.length - 1].role === 'user' && chat[chat.length - 1].content === pending;
+  const thread = h('div', { class: 'chat', 'aria-live': 'polite' },
+    chat.length === 0 && !pending && h('p', { class: 'hint' }, 'No questions yet.'),
+    chat.map((m) => bubble(m)),
+    pending && !already && h('div', { class: 'bubble user' }, pending),
+    pending && h('div', { class: 'bubble assistant' }, h('span', { class: 'thinking' }, h('span', { class: 'dots', 'aria-hidden': 'true' }, h('i'), h('i'), h('i')),
+      'Thinking… this can take up to a minute.')));
+  const ask = (q) => {
+    q = (q || '').trim();
+    if (!q) { toast('Type a question first.'); return; }
+    if (!aiOn() || state.asking[j.id]) return;
+    state.asking[j.id] = q;
+    d.text = '';
+    renderView();
+    setTimeout(() => { const t = $('.thinking'); if (t) t.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 30);
+    api(`/api/jobs/${j.id}/ask`, { question: q }).then(async (msg) => {
+      delete state.asking[j.id];
+      if (state.job && state.job.id === j.id && msg && msg.id != null) {
+        const c = state.job.chat || (state.job.chat = []);
+        if (!c.some((m) => m.id === msg.id)) {
+          if (!(c.length && c[c.length - 1].role === 'user' && c[c.length - 1].content === q)) c.push({ id: `local-${Date.now()}`, role: 'user', content: q, meta: '', saved: false });
+          c.push(msg);
+        }
+      }
+      renderView();
+      refresh(true);
+    }).catch((e) => {
+      delete state.asking[j.id];
+      if (!d.text) d.text = q;
+      if (e.status !== 401) toast(e.message, { error: true });
+      renderView();
+    });
+  };
+  const composer = h('div', { class: 'composer' },
+    h('div', { class: 'suggest' }, SUGGESTIONS.map((s) => btn(s, { small: true, disabled: !aiOn() || !!pending, onclick: () => ask(s) }))),
+    h('label', { class: 'field' }, h('span', { class: 'sr-only' }, 'Your question'),
+      h('textarea', { class: 'textarea', rows: 3, placeholder: 'Paste a question from the application form', value: d.text, 'data-k': key, disabled: !aiOn(),
+        oninput: (e) => { d.text = e.target.value; },
+        onkeydown: (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); ask(d.text); } } })),
+    h('div', { class: 'actions' }, btn(pending ? 'Thinking…' : 'Ask', { kind: 'primary', disabled: !aiOn() || !!pending, onclick: () => ask(d.text) })),
+    aiNote());
+  return h('div', { class: 'stack' },
+    h('div', { class: 'card' }, h('h2', null, 'Application questions'),
+      h('p', { class: 'hint' }, 'Paste a question from the application form. Answers come from your profile, this job’s resume and the answers you saved before. Save good answers to reuse them later.'),
+      thread),
+    h('div', { class: 'card' }, composer));
+}
+function bubble(m) {
+  if (m.role === 'user') return h('div', { class: 'bubble user' }, m.content);
+  const saveKey = `chatsave:${m.id}`;
+  const canSave = typeof m.id === 'number' || /^\d+$/.test(String(m.id));
+  return h('div', { class: 'bubble assistant' }, m.content,
+    h('div', { class: 'tools' },
+      btn('Copy', { kind: 'ghost small', ico: 'copy', onclick: () => copyWithFeedback(m.content) }),
+      canSave && h('button', { class: 'btn ghost small' + (m.saved ? ' saved' : ''), type: 'button', 'aria-pressed': String(!!m.saved), disabled: state.busy.has(saveKey),
+        onclick: () => act(saveKey, async () => {
+          const r = await api(`/api/chat/${m.id}/save`, {});
+          m.saved = !!r.saved;
+          toast(m.saved ? 'Saved for later applications.' : 'Removed from saved answers.');
+        }) }, icon(m.saved ? 'starOn' : 'star'), m.saved ? 'Saved' : 'Save'),
+      m.meta && h('span', { class: 'meta' }, m.meta)));
+}
+
+// -- Activity
+function tabActivity(j) {
+  const work = j.work || [], events = j.events || [];
+  return h('div', { class: 'grid2' },
+    h('div', { class: 'card' }, h('h2', null, 'What the agents did'),
+      work.length === 0 ? h('p', { class: 'hint' }, 'Nothing yet.')
+        : h('ul', { class: 'timeline' }, work.slice().reverse().map((w) => h('li', null, h('time', null, w.time),
+          h('div', { class: w.level === 'warn' || w.level === 'warning' ? 'warn' : w.level === 'error' ? 'error' : '' }, h('span', { class: 'agent' }, w.agent), ' ', w.message))))),
+    h('div', { class: 'card' }, h('h2', null, 'Timeline'),
+      events.length === 0 ? h('p', { class: 'hint' }, 'Nothing yet.')
+        : h('ul', { class: 'timeline' }, events.slice().reverse().map((e) => h('li', null, h('time', null, e.time), h('div', null, e.text))))));
+}
+
+// ---------------------------------------------------------------- sheets
+let sheetClose = null, sheetReturnFocus = null;
+function openSheet(build, label) {
+  closeSheet();
+  sheetReturnFocus = document.activeElement;
+  const layer = $('#layer');
+  const close = () => closeSheet();
+  const sheet = h('div', { class: 'sheet', role: 'dialog', 'aria-modal': 'true', 'aria-label': label || 'Dialog' });
+  const overlay = h('div', { class: 'overlay', onclick: (e) => { if (e.target === overlay) close(); } }, sheet);
+  const paint = () => sheet.replaceChildren(h('div', { class: 'grab', 'aria-hidden': 'true' }), ...[build(close, paint)].flat());
+  paint();
+  layer.replaceChildren(overlay);
+  document.body.style.overflow = 'hidden';
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  sheetClose = () => { document.removeEventListener('keydown', onKey); };
+  setTimeout(() => { const f = sheet.querySelector('input, select, textarea, button:not([disabled])'); if (f && !isTouch()) f.focus(); else sheet.focus(); }, 30);
+  sheet.tabIndex = -1;
+}
+function closeSheet() {
+  if (sheetClose) sheetClose();
+  sheetClose = null;
+  $('#layer').replaceChildren();
+  document.body.style.overflow = '';
+  if (sheetReturnFocus && sheetReturnFocus.isConnected) try { sheetReturnFocus.focus({ preventScroll: true }); } catch { /* ignore */ }
+  sheetReturnFocus = null;
+}
+
+// -- Close one or many
+async function getCloseReasons(jobs) {
+  if (state.closeReasons) return state.closeReasons;
+  if (Array.isArray(state.me?.close_reasons) && state.me.close_reasons.length) return (state.closeReasons = state.me.close_reasons);
+  try {
+    const j = await api(`/api/jobs/${jobs[0].id}`);
+    if (Array.isArray(j.close_reasons) && j.close_reasons.length) state.closeReasons = j.close_reasons;
+  } catch (e) { if (e.status === 401) throw e; }
+  return state.closeReasons || DEFAULT_CLOSE_REASONS;
+}
+async function openCloseSheet(jobs) {
+  if (!jobs.length) return;
+  let reasons;
+  try { reasons = await getCloseReasons(jobs); } catch { return; }
+  const f = { reason: reasons[0], note: '', busy: false };
+  const many = jobs.length > 1;
+  openSheet((close, paint) => [
+    h('h2', null, many ? `Close ${jobs.length} applications` : 'Close this application'),
+    !many && h('p', { style: { 'font-weight': '700' } }, `${jobs[0].title}`, h('span', { class: 'hint', style: { 'font-weight': '400' } }, ` · ${jobs[0].company}`)),
+    h('p', { class: 'hint' }, 'It stays in your history. If the same job turns up again, the app will tell you.'),
+    h('label', { class: 'field' }, h('span', null, 'Why are you closing ' + (many ? 'them' : 'it') + '?'),
+      h('select', { class: 'select', onchange: (e) => { f.reason = e.target.value; } }, reasons.map((r) => h('option', { value: r, selected: r === f.reason }, r)))),
+    h('label', { class: 'field' }, h('span', null, 'Note (optional)'),
+      h('textarea', { class: 'textarea', rows: 2, value: f.note, oninput: (e) => { f.note = e.target.value; } })),
+    h('div', { class: 'actions' },
+      btn('Cancel', { onclick: close }),
+      h('button', { class: 'btn danger', type: 'button', disabled: f.busy, onclick: async () => {
+        f.busy = true; paint();
+        try {
+          const ids = jobs.map((x) => x.id);
+          if (many) await api('/api/jobs/close', { ids, reason: f.reason, note: f.note });
+          else await api(`/api/jobs/${ids[0]}/close`, { reason: f.reason, note: f.note });
+          close();
+          state.apps.selecting = false; state.apps.selected.clear();
+          toast(many ? `Closed ${ids.length} applications.` : 'Closed.', { action: 'Undo', onAction: () => undoClose(ids) });
+          await refresh(true);
+        } catch (e) {
+          f.busy = false; paint();
+          if (e.status !== 401) toast(e.message, { error: true });
+        }
+      } }, f.busy && h('span', { class: 'spinner' }), many ? 'Close them' : 'Close it')),
+  ], 'Close applications');
+}
+async function undoClose(ids) {
+  try {
+    await Promise.all(ids.map((id) => api(`/api/jobs/${id}/reopen`, {})));
+    toast(ids.length > 1 ? 'Reopened them.' : 'Reopened.');
+  } catch (e) { if (e.status !== 401) toast(e.message, { error: true }); }
+  refresh(true);
+}
+
+// -- Add a job
+function openAddSheet() {
+  const f = { url: '', text: '', showText: false, busy: false, dup: null, error: '' };
+  const submit = async (force, paint, close) => {
+    const url = f.url.trim();
+    if (!/^https?:\/\/\S+\.\S+/i.test(url)) { f.error = 'Paste the full link to the posting. It starts with https://'; paint(); return; }
+    f.busy = true; f.error = ''; paint();
+    try {
+      const body = { url, text: f.text };
+      if (force) body.force = true;
+      const res = await api('/api/jobs', body);
+      close();
+      toast('Added. The agents are reading the posting.');
+      state.navDepth++; location.hash = `#/job/${res.id}`;
+    } catch (e) {
+      f.busy = false;
+      if (e.status === 401) return;
+      if (e.status === 409 && e.data && e.data.duplicate_of != null) f.dup = { id: e.data.duplicate_of, msg: e.message };
+      else f.error = e.message;
+      paint();
+    }
+  };
+  openSheet((close, paint) => [
+    h('h2', null, 'Add a job'),
+    h('p', { class: 'hint' }, 'Paste the link to the job posting. The agents read it, check the fit and tailor your resume.'),
+    !aiOn() && h('p', { class: 'ai-note' }, "Your AI isn't connected, so the job is saved but nobody reads it until you connect it on your computer."),
+    h('label', { class: 'field' }, h('span', null, 'Link to the posting'),
+      h('input', { class: 'input', type: 'url', inputmode: 'url', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', placeholder: 'https://', value: f.url, 'data-k': 'add-url',
+        oninput: (e) => { f.url = e.target.value; if (f.error || f.dup) { f.error = ''; f.dup = null; paint(); const i = $('[data-k="add-url"]'); i.focus(); i.setSelectionRange(i.value.length, i.value.length); } },
+        onkeydown: (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(false, paint, close); } } })),
+    f.showText
+      ? h('label', { class: 'field' }, h('span', null, 'Job description (optional)'),
+          h('textarea', { class: 'textarea', rows: 5, value: f.text, placeholder: 'Paste it if the page needs a login to read.', oninput: (e) => { f.text = e.target.value; } }))
+      : btn('Paste the description too', { kind: 'ghost small', onclick: () => { f.showText = true; paint(); } }),
+    f.error && h('p', { class: 'ai-note', role: 'alert', style: { color: 'var(--risk)' } }, f.error),
+    f.dup && h('div', { class: 'dup', role: 'alert' },
+      h('strong', null, 'You’ve seen this job before'),
+      (() => { const rest = f.dup.msg.replace(/^you['’]ve seen this job before[:.…]*\s*/i, ''); return rest && h('p', null, rest); })(),
+      h('div', { class: 'actions' },
+        btn('Open the earlier one', { kind: 'primary', onclick: () => { close(); openJob(f.dup.id); } }),
+        btn('Add it anyway', { disabled: f.busy, onclick: () => submit(true, paint, close) }))),
+    !f.dup && h('div', { class: 'actions' },
+      btn('Cancel', { onclick: close }),
+      h('button', { class: 'btn primary', type: 'button', disabled: f.busy, onclick: () => submit(false, paint, close) }, f.busy && h('span', { class: 'spinner' }), f.busy ? 'Adding…' : 'Add job')),
+  ], 'Add a job');
+}
+
+// ---------------------------------------------------------------- boot
+async function boot() {
+  try { await loadMe(); }
+  catch (e) {
+    if (e.status === 401) return; // showLogin already ran
+    $('#login').hidden = false; setLoginError(e.message); return;
+  }
+  $('#login').hidden = true;
+  $('#app').hidden = false;
+  state.route = parseRoute();
+  renderShell();
+  renderView();
+  await refresh();
+}
+initLogin();
+initShell();
+// Installable app: the service worker only registers over HTTPS or on localhost, so failures are expected on plain http.
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+window.addEventListener('hashchange', onRoute);
+boot();
+</script>
+</body>
+</html>

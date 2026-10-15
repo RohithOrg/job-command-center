@@ -1,0 +1,1040 @@
+[
+ {
+  "name": "ABN AMRO",
+  "careers_url": "https://www.werkenbijabnamro.nl/en/vacancies",
+  "api_url": null,
+  "notes": "Amsterdam HQ. Dutch bank, active DS/AI practice. URL fixed 2026-08-23: abnamro.com/en/careers redirects here for the real vacancy board. Re-checked 2026-08-23: confirmed live — AI Backend engineer (Amsterdam, vacancy/9428) and Machine Learning & Agentic AI Engineer (Amstelveen, vacancy/9467, €5,847-8,353/mo)."
+ },
+ {
+  "name": "Ada",
+  "careers_url": "https://job-boards.greenhouse.io/ada",
+  "api_url": null,
+  "notes": "Toronto + remote. AI customer service."
+ },
+ {
+  "name": "Adaption",
+  "careers_url": "https://adaptionlabs.ai/careers",
+  "api_url": null,
+  "notes": "AI-agent platform startup, remote-first across many countries incl. Netherlands. Ashby-embedded board confirmed live 2026-08-23. Confirmed live: Agent Systems Engineer (Platform team, remote incl. NL)."
+ },
+ {
+  "name": "Adyen",
+  "careers_url": "https://careers.adyen.com/vacancies",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/adyen/jobs",
+  "notes": "Amsterdam HQ. Fintech/payments, strong data science team."
+ },
+ {
+  "name": "Airtable",
+  "careers_url": "https://job-boards.greenhouse.io/airtable",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/airtable/jobs",
+  "notes": "No-code + AI platform."
+ },
+ {
+  "name": "Aiven",
+  "careers_url": "https://aiven.io/careers",
+  "api_url": null,
+  "notes": "Helsinki/Remote EU. Managed open-source data infra. Greenhouse-backed custom board."
+ },
+ {
+  "name": "Aleph Alpha",
+  "careers_url": "https://jobs.ashbyhq.com/AlephAlpha",
+  "api_url": null,
+  "notes": "Heidelberg DE. Sovereign European LLM provider, enterprise & government focus."
+ },
+ {
+  "name": "Alliander",
+  "careers_url": "https://werkenbij.alliander.com/vacatures",
+  "api_url": null,
+  "notes": "Haarlem/Arnhem-HQ Dutch grid operator (energy transition, DSO). Branded career site confirmed live 2026-08-23. Confirmed live: AI Platform Engineer (Haarlem, on-prem AI platform infra for internal DS/ML teams), closes 31 Aug 2026 (req jr18614)."
+ },
+ {
+  "name": "Allianz",
+  "careers_url": "https://careers.allianz.com",
+  "api_url": null,
+  "notes": "Munich. Insurance group."
+ },
+ {
+  "name": "Amazon (Netherlands)",
+  "careers_url": "https://www.amazon.jobs/en/search?base_query=machine+learning&normalized_country_code%5B%5D=NLD",
+  "api_url": null,
+  "notes": "Amsterdam office (AWS + retail). amazon.jobs search, NLD-filtered."
+ },
+ {
+  "name": "Amplemarket",
+  "careers_url": "https://job-boards.greenhouse.io/amplemarket",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/amplemarket/jobs",
+  "notes": "Lisbon PT / Remote. AI-native sales platform."
+ },
+ {
+  "name": "Anthropic",
+  "careers_url": "https://job-boards.greenhouse.io/anthropic",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/anthropic/jobs",
+  "notes": ""
+ },
+ {
+  "name": "Arize AI",
+  "careers_url": "https://job-boards.greenhouse.io/arizeai",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/arizeai/jobs",
+  "notes": "LLMOps / AI observability."
+ },
+ {
+  "name": "ASML",
+  "careers_url": "https://www.asml.com/en/careers/find-your-job",
+  "api_url": null,
+  "notes": "Veldhoven, NL HQ. Semiconductor lithography — heavy computer vision/ML for wafer inspection and process control."
+ },
+ {
+  "name": "Attio",
+  "careers_url": "https://jobs.ashbyhq.com/attio",
+  "api_url": null,
+  "notes": "Remote EU. AI-native CRM. Series B $52M."
+ },
+ {
+  "name": "Backbase",
+  "careers_url": "https://www.backbase.com/careers/jobs",
+  "api_url": null,
+  "notes": "Amsterdam HQ. Banking/fintech software."
+ },
+ {
+  "name": "Bird (MessageBird)",
+  "careers_url": "https://bird.com/careers",
+  "api_url": "page",
+  "notes": "Amsterdam. CPaaS/communications platform."
+ },
+ {
+  "name": "BJAK",
+  "careers_url": "https://jobs.ashbyhq.com/bjakcareer",
+  "api_url": null,
+  "notes": "Malaysia-HQ fintech/insurance-portal co. building an AI neobank app, hiring NL-based remote for that product. Ashby board confirmed live 2026-08-23. Confirmed live: Applied AI Engineer (Netherlands, Remote, req b9420b5f-...). CAUTION: board carries 100+ near-duplicate listings (same titles repeated across 'AI Finance Agent'/'AI Neobank App' variants, several individual job IDs already 404) — treat as a legitimacy yellow flag and re-verify the specific req before applying."
+ },
+ {
+  "name": "Black Forest Labs",
+  "careers_url": "https://job-boards.greenhouse.io/blackforestlabs",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/blackforestlabs/jobs",
+  "notes": "Freiburg DE / SF. FLUX image models, ex-Stable Diffusion team."
+ },
+ {
+  "name": "Bland AI",
+  "careers_url": "https://jobs.ashbyhq.com/bland",
+  "api_url": null,
+  "notes": "Voice phone agents. $65M Series B."
+ },
+ {
+  "name": "Bloomreach",
+  "careers_url": "https://www.bloomreach.com/en/company/careers",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/bloomreach/jobs",
+  "notes": "Amsterdam office. E-commerce search/personalization AI."
+ },
+ {
+  "name": "BMW Group",
+  "careers_url": "https://jobs.bmwgroup.com",
+  "api_url": "https://jobs.bmwgroup.com",
+  "notes": "Munich/Remote DE. Automotive software. SuccessFactors portal."
+ },
+ {
+  "name": "Bol.com",
+  "careers_url": "https://careers.bol.com/en/jobs/",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/bolcom/jobs",
+  "notes": "Utrecht. Dutch e-commerce giant, heavy recommendation/ML engineering org. URL fixed 2026-08-23: werkenbij.bol.com doesn't resolve, correct host is careers.bol.com."
+ },
+ {
+  "name": "Bolt",
+  "careers_url": "https://jobs.ashbyhq.com/bolt",
+  "api_url": null,
+  "notes": "Tallinn. Ride-hailing/mobility."
+ },
+ {
+  "name": "Booking.com",
+  "careers_url": "https://jobs.booking.com/booking/jobs",
+  "api_url": "https://jobs.booking.com/api/jobs?location=Netherlands",
+  "notes": "Amsterdam HQ. Large-scale ML/data science org."
+ },
+ {
+  "name": "Boomi",
+  "careers_url": "https://job-boards.greenhouse.io/boomilp",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/boomilp/jobs",
+  "notes": "Integration and automation platform."
+ },
+ {
+  "name": "Bosch",
+  "careers_url": "https://jobs.bosch.com",
+  "api_url": null,
+  "notes": "Germany/Remote. IoT and automotive. Custom e-spirit CaaS portal (bosch-i3-caas-api.e-spirit.cloud)."
+ },
+ {
+  "name": "bunq",
+  "careers_url": "https://www.bunq.com/careers",
+  "api_url": null,
+  "notes": "Amsterdam. Digital bank."
+ },
+ {
+  "name": "CARIAD (Volkswagen)",
+  "careers_url": "https://jobs.volkswagen-group.com/cariad",
+  "api_url": "https://jobs.volkswagen-group.com",
+  "notes": "Germany. VW Group software. Board on the VW Group SuccessFactors portal."
+ },
+ {
+  "name": "Catawiki",
+  "careers_url": "https://www.catawiki.com/careers",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/catawiki/jobs",
+  "notes": "Amsterdam. Online auction platform, ML for pricing/fraud/recommendations."
+ },
+ {
+  "name": "Causaly",
+  "careers_url": "https://jobs.ashbyhq.com/causaly",
+  "api_url": null,
+  "notes": "London / Athens. Biomedical knowledge graph + AI."
+ },
+ {
+  "name": "Celonis",
+  "careers_url": "https://job-boards.greenhouse.io/celonis",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/celonis/jobs",
+  "notes": "Munich / NYC. Process intelligence, Applied AI Engineer roles, Field CTOs."
+ },
+ {
+  "name": "Cisco (Netherlands)",
+  "careers_url": "https://cisco.wd5.myworkdayjobs.com/Cisco_Careers?q=Netherlands",
+  "api_url": null,
+  "notes": "Global giant, Amsterdam office. Board confirmed live 2026-08-23 (careers.cisco.com/global/en). 8 NL jobs matched 'machine learning' but all were Sales/Associate/CSAP program roles — no DS/ML/AI Engineer opening currently. Re-checked 2026-08-23: 'AI Solutions Engineer' from a LinkedIn listing returns zero results on Cisco's own board search — stale/mislabeled listing, not a real current opening."
+ },
+ {
+  "name": "Clarity AI",
+  "careers_url": "https://jobs.lever.co/clarity-ai",
+  "api_url": null,
+  "notes": "Madrid/Remote. Sustainability analytics with AI."
+ },
+ {
+  "name": "Clay Labs",
+  "careers_url": "https://jobs.ashbyhq.com/claylabs",
+  "api_url": null,
+  "notes": "AI-native GTM and workflow automation platform."
+ },
+ {
+  "name": "Clerk",
+  "careers_url": "https://jobs.ashbyhq.com/clerk",
+  "api_url": null,
+  "notes": "Auth & user management for developers. SE / TAM / PM roles."
+ },
+ {
+  "name": "Cognigy",
+  "careers_url": "https://careers.cognigy.com",
+  "api_url": null,
+  "notes": "Dusseldorf EMEA. Conversational AI enterprise."
+ },
+ {
+  "name": "Cohere",
+  "careers_url": "https://jobs.ashbyhq.com/cohere",
+  "api_url": null,
+  "notes": "AI/LLM provider. Toronto + remote."
+ },
+ {
+  "name": "Contentful",
+  "careers_url": "https://job-boards.greenhouse.io/contentful",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/contentful/jobs",
+  "notes": "Berlin / Denver. Headless CMS, AI content workflows."
+ },
+ {
+  "name": "Coolblue",
+  "careers_url": "https://careers.smartrecruiters.com/coolblue",
+  "api_url": null,
+  "notes": "Rotterdam HQ (near Amsterdam). Dutch e-commerce, in-house data science team."
+ },
+ {
+  "name": "Corti",
+  "careers_url": "https://jobs.ashbyhq.com/corti",
+  "api_url": null,
+  "notes": "Copenhagen DK. Medical AI (ambient clinical documentation), ML / NLP roles."
+ },
+ {
+  "name": "Cradle",
+  "careers_url": "https://jobs.ashbyhq.com/cradlebio",
+  "api_url": null,
+  "notes": "Zurich CH / Amsterdam. AI-guided protein design, ML researcher roles."
+ },
+ {
+  "name": "Curamando",
+  "careers_url": "https://career.curamando.com/jobs",
+  "api_url": null,
+  "notes": "Dutch/Nordic digital-AI consultancy (part of Eidra collective), studios in Amsterdam + Rotterdam. Teamtailor board confirmed live 2026-08-23. Live match: Senior GenAI Engineer (Amsterdam/Rotterdam, €5,150-6,350/mo all-in). NOTE: posting states 'we don't hire applicants living outside the European Union' — candidate is EU-resident (Germany) so unaffected, but flag for anyone outside the EU."
+ },
+ {
+  "name": "DataSnipper",
+  "careers_url": "https://jobs.ashbyhq.com/datasnipper",
+  "api_url": null,
+  "notes": "Amsterdam fintech/audit-AI startup. Ashby board confirmed live 2026-08-23. Strong Amsterdam matches: Senior Software Engineer, AI Agents; Engineering Manager, Excel Agents; Software Engineer - Document Intelligence; Technical Support Specialist (AI First) x2 — direct fit for Applied AI/Agentic AI archetype."
+ },
+ {
+  "name": "Decagon",
+  "careers_url": "https://jobs.ashbyhq.com/decagon",
+  "api_url": null,
+  "notes": "AI customer support agents."
+ },
+ {
+  "name": "Deepgram",
+  "careers_url": "https://jobs.ashbyhq.com/deepgram",
+  "api_url": null,
+  "notes": "STT/TTS APIs."
+ },
+ {
+  "name": "DeepL",
+  "careers_url": "https://jobs.ashbyhq.com/DeepL",
+  "api_url": null,
+  "notes": "Cologne DE. Translation & language AI. 60+ open roles, EU/DACH heavy."
+ },
+ {
+  "name": "Diabolocom",
+  "careers_url": "https://jobs.eu.lever.co/diabolocom",
+  "api_url": null,
+  "notes": "Paris FR. AI-native contact center (CCaaS) platform — Frost & Sullivan 2026 AI CX Leader in Europe; hybrid LLM/SLM architecture powering Agent Assist, Voice Analytics, and automated QA."
+ },
+ {
+  "name": "Dialpad",
+  "careers_url": "https://www.dialpad.com/careers",
+  "api_url": null,
+  "notes": "Voice AI for business comms."
+ },
+ {
+  "name": "Doist",
+  "careers_url": "https://apply.workable.com/doist",
+  "api_url": null,
+  "notes": "Remote global. Productivity (Todoist). Workable board."
+ },
+ {
+  "name": "Elastic",
+  "careers_url": "https://www.elastic.co/careers",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/elastic/jobs",
+  "notes": "Amsterdam is a major EU hub; distributed/remote-first. Search, AI/ML."
+ },
+ {
+  "name": "ElevenLabs",
+  "careers_url": "https://jobs.ashbyhq.com/elevenlabs",
+  "api_url": null,
+  "notes": "Voice AI TTS leader."
+ },
+ {
+  "name": "Elsevier",
+  "careers_url": "https://relx.wd3.myworkdayjobs.com/en-US/ElsevierJobs",
+  "api_url": null,
+  "notes": "Amsterdam. RELX group, AI research arm (scientific data/NLP). URL fixed 2026-08-23: elsevier.com/careers redirects to a marketing page; the real board is a Workday tenant (auto-detected provider), no scan_method needed."
+ },
+ {
+  "name": "Eneco",
+  "careers_url": "https://www.jobsateneco.com/vacancies",
+  "api_url": null,
+  "notes": "Rotterdam HQ (Dutch energy). Board confirmed live 2026-08-23, has a dedicated 'Data & AI' filter (2 openings). Match: Machine Learning Engineer - Energy Management (Rotterdam)."
+ },
+ {
+  "name": "Factorial",
+  "careers_url": "https://careers.factorialhr.com",
+  "api_url": null,
+  "notes": "Barcelona. HR SaaS unicorn."
+ },
+ {
+  "name": "Faculty",
+  "careers_url": "https://jobs.ashbyhq.com/faculty",
+  "api_url": null,
+  "notes": "London UK. Applied AI consultancy. 80+ roles, AI Safety / MLE / Delivery."
+ },
+ {
+  "name": "Flexport (Netherlands)",
+  "careers_url": "https://www.flexport.com/careers/jobs/",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/flexport/jobs",
+  "notes": "Global logistics tech, Amsterdam AI Platform team. Greenhouse board confirmed live 2026-08-23. Confirmed live: Senior Software Engineer, Applied AI (Amsterdam) and Staff Software Engineer, Applied AI (Amsterdam) — direct fit for Applied AI archetype."
+ },
+ {
+  "name": "Flow Traders",
+  "careers_url": "https://www.flowtraders.com/careers/job-search/",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/flowtraders/jobs",
+  "notes": "Amsterdam-based proprietary trading firm. Branded career site confirmed live 2026-08-23. Confirmed live: AI Engineer (Amsterdam, Data team) — building enterprise-grade AI agents/automation workflows."
+ },
+ {
+  "name": "Forto",
+  "careers_url": "https://jobs.ashbyhq.com/forto",
+  "api_url": null,
+  "notes": "Berlin DE. Digital freight forwarder, product & data roles, German + English."
+ },
+ {
+  "name": "Framer",
+  "careers_url": "https://www.framer.com/careers/",
+  "api_url": null,
+  "notes": "Amsterdam. Design/no-code tool startup, growing AI features."
+ },
+ {
+  "name": "Genesys",
+  "careers_url": "https://www.genesys.com/careers",
+  "api_url": null,
+  "notes": "Contact center cloud + AI."
+ },
+ {
+  "name": "GetYourGuide",
+  "careers_url": "https://job-boards.greenhouse.io/getyourguide",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/getyourguide/jobs",
+  "notes": "Berlin. Travel marketplace, ML & data platform roles."
+ },
+ {
+  "name": "Glacis AI",
+  "careers_url": "https://jobs.ashbyhq.com/glacis-ai",
+  "api_url": null,
+  "notes": "Ho Chi Minh City. AI agents for supply chain and logistics workflows."
+ },
+ {
+  "name": "Glean",
+  "careers_url": "https://job-boards.greenhouse.io/gleanwork",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/gleanwork/jobs",
+  "notes": "Enterprise AI search."
+ },
+ {
+  "name": "GoDataDriven",
+  "careers_url": "https://xebiacareers.recruitee.com",
+  "api_url": null,
+  "notes": "GoDataDriven is now part of Xebia; Xebia NL/EMEA board on Recruitee."
+ },
+ {
+  "name": "Gong",
+  "careers_url": "https://www.gong.io/careers",
+  "api_url": null,
+  "notes": "Revenue intelligence with voice AI."
+ },
+ {
+  "name": "Google (Netherlands)",
+  "careers_url": "https://www.google.com/about/careers/applications/jobs/results/?location=Netherlands",
+  "api_url": null,
+  "notes": "Amsterdam office. Location-scoped query to avoid global noise."
+ },
+ {
+  "name": "HelloFresh",
+  "careers_url": "https://job-boards.greenhouse.io/hellofresh",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/hellofresh/jobs",
+  "notes": "Berlin. Meal kit unicorn, large data/ML org."
+ },
+ {
+  "name": "Helsing",
+  "careers_url": "https://job-boards.greenhouse.io/helsing",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/helsing/jobs",
+  "notes": "Munich / Berlin / London / Paris. Defence AI unicorn. 100+ roles, ML & FDE."
+ },
+ {
+  "name": "Hightouch",
+  "careers_url": "https://job-boards.greenhouse.io/hightouch",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/hightouch/jobs",
+  "notes": "Data activation platform with AI agents and solutions engineering roles."
+ },
+ {
+  "name": "Hootsuite",
+  "careers_url": "https://job-boards.greenhouse.io/hootsuite",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/hootsuite/jobs",
+  "notes": "Vancouver. Social media management platform."
+ },
+ {
+  "name": "Hotjar",
+  "careers_url": "https://jobs.lever.co/contentsquare",
+  "api_url": null,
+  "notes": "Remote EU. Analytics, part of Contentsquare. Lever board jobs.lever.co/contentsquare."
+ },
+ {
+  "name": "Hugging Face",
+  "careers_url": "https://apply.workable.com/huggingface/",
+  "api_url": null,
+  "notes": "Paris / NYC / Remote. ML hub & open-source models."
+ },
+ {
+  "name": "Hume AI",
+  "careers_url": "https://job-boards.greenhouse.io/humeai",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/humeai/jobs",
+  "notes": "NYC. Empathic voice AI."
+ },
+ {
+  "name": "ING",
+  "careers_url": "https://careers.ing.com/en/working-in-the-netherlands",
+  "api_url": null,
+  "notes": "Amsterdam HQ. Bank with large data science org. URL fixed 2026-08-23: ing.jobs now redirects to careers.ing.com."
+ },
+ {
+  "name": "Inngest",
+  "careers_url": "https://jobs.ashbyhq.com/inngest",
+  "api_url": null,
+  "notes": "Durable workflow engine for serverless. DX/DevRel/Engineering hiring."
+ },
+ {
+  "name": "Intercom",
+  "careers_url": "https://job-boards.greenhouse.io/intercom",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/intercom/jobs",
+  "notes": "Dublin EMEA. Fin AI agent."
+ },
+ {
+  "name": "Isomorphic Labs",
+  "careers_url": "https://job-boards.greenhouse.io/isomorphiclabs",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/isomorphiclabs/jobs",
+  "notes": "London / Lausanne / Cambridge MA. DeepMind spin-out for drug discovery AI."
+ },
+ {
+  "name": "JetBrains",
+  "careers_url": "https://www.jetbrains.com/careers/jobs/",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/jetbrains/jobs",
+  "notes": "Czech/global (Prague HQ), no dedicated NL office but hires remote/multi-city EU roles that list Amsterdam as an option. Greenhouse EU board confirmed live 2026-08-23 (job-boards.eu.greenhouse.io/jetbrains). Match: AI Technical Lead - C++ Ecosystem lists Amsterdam among ~12 EU cities (senior role). Also confirmed live 2026-08-23: Research Engineer (Agentic Models) lists Amsterdam among ~12 locations."
+ },
+ {
+  "name": "Just Eat Takeaway.com",
+  "careers_url": "https://careers.justeattakeaway.com/global/en",
+  "api_url": null,
+  "notes": "Amsterdam HQ. Food delivery, large data science/ML org (logistics, matching, forecasting)."
+ },
+ {
+  "name": "Justworks (Netherlands)",
+  "careers_url": "https://www.justworks.com/careers",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/justworks/jobs",
+  "notes": "US HR/PEO platform co., hires country-specific remote AI roles. Greenhouse board confirmed live 2026-08-23. Confirmed live: Senior Software Engineer, Applied AI (Netherlands) — Remote-International, req 7797377. Same posting is duplicated per-country (Mexico/Spain/Toronto/UK/NY etc.) — apply to the NL-specific req."
+ },
+ {
+  "name": "Klarna",
+  "careers_url": "https://www.klarna.com/careers/",
+  "api_url": null,
+  "notes": "Stockholm. Fintech. SPA at klarna.com/careers."
+ },
+ {
+  "name": "KLM",
+  "careers_url": "https://careers.klm.com/",
+  "api_url": null,
+  "notes": "careers.klm.com refused connections when last checked (HTTP/2 error). Check manually: https://careers.klm.com"
+ },
+ {
+  "name": "Klue",
+  "careers_url": "https://jobs.ashbyhq.com/klue",
+  "api_url": null,
+  "notes": "Vancouver. Competitive intelligence SaaS."
+ },
+ {
+  "name": "KPN",
+  "careers_url": "https://jobs.kpn.com/en/option/expertise/data-analytics-1",
+  "api_url": null,
+  "notes": "The Hague HQ (Dutch telecom). Board confirmed live 2026-08-23 (jobs.kpn.com, Data & Analytics expertise page — note some individual /vacature/ links from search results are stale/404, browse the expertise page directly). Live matches: AI Engineer - Cloud (Amsterdam), AI Engineer - Network (Amsterdam). Re-checked 2026-08-23: a LinkedIn listing titled 'Senior AI Engineer' (Rotterdam) does NOT match anything on the live board — site search for that exact title returns only 'AI Engineer - Network'; likely a mislabeled/stale duplicate, not a distinct new req."
+ },
+ {
+  "name": "Lakera",
+  "careers_url": "https://jobs.ashbyhq.com/lakera.ai",
+  "api_url": null,
+  "notes": "Zurich CH / SF. AI security & guardrails. Has Forward Deployed Engineer roles."
+ },
+ {
+  "name": "LangChain",
+  "careers_url": "https://jobs.ashbyhq.com/langchain",
+  "api_url": null,
+  "notes": "LangChain/LangSmith framework."
+ },
+ {
+  "name": "Langfuse",
+  "careers_url": "https://langfuse.com/careers",
+  "api_url": null,
+  "notes": "Berlin. LLMOps / observability."
+ },
+ {
+  "name": "Later",
+  "careers_url": "https://job-boards.greenhouse.io/later",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/later/jobs",
+  "notes": "Vancouver/Toronto. Social media and creator platform."
+ },
+ {
+  "name": "Legora",
+  "careers_url": "https://jobs.ashbyhq.com/legora",
+  "api_url": null,
+  "notes": "Stockholm SE / NYC / London. AI-native legal workspace."
+ },
+ {
+  "name": "Lindy",
+  "careers_url": "https://jobs.ashbyhq.com/lindy",
+  "api_url": null,
+  "notes": "AI agent management platform."
+ },
+ {
+  "name": "LivePerson",
+  "careers_url": "https://liveperson.com/company/careers",
+  "api_url": null,
+  "notes": "Remote EMEA. Conversational AI enterprise."
+ },
+ {
+  "name": "Lovable",
+  "careers_url": "https://jobs.ashbyhq.com/lovable",
+  "api_url": null,
+  "notes": "Stockholm SE. AI app builder (text-to-app), 80+ open roles."
+ },
+ {
+  "name": "Make.com (Celonis)",
+  "careers_url": "https://www.make.com/en/careers",
+  "api_url": null,
+  "notes": "Celonis parent company. Automation platform."
+ },
+ {
+  "name": "Marktplaats (Adevinta)",
+  "careers_url": "https://adevinta.com/careers/jobs/",
+  "api_url": null,
+  "notes": "Amsterdam (Dutch classifieds, Adevinta-owned; marktplaats.nl/over-marktplaats/vacatures 404s — the real board is adevinta.com/careers/jobs). Page loads live but the embedded job-search widget returned 'No jobs found' for every query tried (including unfiltered) on 2026-08-23 — inconclusive via Playwright, widget may be broken or bot-gated. Re-check manually before relying on scan results."
+ },
+ {
+  "name": "MarvelX AI",
+  "careers_url": "https://www.marvelx.ai/careers/ai-engineer",
+  "api_url": null,
+  "notes": "Amsterdam-founded AI-agents-for-insurance startup (EQT Ventures-backed, $6M round). Small branded career site (no ATS board index page — each role is its own static URL, apply via Typeform). Confirmed live 2026-08-23: AI Engineer (Amsterdam) and Forward Deployed Engineer (Amsterdam)."
+ },
+ {
+  "name": "Maxim AI",
+  "careers_url": "https://www.getmaxim.ai/careers",
+  "api_url": null,
+  "notes": "AI evaluation and observability platform. Bangalore-based, mostly on-site."
+ },
+ {
+  "name": "Mendix",
+  "careers_url": "https://jobs.lever.co/mendix",
+  "api_url": null,
+  "notes": "Rotterdam. Siemens-owned low-code platform, growing AI features. URL fixed 2026-08-23: real board is Lever (auto-detected provider). No Data Scientist/ML Engineer title as of this check; closest was Software Engineer - AI Platform Tooling."
+ },
+ {
+  "name": "MessageBird",
+  "careers_url": "https://bird.com/careers",
+  "api_url": null,
+  "notes": "Amsterdam. Communications platform (rebranded Bird). Custom SPA board."
+ },
+ {
+  "name": "Meta (Netherlands)",
+  "careers_url": "https://www.metacareers.com/jobs?offices[0]=Amsterdam%2C%20Netherlands",
+  "api_url": null,
+  "notes": "Amsterdam office."
+ },
+ {
+  "name": "Microsoft (Netherlands)",
+  "careers_url": "https://apply.careers.microsoft.com/careers?query=&location=Netherlands",
+  "api_url": null,
+  "notes": "Amsterdam office. Global scan_query scoped to Netherlands to avoid worldwide noise. (careers_url fixed 2026-08-23: careers.microsoft.com/v2/... 404s; site migrated to apply.careers.microsoft.com. Use the on-page Location combobox to select Netherlands, not the URL query param, which the board ignores.)"
+ },
+ {
+  "name": "Miro",
+  "careers_url": "https://jobs.ashbyhq.com/miro",
+  "api_url": null,
+  "notes": "Amsterdam is a major EU hub. Collaboration/whiteboard SaaS."
+ },
+ {
+  "name": "MIstral",
+  "careers_url": "https://jobs.ashbyhq.com/mistral.ai?locationId=4c31f2bd-8895-4b51-bfa0-23aca4de8fac",
+  "api_url": null,
+  "notes": ""
+ },
+ {
+  "name": "Mistral AI",
+  "careers_url": "https://jobs.lever.co/mistral",
+  "api_url": null,
+  "notes": "Paris. European AI lab."
+ },
+ {
+  "name": "Mistral AI (Amsterdam)",
+  "careers_url": "https://jobs.ashbyhq.com/mistral.ai",
+  "api_url": null,
+  "notes": "French AI lab. Ashby board confirmed live 2026-08-23 (mistral.ai/careers links here — note the board slug is 'mistral.ai', NOT 'mistral'; jobs.lever.co/mistral 404s). Strong Amsterdam matches: Applied AI Engineer (ML Infrastructure/DevOps - EMEA), Applied Scientist/Research Engineer (AI4Engineering), AI Deployment Strategist (Amsterdam-only), AI Scientist - Agentic Engineering, several Applied AI/Solutions Architect roles — direct fit for Applied AI/Agentic AI archetype."
+ },
+ {
+  "name": "Mollie",
+  "careers_url": "https://jobs.ashbyhq.com/mollie",
+  "api_url": null,
+  "notes": "Amsterdam. Payments fintech."
+ },
+ {
+  "name": "Mollie",
+  "careers_url": "https://jobs.ashbyhq.com/mollie",
+  "api_url": null,
+  "notes": "Amsterdam. Payments fintech."
+ },
+ {
+  "name": "N26",
+  "careers_url": "https://job-boards.greenhouse.io/n26",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/n26/jobs",
+  "notes": "Berlin / Barcelona. Mobile bank, ~50 roles, ML & risk."
+ },
+ {
+  "name": "n8n",
+  "careers_url": "https://jobs.ashbyhq.com/n8n",
+  "api_url": null,
+  "notes": "Berlin + remote EU/US. Workflow automation."
+ },
+ {
+  "name": "Nationale-Nederlanden",
+  "careers_url": "https://nngroup.wd3.myworkdayjobs.com/WDExternal",
+  "api_url": null,
+  "notes": "The Hague HQ (Dutch insurer, NN Group). Workday board confirmed live 2026-08-23. Strong current matches: Conversational Data Scientist (Rotterdam, LLM/RAG-based chatbot), Lead Machine Learning Engineer (Rotterdam), Software Engineer Data Platform (Amsterdam), GenAI Engineer x2 (The Hague) — the two are distinct reqs, e.g. GenAI Engineer - Asset Reuse Team (REQ2707826) vs. the other GenAI Engineer (REQ2706566)."
+ },
+ {
+  "name": "Netflix (Amsterdam)",
+  "careers_url": "https://explore.jobs.netflix.net/careers?query=&location=Amsterdam",
+  "api_url": "https://explore.jobs.netflix.net/api/apply/v2/jobs?domain=netflix.com&location=Amsterdam",
+  "notes": "Amsterdam EMEA hub. (careers_url fixed 2026-08-23: jobs.netflix.com/search 404s; board migrated to explore.jobs.netflix.net.)"
+ },
+ {
+  "name": "Nortal",
+  "careers_url": "https://careers-en-nortal.icims.com/jobs/search?ss=1",
+  "api_url": null,
+  "notes": "Tallinn HQ, German offices. Digital transformation consulting."
+ },
+ {
+  "name": "OpenAI",
+  "careers_url": "https://openai.com/careers",
+  "api_url": null,
+  "notes": ""
+ },
+ {
+  "name": "Otrium",
+  "careers_url": "https://otrium.careers.hibob.com/",
+  "api_url": null,
+  "notes": "Amsterdam. Fashion e-commerce, recommendation/personalization ML."
+ },
+ {
+  "name": "Palantir",
+  "careers_url": "https://jobs.lever.co/palantir",
+  "api_url": null,
+  "notes": "FDE roles. Mostly US/London."
+ },
+ {
+  "name": "Parloa",
+  "careers_url": "https://job-boards.eu.greenhouse.io/parloa",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/parloa/jobs",
+  "notes": "Berlin EMEA. Voice AI enterprise."
+ },
+ {
+  "name": "Perplexity",
+  "careers_url": "https://jobs.ashbyhq.com/perplexity",
+  "api_url": null,
+  "notes": "AI-native search and enterprise AI platform."
+ },
+ {
+  "name": "Philips",
+  "careers_url": "https://www.careers.philips.com/global/en",
+  "api_url": null,
+  "notes": "Amsterdam/Eindhoven HQ. Health tech — AI for medical imaging/diagnostics. IMPORTANT: always use the www.careers.philips.com host — the bare careers.philips.com (no www) times out at the network level from this environment, while www.careers.philips.com loads fine. Confirmed 2026-08-23."
+ },
+ {
+  "name": "Photoroom",
+  "careers_url": "https://jobs.ashbyhq.com/photoroom",
+  "api_url": null,
+  "notes": "Paris FR. AI photo editor, Head of CV / Head of ML roles."
+ },
+ {
+  "name": "PhysicsX",
+  "careers_url": "https://job-boards.greenhouse.io/physicsx",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/physicsx/jobs",
+  "notes": "London UK. Physics-informed ML for engineering, ~40 roles."
+ },
+ {
+  "name": "Picnic",
+  "careers_url": "https://jobs.picnic.app/en/tech",
+  "api_url": null,
+  "notes": "Amsterdam. Online grocery, heavy logistics/data science. (careers_url fixed 2026-08-23: picnic.jobs no longer resolves; jobs.picnic.app is current ATS.)"
+ },
+ {
+  "name": "Pigment",
+  "careers_url": "https://jobs.lever.co/pigment",
+  "api_url": null,
+  "notes": "Paris FR / NYC / London. AI-powered FP&A planning platform."
+ },
+ {
+  "name": "Pinecone",
+  "careers_url": "https://jobs.ashbyhq.com/pinecone",
+  "api_url": null,
+  "notes": "Vector database."
+ },
+ {
+  "name": "PlanetScale",
+  "careers_url": "https://job-boards.greenhouse.io/planetscale",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/planetscale/jobs",
+  "notes": "Serverless MySQL platform. Customer Engineering, Engineering, Sales."
+ },
+ {
+  "name": "Pleo",
+  "careers_url": "https://jobs.ashbyhq.com/pleo",
+  "api_url": null,
+  "notes": "Copenhagen DK. Spend-management fintech, ML / data / platform roles."
+ },
+ {
+  "name": "PolyAI",
+  "careers_url": "https://job-boards.eu.greenhouse.io/polyai",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/polyai/jobs",
+  "notes": "UK. Voice AI for enterprise contact centers."
+ },
+ {
+  "name": "Prosus",
+  "careers_url": "https://jobs.ashbyhq.com/prosus",
+  "api_url": null,
+  "notes": "Amsterdam HQ. Active AI investing plus internal ML teams. URL fixed 2026-08-23: prosus.com/careers 404s; real board is Lever (auto-detected provider)."
+ },
+ {
+  "name": "Qonto",
+  "careers_url": "https://jobs.lever.co/qonto",
+  "api_url": null,
+  "notes": "Paris / Berlin / Barcelona / Milan. SMB neobank, MLOps for AI Product roles."
+ },
+ {
+  "name": "Rabobank",
+  "careers_url": "https://rabobank.jobs/en/jobs/",
+  "api_url": null,
+  "notes": "Utrecht HQ. Dutch bank, large data science team."
+ },
+ {
+  "name": "Resend",
+  "careers_url": "https://jobs.ashbyhq.com/resend",
+  "api_url": null,
+  "notes": "Email API for developers. Remote-first. DX/DevRel focused."
+ },
+ {
+  "name": "Retool",
+  "careers_url": "https://jobs.gem.com/retool",
+  "api_url": null,
+  "notes": "London. Popularized Deployed Engineer role."
+ },
+ {
+  "name": "Revolut",
+  "careers_url": "https://www.revolut.com/careers",
+  "api_url": null,
+  "notes": "London / EU remote. Fintech super-app. Custom board at /careers/position/."
+ },
+ {
+  "name": "Royal Schiphol Group",
+  "careers_url": "https://www.schipholcareers.nl/vacatures/alle-vacatures",
+  "api_url": null,
+  "notes": ""
+ },
+ {
+  "name": "RunPod",
+  "careers_url": "https://job-boards.greenhouse.io/runpod",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/runpod/jobs",
+  "notes": "GPU cloud for AI."
+ },
+ {
+  "name": "Runway",
+  "careers_url": "https://job-boards.greenhouse.io/runwayml",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/runwayml/jobs",
+  "notes": "Generative AI video and creative tooling platform."
+ },
+ {
+  "name": "Safari AI",
+  "careers_url": "https://job-boards.greenhouse.io/safariai",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/safariai/jobs",
+  "notes": "Miami HQ / Vancouver engineering. Computer vision AI for operations in the physical economy."
+ },
+ {
+  "name": "Salesforce",
+  "careers_url": "https://careers.salesforce.com",
+  "api_url": null,
+  "notes": "Agentforce = AI agents platform."
+ },
+ {
+  "name": "Salesforce (Netherlands)",
+  "careers_url": "https://salesforce.wd12.myworkdayjobs.com/External_Career_Site?q=Netherlands",
+  "api_url": null,
+  "notes": "Amsterdam office. Board confirmed live 2026-08-23 (21 NL jobs currently), but all are Sales/GTM roles (Account Executive, Forward Deployed Engineer, Community Practice Leader) — no DS/ML/AI Engineer opening. (A previously search-indexed 'Agentic Data Specialist' JR305543 is now a dead/stale posting — confirmed 404 'Job not found' via Playwright.)"
+ },
+ {
+  "name": "Sanctuary AI",
+  "careers_url": "https://jobs.lever.co/sanctuary",
+  "api_url": null,
+  "notes": "Vancouver. Humanoid robotics and embodied AI."
+ },
+ {
+  "name": "Scandit",
+  "careers_url": "https://job-boards.greenhouse.io/scandit",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/scandit/jobs",
+  "notes": "Zurich CH. Computer vision / smart data capture, ML roles."
+ },
+ {
+  "name": "Semios",
+  "careers_url": "https://apply.workable.com/semios/",
+  "api_url": null,
+  "notes": "Vancouver. Agtech and crop intelligence platform."
+ },
+ {
+  "name": "Shopify",
+  "careers_url": "https://www.shopify.com/careers",
+  "api_url": null,
+  "notes": "Remote-first. E-commerce platform. Greenhouse-backed SPA."
+ },
+ {
+  "name": "Siemens (Netherlands)",
+  "careers_url": "https://jobs.siemens.com/en_US/externaljobs/SearchJobs?country=Netherlands",
+  "api_url": null,
+  "notes": "Global giant, Amsterdam/Eindhoven presence. Board confirmed live 2026-08-23 (old jobs.siemens.com/careers URL is stale, redirects with a portal-migration notice to jobs.siemens.com/en_US/externaljobs — use this new URL). No DS/ML/AI Engineer NL match currently; closest was Principal Pre-Sales Consultant - Knowledge Graph (Rotterdam, Sales function, not a fit)."
+ },
+ {
+  "name": "Sierra",
+  "careers_url": "https://jobs.ashbyhq.com/sierra",
+  "api_url": null,
+  "notes": "Bret Taylor (ex-CEO Salesforce). AI customer agents."
+ },
+ {
+  "name": "Speechmatics",
+  "careers_url": "https://job-boards.greenhouse.io/speechmatics",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/speechmatics/jobs",
+  "notes": "Cambridge UK. Speech recognition platform."
+ },
+ {
+  "name": "Spotify",
+  "careers_url": "https://jobs.lever.co/spotify",
+  "api_url": null,
+  "notes": "Stockholm SE / NYC / London. Audio platform, large ML/personalization org."
+ },
+ {
+  "name": "Stability AI",
+  "careers_url": "https://job-boards.greenhouse.io/stabilityai",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/stabilityai/jobs",
+  "notes": "London / SF. Generative AI image/video research lab."
+ },
+ {
+  "name": "SumUp",
+  "careers_url": "https://job-boards.greenhouse.io/sumup",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/sumup/jobs",
+  "notes": "Berlin / London. Payments fintech, EU + LATAM hiring."
+ },
+ {
+  "name": "Supabase",
+  "careers_url": "https://jobs.ashbyhq.com/supabase",
+  "api_url": null,
+  "notes": "Open-source Firebase alternative. Remote-first. Postgres + Auth + Storage. Strong DevRel/DX hiring."
+ },
+ {
+  "name": "Swift",
+  "careers_url": "https://swift.wd3.myworkdayjobs.com/en-US/Join-Swift",
+  "api_url": null,
+  "notes": "Leiden area, Netherlands. SWIFT global payments messaging network, HQ Belgium. Growing AI/GenAI/automation practice. Added 2026-08-23 (user tip)."
+ },
+ {
+  "name": "Swisscom DevOps Center Rotterdam",
+  "careers_url": "https://swisscom.recruitee.com",
+  "api_url": null,
+  "notes": "Swiss telecom, Rotterdam DevOps Center is the NL presence. Board confirmed live 2026-08-23, 6 open Rotterdam roles (AWS Platform Security Engineer, DevOps Engineer x4, Senior Software Engineer) — no DS/ML/AI Engineer title currently; re-check, a 'Junior AI Platform Engineer' was indexed previously but not live now."
+ },
+ {
+  "name": "Synthesia",
+  "careers_url": "https://jobs.ashbyhq.com/synthesia",
+  "api_url": null,
+  "notes": "London UK. AI video generation for enterprise, $4B valuation."
+ },
+ {
+  "name": "Talkdesk",
+  "careers_url": "https://www.talkdesk.com/careers",
+  "api_url": null,
+  "notes": "Lisbon. Contact center AI. EMEA friendly."
+ },
+ {
+  "name": "Templafy",
+  "careers_url": "https://job-boards.greenhouse.io/templafy",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/templafy/jobs",
+  "notes": "Copenhagen DK. Document-generation / content-enablement platform."
+ },
+ {
+  "name": "Temporal",
+  "careers_url": "https://job-boards.greenhouse.io/temporal",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/temporal/jobs",
+  "notes": "Workflow orchestration."
+ },
+ {
+  "name": "Tinybird",
+  "careers_url": "https://jobs.ashbyhq.com/tinybird",
+  "api_url": null,
+  "notes": "Remote. Real-time data platform."
+ },
+ {
+  "name": "Tiqets",
+  "careers_url": "https://jobs.tiqets.work/",
+  "api_url": null,
+  "notes": "Amsterdam. Travel tech. URL fixed 2026-08-23: tiqets.com/jobs now redirects to jobs.tiqets.work."
+ },
+ {
+  "name": "Toggl",
+  "careers_url": "https://apply.workable.com/toggl",
+  "api_url": null,
+  "notes": "Remote EU. Time tracking. Workable board."
+ },
+ {
+  "name": "TomTom",
+  "careers_url": "https://jobs.eu.lever.co/tomtom",
+  "api_url": null,
+  "notes": "Amsterdam HQ. Mapping/location AI."
+ },
+ {
+  "name": "Trade Republic",
+  "careers_url": "https://job-boards.greenhouse.io/traderepublicbank",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/traderepublicbank/jobs",
+  "notes": "Berlin / London / Paris. Neobroker, ~50 roles, platform & data."
+ },
+ {
+  "name": "Travelperk",
+  "careers_url": "https://jobs.ashbyhq.com/perk",
+  "api_url": null,
+  "notes": "Barcelona. Business travel unicorn (rebranded Perk)."
+ },
+ {
+  "name": "Twilio",
+  "careers_url": "https://jobs.twilio.com",
+  "api_url": null,
+  "notes": "Voice/messaging infrastructure."
+ },
+ {
+  "name": "Uber (Amsterdam)",
+  "careers_url": "https://www.uber.com/global/en/careers/list/",
+  "api_url": null,
+  "notes": "Amsterdam engineering/data hub for EMEA marketplace/pricing."
+ },
+ {
+  "name": "Vapi",
+  "careers_url": "https://jobs.ashbyhq.com/vapi",
+  "api_url": null,
+  "notes": "Voice AI infrastructure."
+ },
+ {
+  "name": "Vercel",
+  "careers_url": "https://job-boards.greenhouse.io/vercel",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/vercel/jobs",
+  "notes": "AI SDK, v0.dev. Frontend AI tooling."
+ },
+ {
+  "name": "Vinted",
+  "careers_url": "https://careers.vinted.com",
+  "api_url": null,
+  "notes": "Vilnius LT / Berlin. C2C marketplace unicorn, data science & ML roles. Greenhouse-backed custom board."
+ },
+ {
+  "name": "Wayve",
+  "careers_url": "https://job-boards.greenhouse.io/wayve",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/wayve/jobs",
+  "notes": "London UK. Embodied AI for self-driving, ML & robotics roles."
+ },
+ {
+  "name": "Weights & Biases (CoreWeave)",
+  "careers_url": "https://job-boards.greenhouse.io/coreweave",
+  "api_url": "https://boards-api.greenhouse.io/v1/boards/coreweave/jobs",
+  "notes": "Acquired by CoreWeave (announced March 2025, closed May 2025). W&B roles now live on CoreWeave's Greenhouse board. Old Lever URL (jobs.lever.co/wandb) returns 404."
+ },
+ {
+  "name": "Wolters Kluwer",
+  "careers_url": "https://wk.wd3.myworkdayjobs.com/External",
+  "api_url": null,
+  "notes": "Alphen aan den Rijn HQ (Dutch publisher/info-services). Workday board confirmed live 2026-08-23 (careers.wolterskluwer.com redirects here for actual search); branded page has no listing UI of its own. UPDATE 2026-08-23: earlier 'no NL DS/ML/AI opening' finding is now stale — searching 'Libra' (their legal AI product) surfaces a live NL match: Senior AI Engineer (Libra - Legal AI Assistant), NLD-Alphen Aan Den Rijn + DEU-Berlin, Hybrid 8 days/month (req R0058491). Several other Libra-team NL roles (Legal Engineer, Account Executive) are non-AI-engineering. Re-search by product name ('Libra'), not just generic keywords, when re-checking."
+ },
+ {
+  "name": "WorkOS",
+  "careers_url": "https://jobs.ashbyhq.com/workos",
+  "api_url": null,
+  "notes": "Developer tools and enterprise-ready auth/platform APIs."
+ },
+ {
+  "name": "Zapier",
+  "careers_url": "https://jobs.ashbyhq.com/zapier",
+  "api_url": null,
+  "notes": "Remote-first. Automation platform leader."
+ },
+ {
+  "name": "Zendesk",
+  "careers_url": "https://careers.zendesk.com",
+  "api_url": null,
+  "notes": "Global remote. Customer service SaaS. Cloudflare-walled careers page."
+ },
+ {
+  "name": "Zep AI",
+  "careers_url": "https://www.getzep.com/careers",
+  "api_url": null,
+  "notes": "Context engineering platform for AI agents. YC W24. Lead FDE + DevRel Lead roles. US-only currently."
+ }
+]

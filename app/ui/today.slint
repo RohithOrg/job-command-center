@@ -1,0 +1,89 @@
+// Today as a departures board: what needs the user, most urgent first.
+import { ScrollView } from "std-widgets.slint";
+import { Theme, Heading, StageChip, Monogram } from "theme.slint";
+import { App, JobRow } from "state.slint";
+import { BoardFlag } from "common.slint";
+import { ActionButton, RowAction } from "widgets.slint";
+
+component BoardRow inherits Rectangle {
+    in property <JobRow> job;
+    in property <bool> odd;
+    callback clicked;
+    height: 72px;
+    background: touch.has-hover ? Theme.selected : odd ? Theme.sunken.with-alpha(0.5) : transparent;
+    touch := TouchArea { clicked => { root.clicked(); } mouse-cursor: pointer; }
+    HorizontalLayout {
+        padding-left: 24px; padding-right: 24px; spacing: 20px;
+        Text { width: 92px; text: job.when; font-family: Theme.display; font-size: Theme.fs-lg; font-weight: 700;
+               color: job.board == "Delayed" ? Theme.risk : job.when == "Today" ? Theme.marigold-ink : Theme.ink;
+               vertical-alignment: center; }
+        Monogram { initial: job.initial; hue-seed: job.hue; size: 36px; y: (parent.height - 36px) / 2; }
+        VerticalLayout {
+            alignment: center; spacing: 3px; horizontal-stretch: 1;
+            Text { text: job.title; font-family: Theme.body; font-size: Theme.fs-md; font-weight: 700; color: Theme.ink; overflow: elide; }
+            Text { text: job.reason; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; overflow: elide; }
+        }
+        VerticalLayout { width: 150px; alignment: center;
+            Text { text: job.company; font-family: Theme.body; font-size: Theme.fs-sm; font-weight: 500; color: Theme.ink; overflow: elide; } }
+        VerticalLayout { width: 130px; alignment: center; StageChip { position: job.position; ended: job.ended; } }
+        VerticalLayout { width: 100px; alignment: center; BoardFlag { state: job.board; } }
+        // Quick close without opening the application (shown on hover, room kept so rows don't jump).
+        VerticalLayout { width: 70px; alignment: center;
+            RowAction { text: "Close"; visible: !job.working; show: touch.has-hover; clicked => { App.closing-job = job.id; App.closing = true; } } }
+    }
+    Rectangle { y: parent.height - 1px; height: 1px; background: Theme.line; }
+}
+
+export component TodayPage inherits Rectangle {
+    background: Theme.paper;
+    ScrollView {
+        VerticalLayout {
+            padding: 40px; padding-top: 36px; spacing: 24px; alignment: start;
+            HorizontalLayout {
+                VerticalLayout {
+                    spacing: 6px; horizontal-stretch: 1;
+                    Text { text: App.date-line; font-family: Theme.body; font-size: Theme.fs-sm; font-weight: 700; color: Theme.accent; }
+                    Heading { text: App.today.length == 0 ? "Nothing is waiting on you" :
+                                    App.today.length == 1 ? "One thing is waiting on you" : App.today.length + " things are waiting on you"; }
+                    Text { text: App.user-first-name == "" ? "Start with the top row." : "Hi " + App.user-first-name + ". Start with the top row; it has waited longest.";
+                           font-family: Theme.body; font-size: Theme.fs-md; color: Theme.muted; }
+                }
+            }
+            if !App.ai-connected || App.ai-problem != "" : Rectangle {
+                background: Theme.marigold-soft; border-radius: Theme.r-panel; height: warn.preferred-height;
+                warn := HorizontalLayout {
+                    padding: 16px; spacing: 12px;
+                    Text { text: !App.ai-connected ? "Connect your AI so the agents can read postings and tailor resumes."
+                                                     : "Your AI isn't answering: " + App.ai-problem; wrap: word-wrap;
+                           font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.marigold-ink; horizontal-stretch: 1; vertical-alignment: center; }
+                    ActionButton { text: "Open Settings"; small: true; clicked => { App.go(5); } }
+                }
+            }
+            Rectangle {
+                background: Theme.surface; border-radius: Theme.r-ticket; border-width: 1px; border-color: Theme.line; clip: true;
+                height: board.preferred-height;
+                board := VerticalLayout {
+                    Rectangle {
+                        height: 48px; background: Theme.rail;
+                        HorizontalLayout {
+                            padding-left: 24px; padding-right: 24px; spacing: 20px;
+                            Text { width: 92px; text: "Next step"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.rail-muted; vertical-alignment: center; }
+                            Rectangle { width: 36px; }
+                            Text { horizontal-stretch: 1; text: "Role"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.rail-muted; vertical-alignment: center; }
+                            Text { width: 150px; text: "Company"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.rail-muted; vertical-alignment: center; }
+                            Text { width: 130px; text: "Stage"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.rail-muted; vertical-alignment: center; }
+                            Text { width: 100px; text: "Status"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.rail-muted; vertical-alignment: center; }
+                            Rectangle { width: 70px; }
+                        }
+                    }
+                    for job[i] in App.today : BoardRow { job: job; odd: mod(i, 2) == 1; clicked => { App.open-job-page(job.id); } }
+                    if App.today.length == 0 : Rectangle {
+                        height: 120px;
+                        Text { text: "All clear. New matches from your companies arrive in Discover.";
+                               font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; }
+                    }
+                }
+            }
+        }
+    }
+}

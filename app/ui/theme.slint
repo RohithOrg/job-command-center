@@ -1,0 +1,113 @@
+// Design tokens: the job search as a transit network.
+// Teal sidebar + mint-grey work surface; each stage has its own line colour
+// (that colour encodes stage, so it is information, not decoration).
+import "fonts/BricolageGrotesque.ttf";
+import "fonts/AtkinsonHyperlegibleNext.ttf";
+import { Palette } from "std-widgets.slint";
+import { App } from "state.slint";
+
+export global Theme {
+    out property <bool> dark: App.appearance == "Dark" || (App.appearance != "Light" && Palette.color-scheme == ColorScheme.dark);
+
+    // surfaces
+    out property <color> rail:        dark ? #0B2629 : #0F3A3E;   // sidebar
+    out property <color> rail-ink:    #E8F1EF;
+    out property <color> rail-muted:  #8FB3AE;
+    out property <color> rail-active: dark ? #154347 : #1A5257;
+    out property <color> paper:       dark ? #111B1C : #EEF2F0;
+    out property <color> surface:     dark ? #182425 : #FFFFFF;
+    out property <color> sunken:      dark ? #142021 : #E4EAE7;
+    out property <color> ink:         dark ? #E7EFED : #0F2A2E;
+    out property <color> muted:       dark ? #93A8A5 : #55706F;
+    out property <color> faint:       dark ? #637A78 : #8EA3A1;
+    out property <color> line:        dark ? #263738 : #D3DDDA;
+    out property <color> accent:      dark ? #4FC1A6 : #0F7A66;
+    out property <color> accent-soft: dark ? #173A35 : #D7EEE8;
+    out property <color> selected:    dark ? #1F3233 : #E2EEEA;
+
+    // the "needs you" signal
+    out property <color> marigold:      #E3A83B;
+    out property <color> marigold-soft: dark ? #3A2E14 : #FCEFD3;
+    out property <color> marigold-ink:  dark ? #F2C66E : #8A5A0B;
+    out property <color> risk:          dark ? #F08A80 : #B4413C;
+    out property <color> risk-soft:     dark ? #3A1F1D : #F8E1DE;
+    out property <color> good:          dark ? #5ED39E : #1F8F63;
+
+    // metro line colours per stage: Found, Fit checked, Tailored, Applied, Interview, Offer
+    out property <[color]> stage-colors: [#8592A0, #3B7DD8, #7A5AF0, #1F9D6E, #E3A83B, #E4572E];
+
+    out property <string> display: "Bricolage Grotesque";
+    out property <string> body: "Atkinson Hyperlegible Next";
+
+    // Type scale (≈ minor third) + a display size for page titles
+    out property <length> fs-xs: 13px;
+    out property <length> fs-sm: 15px;
+    out property <length> fs-md: 17px;
+    out property <length> fs-lg: 21px;
+    out property <length> fs-xl: 28px;
+    out property <length> fs-xxl: 40px;
+
+    // Radius hierarchy: tickets 16, panels 12, controls 8, pills round
+    out property <length> r-ticket: 16px;
+    out property <length> r-panel: 12px;
+    out property <length> r-control: 8px;
+}
+
+export global Stages {
+    out property <[string]> names: ["Found", "Fit checked", "Tailored", "Applied", "Interview", "Offer"];
+}
+
+export component Heading inherits Text {
+    font-family: Theme.display;
+    font-weight: 700;
+    font-size: Theme.fs-xxl;
+    color: Theme.ink;
+    letter-spacing: -0.5px;
+}
+
+export component Panel inherits Rectangle {
+    background: Theme.surface;
+    border-radius: Theme.r-panel;
+    border-width: 1px;
+    border-color: Theme.line;
+}
+
+// A stage chip in the line's colour, like a platform sign.
+export component StageChip inherits Rectangle {
+    in property <int> position;
+    in property <bool> ended;
+    in property <string> ended-label: "Closed";
+    property <color> c: ended ? Theme.risk : Theme.stage-colors[position];
+    height: 24px;
+    width: row.preferred-width + 18px;
+    border-radius: 6px;
+    background: c.with-alpha(Theme.dark ? 0.22 : 0.13);
+    row := HorizontalLayout {
+        x: 9px; spacing: 6px;
+        Rectangle { width: 8px; height: 8px; y: (parent.height - 8px) / 2; border-radius: 4px; background: root.c; }
+        Text {
+            text: root.ended ? root.ended-label : Stages.names[root.position];
+            font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700;
+            color: Theme.dark ? root.c.brighter(0.25) : root.c.darker(0.35);
+            vertical-alignment: center;
+        }
+    }
+}
+
+// Company monogram: first letter on a colour derived from the name.
+export component Monogram inherits Rectangle {
+    in property <string> initial;
+    in property <length> size: 40px;
+    in property <int> hue-seed: 0;
+    in property <bool> inverted;   // white tile with a coloured letter, for coloured backgrounds
+    property <color> tone: hsv(mod(hue-seed * 47, 360), Theme.dark ? 0.45 : 0.55, Theme.dark ? 0.55 : 0.62);
+    width: size; height: size;
+    border-radius: size * 0.28;
+    background: inverted ? white : tone;
+    Text {
+        text: root.initial == "" ? "?" : root.initial;
+        font-family: Theme.display; font-weight: 700; font-size: root.size * 0.46; color: root.inverted ? root.tone.darker(0.2) : white;
+        horizontal-alignment: center; vertical-alignment: center;
+    }
+}
+

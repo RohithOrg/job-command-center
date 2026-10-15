@@ -1,0 +1,642 @@
+// One application, full page: ticket header, then Overview / Resume / Cover letter / Q&A / Activity.
+import { ScrollView, ListView } from "std-widgets.slint";
+import { Theme, Monogram } from "theme.slint";
+import { Track } from "track.slint";
+import { App, RoundRow, VersionRow, ChatRow, TemplateRow, CheckRow } from "state.slint";
+import { ActionButton, LinkButton, SearchField, Field, TextArea, Tabs, Chip, ChipFlow, Working, SectionTitle, Card, Bullets, Select } from "widgets.slint";
+
+// Close an application with a reason; it stays in history and is recognised if the job comes back.
+export component CloseDialog inherits Rectangle {
+    in-out property <string> reason: App.close-reasons[0];
+    in-out property <string> note;
+    background: #0008;
+    TouchArea { }
+    Card {
+        width: min(520px, parent.width - 80px);
+        height: col.preferred-height;
+        x: (parent.width - self.width) / 2;
+        y: max(40px, (parent.height - self.height) / 2);
+        col := VerticalLayout {
+            padding: 28px; spacing: 14px;
+            Text { text: App.closing-many ? "Close " + App.selected-count + (App.selected-count == 1 ? " application" : " applications") : "Close this application";
+                   font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xl; color: Theme.ink; }
+            Text { text: "It stays in your history. If the same job turns up again, from a link or a scan, the app will tell you.";
+                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; }
+            VerticalLayout { spacing: 6px;
+                Text { text: "Why"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
+                Select { model: App.close-reasons; by-value: true; value <=> root.reason; } }
+            TextArea { label: "Note (optional)"; text <=> root.note; area-height: 70px; }
+            HorizontalLayout { spacing: 10px; alignment: end;
+                ActionButton { text: "Cancel"; clicked => { App.closing = false; App.closing-many = false; } }
+                ActionButton { text: !App.closing-many ? "Close application" : App.selected-count == 1 ? "Close it" : "Close them"; primary: true;
+                               clicked => {
+                                   if (App.closing-many) { App.close-selected(root.reason, root.note); }
+                                   else { App.close-application(App.closing-job, root.reason, root.note); }
+                                   App.closing = false; App.closing-many = false; root.note = "";
+                               } } }
+        }
+    }
+}
+
+component TicketHeader inherits Rectangle {
+    in property <bool> compact;
+    property <color> band: App.job.ended ? #5B6B6A : Theme.stage-colors[App.job.position].darker(App.job.position == 4 ? 0.55 : 0.3);
+    border-radius: Theme.r-ticket;
+    background: band;
+    height: col.preferred-height;
+    col := VerticalLayout {
+        padding: 24px; padding-bottom: 8px; spacing: 14px;
+        HorizontalLayout {
+            spacing: 16px;
+            Monogram { initial: App.job.initial; hue-seed: App.job.hue; size: 52px; inverted: true; }
+            VerticalLayout {
+                alignment: center; spacing: 4px; horizontal-stretch: 1;
+                Text { text: App.job.title; wrap: word-wrap; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xl; color: white; letter-spacing: -0.3px; }
+                Text { text: App.job.location == "" ? App.job.company : App.job.company + ", " + App.job.location;
+                       font-family: Theme.body; font-size: Theme.fs-md; color: #ffffffc8; }
+            }
+            VerticalLayout {
+                alignment: center; spacing: 6px;
+                if App.job.working : HorizontalLayout {
+                    spacing: 8px; alignment: end;
+                    Working { color: white; }
+                    Text { text: App.job.stage-label; font-family: Theme.body; font-size: Theme.fs-sm; font-weight: 700; color: white; }
+                }
+                if App.job.fit != "" : Text { text: "Fit " + App.job.fit + " / 5"; horizontal-alignment: right; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-lg; color: white; }
+                if App.job.ats != "" : Text { text: "ATS " + App.job.ats; horizontal-alignment: right; font-family: Theme.body; font-size: Theme.fs-sm; color: #ffffffc8; }
+            }
+        }
+        if !root.compact : Track { position: App.job.position; ended: App.job.ended; ended-label: App.job.status; on-dark: true; }
+    }
+}
+
+// ---------------------------------------------------------------- Overview
+
+component ProgressPanel inherits Card {
+    in-out property <string> step: App.job.next-step;
+    in-out property <string> date: App.job.next-step-date;
+    in-out property <string> notes: App.job.notes;
+    height: col.preferred-height;
+    col := VerticalLayout {
+        padding: 20px; spacing: 14px;
+        SectionTitle { text: "Your progress"; }
+        VerticalLayout {
+            spacing: 6px;
+            Text { text: "Status"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
+            Select { model: App.statuses; current-index: App.job.status-index;
+                       selected(v) => { App.set-status(App.job.id, v); } }
+        }
+        if App.job.applied != "" : Text { text: "Applied on " + App.job.applied; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.ink; }
+        Field { label: "Next step"; placeholder: "e.g. Follow up with the recruiter"; text <=> root.step; }
+        Field { label: "When"; placeholder: "YYYY-MM-DD"; text <=> root.date; }
+        TextArea { label: "Notes"; text <=> root.notes; area-height: 120px; }
+        HorizontalLayout { alignment: start; ActionButton { text: "Save progress"; primary: true; clicked => { App.save-progress(App.job.id, root.step, root.date, root.notes); } } }
+    }
+}
+
+component OverviewTab inherits ScrollView {
+    HorizontalLayout {
+        padding-top: 20px; padding-bottom: 32px; spacing: 20px; alignment: start;
+        VerticalLayout {
+            spacing: 16px; alignment: start; horizontal-stretch: 1;
+            if App.job.error != "" : Rectangle {
+                background: Theme.risk-soft; border-radius: Theme.r-panel;
+                height: err.preferred-height;
+                err := HorizontalLayout {
+                    padding: 16px; spacing: 12px;
+                    Text { text: App.job.error; wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.risk; horizontal-stretch: 1; }
+                    VerticalLayout { alignment: center; ActionButton { text: "Try again"; small: true; clicked => { App.rerun(App.job.id); } } }
+                }
+            }
+            if App.job.duplicate-note != "" : Rectangle {
+                background: Theme.marigold-soft; border-radius: Theme.r-panel; height: dup.preferred-height;
+                dup := HorizontalLayout { padding: 14px;
+                    Text { text: App.job.duplicate-note; wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.marigold-ink; } }
+            }
+            if !App.job.has-jd && !App.job.working : Card {
+                height: empty.preferred-height;
+                empty := VerticalLayout {
+                    padding: 24px; spacing: 10px;
+                    SectionTitle { text: "Not read yet"; }
+                    Text { text: "The agents haven't read this posting. Start them to get a fit score, a tailored resume and a cover letter.";
+                           wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; }
+                    HorizontalLayout { alignment: start; ActionButton { text: "Read and tailor"; primary: true; clicked => { App.rerun(App.job.id); } } }
+                }
+            }
+            if App.job.fit-summary != "" : Card {
+                height: fit.preferred-height;
+                fit := VerticalLayout {
+                    padding: 24px; spacing: 10px;
+                    HorizontalLayout {
+                        spacing: 12px;
+                        SectionTitle { text: "Why it fits, or doesn't"; horizontal-stretch: 1; }
+                        if App.job.recommendation != "" : Chip { text: App.job.recommendation; fg: Theme.accent; bg: Theme.accent-soft; }
+                    }
+                    Text { text: App.job.fit-summary; wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.ink; }
+                    if App.job.archetype != "" : Text { text: "Maps to: " + App.job.archetype; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; }
+                    if App.job.work-auth != "" : Text { text: "Work authorization: " + App.job.work-auth; wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; }
+                }
+            }
+            if App.job.strengths.length > 0 : Card {
+                height: s.preferred-height;
+                s := VerticalLayout { padding: 24px; spacing: 12px;
+                    SectionTitle { text: "Strengths"; font-size: Theme.fs-md; }
+                    Bullets { items: App.job.strengths; dot: Theme.good; } }
+            }
+            if App.job.gaps.length > 0 : Card {
+                height: g.preferred-height;
+                g := VerticalLayout { padding: 24px; spacing: 12px;
+                    SectionTitle { text: "Gaps to handle"; font-size: Theme.fs-md; }
+                    Bullets { items: App.job.gaps; dot: Theme.marigold; } }
+            }
+            if App.job.job-summary != "" : Card {
+                height: role.preferred-height;
+                role := VerticalLayout {
+                    padding: 24px; spacing: 10px;
+                    SectionTitle { text: "The role"; }
+                    Text { text: App.job.job-summary; wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.ink; }
+                    HorizontalLayout {
+                        spacing: 8px; alignment: start;
+                        if App.job.seniority != "" : Chip { text: App.job.seniority; }
+                        if App.job.remote != "" : Chip { text: App.job.remote; }
+                        if App.job.salary != "" : Chip { text: App.job.salary; }
+                    }
+                    if App.job.red-flags.length > 0 : VerticalLayout {
+                        spacing: 8px;
+                        Text { text: "Watch out for"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.risk; }
+                        Bullets { items: App.job.red-flags; dot: Theme.risk; }
+                    }
+                }
+            }
+        }
+        VerticalLayout {
+            width: 320px; spacing: 16px; alignment: start;
+            ProgressPanel { }
+            HorizontalLayout { alignment: start; spacing: 8px;
+                if App.job.has-jd : ActionButton { text: "Read the posting again"; small: true; clicked => { App.rerun(App.job.id); } }
+                if !App.job.ended : ActionButton { text: "Close application"; small: true; clicked => { App.closing-job = App.job.id; App.closing = true; } }
+                if App.job.ended : ActionButton { text: "Reopen"; small: true; clicked => { App.reopen-application(App.job.id); } } }
+            // Deleting is rare and permanent: a quiet link on its own line, away from the everyday buttons.
+            HorizontalLayout { alignment: start;
+                LinkButton { text: "Delete this application"; ink: Theme.risk; clicked => { App.delete-job(App.job.id); } } }
+        }
+    }
+}
+
+// ---------------------------------------------------------------- Resume
+
+component RoundCard inherits Rectangle {
+    in property <RoundRow> r;
+    property <color> c: r.state == "drafting" || r.state == "checking" ? Theme.accent : r.score >= 85 ? Theme.good : r.score >= 70 ? Theme.marigold : Theme.risk;
+    width: 220px;
+    height: col.preferred-height;
+    border-radius: Theme.r-panel;
+    background: Theme.surface;
+    border-width: r.state == "kept" ? 2px : 1px;
+    border-color: r.state == "kept" ? Theme.good : Theme.line;
+    col := VerticalLayout {
+        padding: 14px; spacing: 6px;
+        HorizontalLayout {
+            Text { text: "Round " + r.round; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; horizontal-stretch: 1; }
+            if r.state == "kept" : Text { text: "Kept"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.good; }
+        }
+        if r.state == "drafting" || r.state == "checking" : HorizontalLayout {
+            spacing: 8px; height: 34px;
+            Working { color: Theme.accent; }
+            Text { text: r.state == "drafting" ? "Tailor is writing" : "ATS critic is reading the PDF"; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.ink; vertical-alignment: center; wrap: word-wrap; }
+        }
+        if r.state != "drafting" && r.state != "checking" : HorizontalLayout {
+            spacing: 6px;
+            Text { text: r.score; font-family: Theme.display; font-weight: 700; font-size: 30px; color: root.c; }
+            VerticalLayout { alignment: end; padding-bottom: 5px;
+                Text { text: "ATS, " + r.coverage + "% keywords, " + r.pages + "p"; font-family: Theme.body; font-size: 12px; color: Theme.muted; } }
+        }
+        if r.missing != "" : Text { text: "Missing: " + r.missing; wrap: word-wrap; font-family: Theme.body; font-size: 12px; color: Theme.marigold-ink; }
+        if r.issues != "" : Text { text: r.issues; wrap: word-wrap; font-family: Theme.body; font-size: 12px; color: Theme.risk; }
+    }
+}
+
+component VersionItem inherits Rectangle {
+    in property <VersionRow> v;
+    in property <bool> selected;
+    callback clicked;
+    height: col.preferred-height;
+    border-radius: Theme.r-control;
+    background: selected ? Theme.surface : touch.has-hover ? Theme.surface.with-alpha(0.6) : transparent;
+    border-width: selected ? 1px : 0px;
+    border-color: Theme.line;
+    touch := TouchArea { clicked => { root.clicked(); } mouse-cursor: pointer; }
+    col := VerticalLayout {
+        padding: 12px; padding-right: 18px; spacing: 4px;
+        HorizontalLayout {
+            spacing: 8px;
+            Text { text: v.label; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-md; color: Theme.ink; }
+            if v.current : Chip { text: "In use"; fg: Theme.accent; bg: Theme.accent-soft; height: 22px; }
+            Rectangle { horizontal-stretch: 1; }
+            if v.has-ats : Text { text: v.ats; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-md;
+                                  color: v.ats >= 85 ? Theme.good : v.ats >= 70 ? Theme.marigold-ink : Theme.risk; }
+        }
+        Text { text: v.kind + ", " + v.template-name + " design"; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; overflow: elide; }
+        if v.note != "" : Text { text: v.note; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.ink; wrap: word-wrap; max-height: 40px; overflow: elide; }
+        Text { text: v.created; font-family: Theme.body; font-size: 12px; color: Theme.faint; }
+    }
+}
+
+component DesignThumb inherits Rectangle {
+    in property <TemplateRow> t;
+    in property <image> thumb;
+    in property <bool> previewing;
+    in property <bool> in-use;
+    callback clicked;
+    // Share the row equally rather than asking for the page image's full width.
+    preferred-width: 40px;
+    min-width: 40px;
+    horizontal-stretch: 1;
+    height: col.preferred-height;
+    border-radius: Theme.r-control;
+    background: previewing ? Theme.accent-soft : touch.has-hover ? Theme.selected : transparent;
+    touch := TouchArea { clicked => { root.clicked(); } mouse-cursor: pointer; }
+    col := VerticalLayout {
+        padding: 6px; spacing: 6px;
+        Rectangle {
+            height: self.width * 1.414;
+            background: white;
+            border-radius: 3px;
+            border-width: previewing ? 2px : 1px;
+            border-color: previewing ? Theme.accent : Theme.line;
+            clip: true;
+            Image { source: root.thumb; width: parent.width; height: parent.height; image-fit: contain; }
+            if root.thumb.width == 0 : Working { color: Theme.faint; x: (parent.width - 30px) / 2; y: (parent.height - 10px) / 2; }
+            if root.in-use : Rectangle {
+                x: 4px; y: parent.height - self.height - 4px; height: 18px; width: badge.preferred-width + 10px; border-radius: 9px;
+                background: Theme.accent;
+                badge := Text { text: "In use"; font-family: Theme.body; font-size: 11px; font-weight: 700; color: white; }
+            }
+        }
+        Text { text: t.name; horizontal-alignment: center; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.ink; overflow: elide; }
+    }
+    accessible-role: button;
+    accessible-label: "Preview the " + t.name + " design";
+}
+
+component Stat inherits VerticalLayout {
+    in property <string> label;
+    in property <string> value;
+    in property <color> color: Theme.ink;
+    spacing: 0px;
+    Text { text: value; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-lg; color: root.color; }
+    Text { text: label; font-family: Theme.body; font-size: 12px; color: Theme.muted; }
+}
+
+// Right column: score, design, change request, then the details.
+component ResumeSide inherits ScrollView {
+    in-out property <string> instruction;
+    property <color> score-color: App.version.ats >= 85 ? Theme.good : App.version.ats >= 70 ? Theme.marigold-ink : Theme.risk;
+    VerticalLayout {
+        width: root.visible-width;   // wrap to the column instead of scrolling sideways
+        spacing: 14px; padding-bottom: 24px; padding-right: 10px; alignment: start;
+        Card {
+            height: sc.preferred-height;
+            sc := VerticalLayout {
+                padding: 16px; spacing: 10px;
+                HorizontalLayout {
+                    spacing: 14px;
+                    VerticalLayout { alignment: center;
+                        Text { text: App.version.ats; font-family: Theme.display; font-weight: 700; font-size: 44px; color: root.score-color; } }
+                    VerticalLayout { alignment: center; spacing: 2px; horizontal-stretch: 1;
+                        Text { text: "ATS score"; font-family: Theme.body; font-size: Theme.fs-sm; font-weight: 700; color: Theme.ink; }
+                        Text { text: App.version.ats >= 85 ? "Passes the target of 85." : App.version.gaps.length > 0 ? "Held back by skills your profile doesn't show. Those are never claimed." : "Below the target of 85.";
+                               wrap: word-wrap; font-family: Theme.body; font-size: 12px; color: Theme.muted; } }
+                }
+                HorizontalLayout { spacing: 18px;
+                    Stat { label: "keywords"; value: App.version.coverage + "%"; }
+                    Stat { label: "structure"; value: App.version.structure + "%"; }
+                    Stat { label: "pages"; value: App.version.pages; } }
+                if !App.version.current : ActionButton { text: "Use this version"; small: true; clicked => { App.make-current(App.job.id, App.version.id); } }
+            }
+        }
+        Card {
+            height: ds.preferred-height;
+            ds := VerticalLayout {
+                padding: 16px; spacing: 10px;
+                SectionTitle { text: "Design"; font-size: Theme.fs-md; }
+                Text { text: "Click a design to preview your resume in it. All four are single-column and ATS-safe.";
+                       wrap: word-wrap; font-family: Theme.body; font-size: 12px; color: Theme.muted; }
+                HorizontalLayout { spacing: 6px;
+                    for t[i] in App.templates : DesignThumb {
+                        t: t;
+                        thumb: i < App.design-thumbs.length ? App.design-thumbs[i] : @image-url("");
+                        previewing: t.id == App.preview-template;
+                        in-use: t.id == App.version.template;
+                        clicked => { App.preview-design(t.id); }
+                    } }
+                if App.preview-template != App.version.template && App.preview-template != "" : ActionButton {
+                    text: "Save as a new version in this design"; primary: true; small: true;
+                    clicked => { App.restyle(App.job.id, App.version.id, App.preview-template); } }
+            }
+        }
+        Card {
+            height: rv.preferred-height;
+            rv := VerticalLayout {
+                padding: 16px; spacing: 10px;
+                SectionTitle { text: "Change it"; font-size: Theme.fs-md; }
+                Text { text: "Tell the agent what to change. It edits this version, re-checks it like an ATS and saves a new version.";
+                       wrap: word-wrap; font-family: Theme.body; font-size: 12px; color: Theme.muted; }
+                TextArea { text <=> root.instruction; area-height: 90px; hint: "For example: shorter summary, drop the 2015 role, lead with RAG work."; }
+                HorizontalLayout { alignment: start;
+                    ActionButton { text: "Revise"; primary: true; small: true; enabled: root.instruction != "" && !App.job.working;
+                                   clicked => { App.revise(App.job.id, root.instruction); root.instruction = ""; } } }
+            }
+        }
+        Card {
+            height: kw.preferred-height;
+            kw := VerticalLayout {
+                padding: 16px; spacing: 8px;
+                SectionTitle { text: "What the ATS sees"; font-size: Theme.fs-md; }
+                Text { text: "Keywords in the PDF"; font-family: Theme.body; font-size: 12px; font-weight: 700; color: Theme.good; }
+                ChipFlow { items: App.version.matched; fg: Theme.good; bg: Theme.good.with-alpha(0.12); }
+                Text { text: "Backed by your experience, not in the PDF yet"; font-family: Theme.body; font-size: 12px; font-weight: 700; color: Theme.marigold-ink; }
+                ChipFlow { items: App.version.missing; fg: Theme.marigold-ink; bg: Theme.marigold-soft; empty: "None"; }
+                Text { text: "Not claimed: your profile doesn't show these"; font-family: Theme.body; font-size: 12px; font-weight: 700; color: Theme.muted; }
+                ChipFlow { items: App.version.gaps; fg: Theme.muted; bg: Theme.sunken; }
+                if App.version.unsupported.length > 0 : Text { text: "Check these claims"; font-family: Theme.body; font-size: 12px; font-weight: 700; color: Theme.risk; }
+                if App.version.unsupported.length > 0 : ChipFlow { items: App.version.unsupported; fg: Theme.risk; bg: Theme.risk-soft; }
+                for c in App.version.checks : HorizontalLayout { spacing: 6px;
+                    Text { width: 14px; text: c.ok ? "✓" : "!"; font-weight: 700; font-size: Theme.fs-xs; color: c.ok ? Theme.good : Theme.risk; }
+                    Text { text: c.name; font-family: Theme.body; font-size: 12px; color: Theme.ink; horizontal-stretch: 1; overflow: elide; } }
+            }
+        }
+        if App.version.changes.length > 0 : Card {
+            height: ch.preferred-height;
+            ch := VerticalLayout { padding: 16px; spacing: 8px;
+                SectionTitle { text: "What the tailor changed"; font-size: Theme.fs-md; }
+                Bullets { items: App.version.changes; } }
+        }
+    }
+}
+
+// The resume itself, page by page, as it will print.
+component Preview inherits Rectangle {
+    background: Theme.sunken;
+    in property <bool> narrow;
+    border-radius: Theme.r-panel;
+    clip: true;
+    VerticalLayout {
+        HorizontalLayout {
+            padding: 12px; padding-left: 16px; spacing: 8px; height: 52px;
+            Text { text: App.version.label + (App.preview-template != App.version.template && App.preview-template != "" ? ", previewed in another design" : "");
+                   min-width: 0px; font-family: Theme.body; font-size: Theme.fs-sm; font-weight: 700; color: Theme.ink; vertical-alignment: center; horizontal-stretch: 1; overflow: elide; }
+            if App.preview-busy : Working { }
+            ActionButton { text: "Expand"; small: true; clicked => { App.open-viewer(); } }
+            if !root.narrow : ActionButton { text: "Show in folder"; small: true; clicked => { App.show-file(App.version.pdf); } }
+            ActionButton { text: "Open PDF"; small: true; primary: true; clicked => { App.open-file(App.version.pdf); } }
+        }
+        // Pages are placed by hand: a layout inside a Flickable would size the Flickable from its content.
+        flick := Flickable {
+            vertical-stretch: 1;
+            property <length> page-w: min(self.width - 48px, 820px);
+            property <float> ratio: App.preview-pages.length > 0 ? App.preview-pages[0].height / max(1, App.preview-pages[0].width) : 1.414;
+            property <length> page-h: self.page-w * self.ratio;
+            content-height: App.preview-pages.length * (self.page-h + 18px) + 24px;
+            for p[i] in App.preview-pages : Rectangle {
+                x: (flick.width - flick.page-w) / 2;
+                y: 4px + i * (flick.page-h + 18px);
+                width: flick.page-w;
+                height: flick.page-h;
+                background: white;
+                drop-shadow-blur: 14px;
+                drop-shadow-color: #00000030;
+                drop-shadow-offset-y: 3px;
+                Image { source: p; width: parent.width; height: parent.height; image-fit: contain; }
+                TouchArea { clicked => { App.open-viewer(); } mouse-cursor: pointer; }
+            }
+            if App.preview-pages.length == 0 : Text { y: 40px; width: flick.width; text: "Rendering the preview…"; horizontal-alignment: center;
+                                                     font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; }
+        }
+    }
+}
+
+component AgentsBar inherits Card {
+    height: col.preferred-height;
+    col := VerticalLayout {
+        padding: 14px; spacing: 10px;
+        HorizontalLayout {
+            spacing: 10px;
+            if App.job.working : Working { }
+            Text { text: App.job.working ? "Agents at work: " + App.job.stage-label : "Latest run"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-md; color: Theme.ink; vertical-alignment: center; }
+            Rectangle { horizontal-stretch: 1; }
+            if App.work.length > 0 : Text { text: App.work[App.work.length - 1].message; font-family: Theme.body; font-size: 12px; color: Theme.muted; vertical-alignment: center; overflow: elide; max-width: 420px; }
+        }
+        if App.rounds.length > 0 : HorizontalLayout { spacing: 10px; alignment: start;
+            for r in App.rounds : RoundCard { r: r; } }
+    }
+}
+
+component ResumeTab inherits HorizontalLayout {
+    // Narrow windows: the side columns give up width before the resume preview does.
+    property <bool> narrow: self.width < 1000px;
+    padding-top: 16px;
+    spacing: narrow ? 10px : 16px;
+    VerticalLayout {
+        width: root.narrow ? 190px : 240px; spacing: 10px;
+        HorizontalLayout {
+            SectionTitle { text: "Versions"; horizontal-stretch: 1; vertical-alignment: center; }
+            Text { text: App.versions.length; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; vertical-alignment: center; }
+        }
+        ActionButton { text: App.versions.length > 0 ? "Tailor a new version" : App.job.fit != "" && App.job.fit.to-float() < 3.0 ? "Tailor anyway" : "Create tailored resume";
+                       primary: App.versions.length == 0;
+                       enabled: !App.job.working && App.job.has-jd; clicked => { App.tailor(App.job.id); } }
+        ListView {
+            vertical-stretch: 1;
+            for v in App.versions : VersionItem { v: v; selected: v.id == App.version.id; clicked => { App.select-version(v.id); } }
+        }
+    }
+    VerticalLayout {
+        horizontal-stretch: 1; spacing: 12px; padding-bottom: 16px;
+        if App.job.working || (App.rounds.length > 0 && App.versions.length == 0) : AgentsBar { }
+        if App.version.id > 0 : Preview { vertical-stretch: 1; narrow: root.narrow; }
+        if App.version.id <= 0 && !App.job.working : Card {
+            height: none.preferred-height;
+            none := VerticalLayout {
+                padding: 28px; spacing: 10px;
+                SectionTitle { text: "No tailored resume yet"; }
+                Text { text: App.job.fit != "" && App.job.fit.to-float() < 3.0
+                           ? "This role scored " + App.job.fit + "/5, a weak match (see Overview), so the agents didn't tailor a resume. Use “Tailor anyway” if you still want one."
+                           : App.job.has-jd
+                           ? "Create one: the Tailor drafts it from your profile, the ATS critic renders the real PDF, reads it back and sends feedback until it passes. Every draft is fact-checked against your profile."
+                           : "The agents need to read the posting first (Overview tab).";
+                       wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; }
+            }
+        }
+        if App.version.id <= 0 && App.job.working : Rectangle { vertical-stretch: 1; }
+    }
+    if App.version.id > 0 : ResumeSide { width: root.narrow ? 280px : 360px; }
+}
+
+// ---------------------------------------------------------------- Cover letter
+
+component CoverTab inherits HorizontalLayout {
+    in-out property <string> letter: App.job.cover-letter;
+    in-out property <string> instruction;
+    padding-top: 16px; padding-bottom: 16px;
+    spacing: 16px;
+    if App.job.cover-letter == "" : Card {
+        horizontal-stretch: 1;
+        height: e.preferred-height;
+        e := VerticalLayout { padding: 24px; spacing: 10px;
+            SectionTitle { text: "No cover letter yet"; }
+            Text { text: "The writer drafts one after the resume is tailored. You can also ask for one now.";
+                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; }
+            HorizontalLayout { alignment: start; ActionButton { text: "Write cover letter"; primary: true; enabled: App.job.has-jd && !App.job.working;
+                clicked => { App.revise-cover(App.job.id, "Write the cover letter."); } } } }
+    }
+    if App.job.cover-letter != "" : Card {
+        horizontal-stretch: 1;
+        VerticalLayout {
+            padding: 20px; spacing: 12px;
+            HorizontalLayout {
+                SectionTitle { text: "Cover letter"; horizontal-stretch: 1; }
+                HorizontalLayout { spacing: 8px;
+                    ActionButton { text: "Copy"; small: true; clicked => { App.copy(root.letter); } }
+                    ActionButton { text: "Save edits"; small: true; enabled: root.letter != App.job.cover-letter; clicked => { App.save-cover(App.job.id, root.letter); } } }
+            }
+            TextArea { text <=> root.letter; grow: true; area-height: 160px; vertical-stretch: 1; }
+        }
+    }
+    if App.job.cover-letter != "" : VerticalLayout {
+        width: 340px; spacing: 14px; alignment: start;
+        Card {
+            height: r.preferred-height;
+            r := VerticalLayout { padding: 16px; spacing: 10px;
+                SectionTitle { text: "Change it"; font-size: Theme.fs-md; }
+                Text { text: "Tell the writer what to change. Facts still come only from your profile.";
+                       wrap: word-wrap; font-family: Theme.body; font-size: 12px; color: Theme.muted; }
+                TextArea { text <=> root.instruction; area-height: 110px; hint: "For example: shorter, warmer, mention the relocation plan up front."; }
+                HorizontalLayout { alignment: start; ActionButton { text: "Rewrite"; primary: true; small: true; enabled: root.instruction != "" && !App.job.working;
+                    clicked => { App.revise-cover(App.job.id, root.instruction); root.instruction = ""; } } } }
+        }
+        if App.job.working && App.job.stage-label == "Writing the cover letter" : HorizontalLayout { spacing: 8px;
+            Working { } Text { text: "The writer is on it"; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; vertical-alignment: center; } }
+    }
+}
+
+// ---------------------------------------------------------------- Q&A
+
+component Bubble inherits Rectangle {
+    in property <ChatRow> m;
+    property <bool> mine: m.role == "user";
+    height: col.preferred-height;
+    col := HorizontalLayout {
+        alignment: mine ? end : start;
+        Rectangle {
+            width: min(root.width * 0.78, inner.preferred-width + 2px);
+            border-radius: Theme.r-panel;
+            background: mine ? Theme.accent-soft : Theme.surface;
+            border-width: mine ? 0px : 1px;
+            border-color: Theme.line;
+            inner := VerticalLayout {
+                padding: 14px; spacing: 8px;
+                Text { text: m.content; wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.ink; }
+                if !mine : HorizontalLayout {
+                    spacing: 6px;
+                    Text { text: m.meta; font-family: Theme.body; font-size: 12px; color: Theme.faint; vertical-alignment: center; horizontal-stretch: 1; }
+                    LinkButton { text: "Copy"; clicked => { App.copy(m.content); } }
+                    LinkButton { text: m.saved ? "Saved to library" : "Save to library"; ink: m.saved ? Theme.good : Theme.accent;
+                                 clicked => { App.toggle-saved(m.id); } }
+                }
+            }
+        }
+    }
+}
+
+component QaTab inherits VerticalLayout {
+    in-out property <string> question;
+    padding-top: 20px;
+    spacing: 12px;
+    if App.chat.length == 0 : Card {
+        height: intro.preferred-height;
+        intro := VerticalLayout {
+            padding: 24px; spacing: 10px;
+            SectionTitle { text: "Application questions"; }
+            Text { text: "Paste a question from the application form. Answers come from your profile, this job's tailored resume and the answers you saved before. Save good answers to reuse them in later applications.";
+                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; }
+        }
+    }
+    ListView {
+        vertical-stretch: 1;
+        for m in App.chat : VerticalLayout { padding-bottom: 12px; Bubble { m: m; } }
+    }
+    HorizontalLayout {
+        spacing: 8px; alignment: start;
+        for q in ["Why do you want to work here?", "Do you need visa sponsorship?", "Salary expectations?", "Notice period?"] :
+            LinkButton { text: q; clicked => { root.question = q; } }
+    }
+    HorizontalLayout {
+        spacing: 10px;
+        TextArea { text <=> root.question; area-height: 76px; horizontal-stretch: 1; }
+        VerticalLayout {
+            alignment: center;
+            if App.chat-busy : HorizontalLayout { spacing: 8px; Working { } Text { text: "Thinking"; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; vertical-alignment: center; } }
+            if !App.chat-busy : ActionButton { text: "Ask"; primary: true; enabled: root.question != "";
+                clicked => { App.ask(App.job.id, root.question); root.question = ""; } }
+        }
+    }
+}
+
+// ---------------------------------------------------------------- Activity
+
+component ActivityTab inherits ScrollView {
+    HorizontalLayout {
+        padding-top: 20px; padding-bottom: 32px; spacing: 20px; alignment: start;
+        Card {
+            horizontal-stretch: 1;
+            height: log.preferred-height;
+            log := VerticalLayout {
+                padding: 20px; spacing: 6px;
+                SectionTitle { text: "What the agents did"; font-size: Theme.fs-md; }
+                if App.work.length == 0 : Text { text: "Nothing yet."; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; }
+                for w in App.work : HorizontalLayout {
+                    spacing: 10px;
+                    Text { width: 64px; text: w.time; font-family: Theme.body; font-size: 12px; color: Theme.faint; }
+                    Text { width: 90px; text: w.agent; font-family: Theme.body; font-size: 12px; font-weight: 700; color: Theme.muted; }
+                    Text { text: w.message; wrap: word-wrap; horizontal-stretch: 1; font-family: Theme.body; font-size: 12px;
+                           color: w.level == "error" ? Theme.risk : w.level == "warn" ? Theme.marigold-ink : w.level == "success" ? Theme.good : Theme.ink; }
+                }
+            }
+        }
+        Card {
+            width: 300px;
+            height: ev.preferred-height;
+            ev := VerticalLayout {
+                padding: 20px; spacing: 10px;
+                SectionTitle { text: "Timeline"; font-size: Theme.fs-md; }
+                for e in App.events : VerticalLayout {
+                    spacing: 2px;
+                    Text { text: e.text; wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.ink; }
+                    Text { text: e.time; font-family: Theme.body; font-size: 12px; color: Theme.faint; }
+                }
+            }
+        }
+    }
+}
+
+export component ApplicationPage inherits Rectangle {
+    background: Theme.paper;
+    VerticalLayout {
+        padding: 28px; padding-bottom: 0; spacing: 14px;
+        HorizontalLayout {
+            spacing: 10px;
+            LinkButton { text: "← Applications"; clicked => { App.close-job(); } }
+            Rectangle { horizontal-stretch: 1; }
+            if App.job.url != "" : ActionButton { text: "Open posting"; small: true; clicked => { App.open-url(App.job.url); } }
+            if App.job.has-pdf : ActionButton { text: "Open resume PDF"; small: true; primary: true; clicked => { App.open-file(App.version.pdf); } }
+        }
+        TicketHeader { compact: root.height < 780px; }
+        Tabs { labels: ["Overview", "Resume", "Cover letter", "Q&A", "Activity"]; current <=> App.job-tab; }
+        if App.job-tab == 0 : OverviewTab { vertical-stretch: 1; }
+        if App.job-tab == 1 : ResumeTab { vertical-stretch: 1; }
+        if App.job-tab == 2 : CoverTab { vertical-stretch: 1; }
+        if App.job-tab == 3 : QaTab { vertical-stretch: 1; padding-bottom: 24px; }
+        if App.job-tab == 4 : ActivityTab { vertical-stretch: 1; }
+    }
+}
