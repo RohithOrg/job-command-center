@@ -9,7 +9,7 @@ Download one file, open it, done. Nothing else to install.
 **Mac (Apple silicon: M1 or newer; check under  → About This Mac, "Chip")**
 1. Download [Job Command Center for Mac](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.6/job-command-center-0.1.6-macos-aarch64.dmg).
 2. Open the downloaded file and drag **Job Command Center** onto **Applications**.
-3. Open it from Applications. The first time, macOS says it "could not verify" the app: open **System Settings → Privacy & Security**, scroll down and press **Open Anyway**. This happens once.
+3. Open it from Applications. The app is signed and notarized with Apple, so it opens like any other app.
 
 **Windows 10 / 11**
 1. Download [Job Command Center for Windows](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.6/job-command-center-0.1.6-windows-x86_64.exe).
@@ -22,7 +22,7 @@ Download one file, open it, done. Nothing else to install.
 3. Double-click it. On Ubuntu 22.04 or newer, if nothing happens, run `sudo apt install libfuse2` once.
 4. Your API key is kept in the desktop's password store (GNOME Keyring or KWallet). Ubuntu, Fedora, Mint and other desktops have one already; if you use a bare window manager without one, install `gnome-keyring` first.
 
-All downloads: [github.com/RohithOrg/releases](https://github.com/RohithOrg/releases/releases). Or install **Hangar**, which installs and updates this app and the rest of the suite for you.
+All downloads: [github.com/RohithOrg/releases](https://github.com/RohithOrg/releases/releases). Updates arrive inside the app: when a new version is out, the Today page shows "Install and restart". Or install **Hangar**, which installs and updates this app and the rest of the suite for you.
 
 On first launch the app sets itself up (about a minute), then walks you through four things:
 
