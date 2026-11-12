@@ -775,7 +775,8 @@ pub fn refresh_settings(ui: &AppWindow, store: &Store) {
     app.set_ai(AiForm {
         provider_index: index as i32,
         base_url: if s.base_url.is_empty() { p.base_url.into() } else { s.base_url.clone().into() },
-        models: if s.models.is_empty() { p.default_model.into() } else { s.models.join(", ").into() },
+        models: s.models.first().cloned().unwrap_or_else(|| p.default_model.to_string()).into(),
+        backup: s.models.get(1).cloned().unwrap_or_default().into(),
         key_status: if s.provider.is_empty() { SharedString::new() } else { ai::mask(&ai::load_key(&s.provider)).into() },
         new_key: SharedString::new(),
         search: if s.embed_provider == "builtin" || s.provider.is_empty() { 0 } else { 1 },
@@ -1417,11 +1418,25 @@ pub fn wire(ui: &AppWindow, w: Rc<Wiring>) {
         f.provider_index = index;
         f.base_url = p.base_url.into();
         f.models = p.default_model.into();
+        f.backup = SharedString::new();
         f.key_status = ai::mask(&ai::load_key(p.id)).into();
         f.new_key = SharedString::new();
+        let have_key = !f.key_status.is_empty();
         app.set_ai(f);
         app.set_model_options(model(vec![]));
+        app.set_backup_options(model(vec![]));
         app.set_ai_status(SharedString::new());
+        if !p.needs_key || have_key {
+            app.invoke_load_models();
+        }
+    });
+    // A pasted key is long; once it looks complete, fetch the model list without asking.
+    on!(on_key_edited, |ui, w, text| {
+        let _ = w;
+        let app = ui.global::<App>();
+        if text.trim().chars().count() >= 20 && !app.get_ai_busy() {
+            app.invoke_load_models();
+        }
     });
     on!(on_load_models, |ui, w| {
         let app = ui.global::<App>();
@@ -1436,7 +1451,22 @@ pub fn wire(ui: &AppWindow, w: Rc<Wiring>) {
                 app.set_ai_busy(false);
                 match r {
                     Ok(models) if models.is_empty() => { app.set_ai_ok(false); app.set_ai_status("The provider listed no models".into()); }
-                    Ok(models) => { app.set_ai_ok(true); app.set_ai_status(format!("{} models available", models.len()).into()); app.set_model_options(strings(&models)); }
+                    Ok(models) => {
+                        app.set_ai_ok(true);
+                        app.set_ai_status(format!("{} models available", models.len()).into());
+                        let mut f = app.get_ai();
+                        if !models.iter().any(|m| *m == f.models.as_str()) {
+                            f.models = models[0].clone().into();
+                        }
+                        if !f.backup.is_empty() && !models.iter().any(|m| *m == f.backup.as_str()) {
+                            f.backup = SharedString::new();
+                        }
+                        app.set_ai(f);
+                        let mut with_none = vec!["None".to_string()];
+                        with_none.extend(models.iter().cloned());
+                        app.set_backup_options(strings(&with_none));
+                        app.set_model_options(strings(&models));
+                    }
                     Err(e) => { app.set_ai_ok(false); app.set_ai_status(format!("{e:#}").into()); }
                 }
             });
@@ -2031,7 +2061,7 @@ fn form_settings(f: &AiForm) -> (AiSettings, Option<String>) {
     let base = f.base_url.trim();
     let settings = AiSettings {
         provider: p.id.into(),
-        models: f.models.split(',').map(|m| m.trim().to_string()).filter(|m| !m.is_empty()).collect(),
+        models: [f.models.as_str(), f.backup.as_str()].iter().map(|m| m.trim().to_string()).filter(|m| !m.is_empty()).collect(),
         base_url: if base == p.base_url { String::new() } else { base.to_string() },
         embed_model: if f.search == 0 { crate::embed::MODEL_ID.into() } else { String::new() },
         embed_provider: if f.search == 0 { "builtin".into() } else { String::new() },
@@ -2284,6 +2314,16 @@ fn wire_web(ui: &AppWindow, w: &Rc<Wiring>) {
     // Pick up where the user left it.
     if saved["enabled"] == json!(true) {
         web_start(ui, w, saved["remote"] == json!(true));
+    }
+}
+
+/// The saved provider's model list, so Settings and the first-run screen show a dropdown.
+pub fn preload_models(ui: &AppWindow) {
+    let app = ui.global::<App>();
+    let f = app.get_ai();
+    let p = &ai::PROVIDERS[(f.provider_index.max(0) as usize).min(ai::PROVIDERS.len() - 1)];
+    if !p.needs_key || !f.key_status.is_empty() {
+        app.invoke_load_models();
     }
 }
 

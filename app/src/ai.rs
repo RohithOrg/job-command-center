@@ -37,7 +37,7 @@ pub const PROVIDERS: &[Provider] = &[
                needs_key: true, default_model: "gpt-5.5", key_hint: "sk-…",
                key_url: "https://platform.openai.com/api-keys" },
     Provider { id: "gemini", label: "Google Gemini", kind: Kind::Gemini, base_url: "https://generativelanguage.googleapis.com/v1beta",
-               needs_key: true, default_model: "gemini-3.5-flash, gemini-3.5-flash-lite", key_hint: "AIza…",
+               needs_key: true, default_model: "gemini-3.5-flash", key_hint: "AIza…",
                key_url: "https://aistudio.google.com/apikey" },
     Provider { id: "openrouter", label: "OpenRouter", kind: Kind::Compat, base_url: "https://openrouter.ai/api/v1",
                needs_key: true, default_model: "", key_hint: "sk-or-…", key_url: "https://openrouter.ai/keys" },

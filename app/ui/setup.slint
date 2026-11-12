@@ -115,7 +115,7 @@ export component SetupPage inherits Rectangle {
                             Text { text: "Provider"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
                             Select { model: App.provider-labels; current-index: App.ai.provider-index; selected => { App.provider-changed(self.current-index); } } }
                         if App.providers.length > 0 && App.providers[App.ai.provider-index].needs-key : HorizontalLayout { spacing: 12px;
-                            Field { label: "API key"; password: true; text <=> App.ai.new-key;
+                            Field { label: "API key"; password: true; text <=> App.ai.new-key; edited(t) => { App.key-edited(t); }
                                 placeholder: App.ai.key-status != "" ? "Saved (" + App.ai.key-status + ")" : App.providers[App.ai.provider-index].key-hint; }
                             VerticalLayout { alignment: end; padding-bottom: 6px;
                                 if App.providers[App.ai.provider-index].key-url != "" : LinkButton { text: "Get a key"; clicked => { App.open-url(App.providers[App.ai.provider-index].key-url); } } } }
@@ -127,18 +127,13 @@ export component SetupPage inherits Rectangle {
                             text: "LM Studio is a free program. Install it from lmstudio.ai, download a model in it and start its local server. Then type that model's name below and press Check.";
                             wrap: word-wrap; width: parent.width; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; }
                         if App.providers.length > 0 && App.providers[App.ai.provider-index].key-url == "" : Field { label: "Endpoint URL"; text <=> App.ai.base-url; }
-                        HorizontalLayout { spacing: 12px;
-                            Field { label: "Model"; hint: "Add fallbacks after a comma."; text <=> App.ai.models; }
+                        if App.model-options.length > 0 : VerticalLayout { spacing: 6px;
+                            Text { text: "Model"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
+                            Select { model: App.model-options; by-value: true; value: App.ai.models; selected(v) => { App.ai.models = v; } } }
+                        if App.model-options.length == 0 : HorizontalLayout { spacing: 12px;
+                            Field { label: "Model"; hint: App.ai-busy ? "Fetching the models your key can use…" : "The list of models appears here once your key is in."; text <=> App.ai.models; }
                             VerticalLayout { alignment: start; padding-top: 22px;
                                 ActionButton { text: "Show models"; small: true; enabled: !App.ai-busy; clicked => { App.load-models(); } } } }
-                        if App.model-options.length > 0 : VerticalLayout { spacing: 6px;
-                            Text { text: "Models your key can use (click one to use it)"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
-                            Rectangle {
-                                height: min(150px, (ceil(App.model-options.length / 3) * 34px));
-                                ScrollView {
-                                    VerticalLayout { spacing: 2px;
-                                        for m in App.model-options : LinkButton { text: m; ink: Theme.ink;
-                                            clicked => { App.ai.models = m; } } } } } }
                         HorizontalLayout { spacing: 10px;
                             if App.ai-busy : Working { }
                             Text { text: App.ai-status; wrap: word-wrap; horizontal-stretch: 1; vertical-alignment: center; font-family: Theme.body; font-size: Theme.fs-xs;

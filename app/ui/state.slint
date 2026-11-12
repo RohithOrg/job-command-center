@@ -68,7 +68,7 @@ export struct DocRow { id: int, kind: string, title: string, preview: string, ch
 export struct ProviderRow { id: string, label: string, needs-key: bool, base-url: string, key-hint: string, key-url: string, default-model: string }
 
 export struct AiForm {
-    provider-index: int, base-url: string, models: string, key-status: string, new-key: string, search: int,
+    provider-index: int, base-url: string, models: string, backup: string, key-status: string, new-key: string, search: int,
 }
 
 // Settings > Job search: only the automation. What to search for lives in the profile.
@@ -191,6 +191,8 @@ export global App {
     in property <[ProviderRow]> providers;
     in-out property <AiForm> ai;
     in property <[string]> model-options;
+    in property <[string]> backup-options;   // "None" + model-options
+    callback key-edited(string);              // the API key field changed (loads the model list when it looks complete)
     in property <[string]> provider-labels;
     in property <string> ai-status;
     in property <bool> ai-ok;

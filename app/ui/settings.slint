@@ -34,23 +34,22 @@ export component SettingsPage inherits Rectangle {
                             selected => { App.provider-changed(self.current-index); }
                         } }
                     if root.needs-key : HorizontalLayout { spacing: 12px;
-                        Field { width: 420px; label: "API key"; password: true; text <=> App.ai.new-key;
+                        Field { width: 420px; label: "API key"; password: true; text <=> App.ai.new-key; edited(t) => { App.key-edited(t); }
                                 placeholder: App.ai.key-status != "" ? "Saved (" + App.ai.key-status + "). Type to replace." : App.providers[App.ai.provider-index].key-hint; }
                         VerticalLayout { alignment: end; padding-bottom: 6px;
                             if App.providers[App.ai.provider-index].key-url != "" : LinkButton { text: "Get a key"; clicked => { App.open-url(App.providers[App.ai.provider-index].key-url); } } } }
                     if root.custom-url : Field { label: "Endpoint URL"; hint: "OpenAI-compatible base URL, ending in /v1"; text <=> App.ai.base-url; }
-                    HorizontalLayout { spacing: 12px;
-                        Field { label: "Model"; hint: "Add backups after a comma; they're used if the first one fails."; text <=> App.ai.models; }
+                    if App.model-options.length > 0 : HorizontalLayout { spacing: 16px;
+                        VerticalLayout { spacing: 6px; width: 420px;
+                            Text { text: "Model"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
+                            Select { model: App.model-options; by-value: true; value: App.ai.models; selected(v) => { App.ai.models = v; } } }
+                        VerticalLayout { spacing: 6px; width: 420px;
+                            Text { text: "Backup model (used when the first one fails)"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
+                            Select { model: App.backup-options; by-value: true; value: App.ai.backup == "" ? "None" : App.ai.backup; selected(v) => { App.ai.backup = v == "None" ? "" : v; } } } }
+                    if App.model-options.length == 0 : HorizontalLayout { spacing: 12px;
+                        Field { width: 420px; label: "Model"; hint: App.ai-busy ? "Fetching the models your key can use…" : "The list of models appears here once your key is in."; text <=> App.ai.models; }
                         VerticalLayout { alignment: start; padding-top: 22px;
-                            ActionButton { text: "Load models"; clicked => { App.load-models(); } } } }
-                    if App.model-options.length > 0 : VerticalLayout { spacing: 6px;
-                        Text { text: "Available models (click to add)"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
-                        Rectangle {
-                            height: min(220px, (ceil(App.model-options.length / 3) * 34px));
-                            ScrollView {
-                                VerticalLayout { spacing: 2px;
-                                    for m in App.model-options : LinkButton { text: m; ink: Theme.ink;
-                                        clicked => { App.ai.models = App.ai.models == "" ? m : App.ai.models + ", " + m; } } } } } }
+                            ActionButton { text: "Show models"; clicked => { App.load-models(); } } } }
                     VerticalLayout { spacing: 6px;
                         Text { text: "Smart search"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
                         Select { width: 420px; model: ["On: built in, works offline (recommended)", "Off: match exact words only"];

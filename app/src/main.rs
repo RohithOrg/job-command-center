@@ -127,6 +127,7 @@ fn main() -> Result<()> {
     ui::start_setup(&window, &wiring, startup);
     ui::check_ai(&window, &wiring);
     ui::start_updates(&window, &wiring);
+    ui::preload_models(&window);
     if imported > 0 {
         window.global::<App>().set_toast(format!("Imported {imported} applications").into());
     }
