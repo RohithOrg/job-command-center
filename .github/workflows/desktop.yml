@@ -32,10 +32,14 @@ jobs:
       - name: Linux build libraries
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libxkbcommon-dev libfontconfig1-dev libdbus-1-dev libwayland-dev libxcursor-dev libxrandr-dev libxi-dev libgl1-mesa-dev
+      # Tests run in the release profile so the Package step reuses the same compiled crates
+      # instead of building everything a second time in debug.
       - name: Tests
-        run: cargo test --locked
+        run: cargo test --release --locked
+      # rust-cache restores ~/.cargo/bin; only compile the packager when it isn't there yet.
       - name: Install cargo-packager
-        run: cargo install cargo-packager --locked
+        shell: bash
+        run: command -v cargo-packager >/dev/null || cargo install cargo-packager --locked
       - name: Package
         run: cargo packager --release --formats ${{ matrix.formats }}
       # Seal the whole .app with an ad-hoc signature (the linker only signs the program inside;
