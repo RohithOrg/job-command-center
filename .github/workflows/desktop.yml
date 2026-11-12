@@ -42,14 +42,47 @@ jobs:
       # an unsealed app downloaded in a browser is reported as "damaged"), then build the .dmg.
       - name: macOS disk image
         if: runner.os == 'macOS'
+        env:
+          MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
+          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          NOTARY_KEY_P8: ${{ secrets.NOTARY_KEY_P8 }}
+          NOTARY_KEY_ID: ${{ secrets.NOTARY_KEY_ID }}
+          NOTARY_ISSUER_ID: ${{ secrets.NOTARY_ISSUER_ID }}
         run: |
           app="$(ls -d dist/*.app | head -1)"
           name="$(basename "$app" .app)"
-          codesign --force --deep --sign - "$app"
-          codesign --verify --deep --strict "$app"
-          mkdir -p stage && ditto "$app" "stage/$name.app" && ln -s /Applications stage/Applications
           version="$(grep -m1 '^version' Cargo.toml | cut -d'"' -f2)"
-          hdiutil create -size 400m -volname "$name" -srcfolder stage -ov -format UDZO "dist/${name}_${version}_aarch64.dmg"
+          dmg="dist/${name}_${version}_aarch64.dmg"
+          if [ -n "$MACOS_CERT_P12" ]; then
+            # Developer ID signing + notarization: the app opens with no security warning.
+            echo "$MACOS_CERT_P12" | base64 --decode > cert.p12
+            security create-keychain -p ci build.keychain
+            security default-keychain -s build.keychain
+            security unlock-keychain -p ci build.keychain
+            security import cert.p12 -k build.keychain -P "$MACOS_CERT_PASSWORD" -T /usr/bin/codesign
+            security set-key-partition-list -S apple-tool:,apple: -s -k ci build.keychain >/dev/null
+            identity="$(security find-identity -v -p codesigning build.keychain | grep -o '"Developer ID Application[^"]*"' | head -1 | tr -d '"')"
+            codesign --force --deep --options runtime --timestamp --sign "$identity" "$app"
+            codesign --verify --deep --strict "$app"
+            echo "$NOTARY_KEY_P8" > notary.p8
+            ditto -c -k --keepParent "$app" notarize.zip
+            xcrun notarytool submit notarize.zip --key notary.p8 --key-id "$NOTARY_KEY_ID" --issuer "$NOTARY_ISSUER_ID" --wait
+            xcrun stapler staple "$app"
+          else
+            # No certificate in the secrets: seal with an ad-hoc signature (opens after "Open Anyway").
+            codesign --force --deep --sign - "$app"
+            codesign --verify --deep --strict "$app"
+          fi
+          mkdir -p stage && ditto "$app" "stage/$name.app" && ln -s /Applications stage/Applications
+          hdiutil create -size 400m -volname "$name" -srcfolder stage -ov -format UDZO "$dmg"
+          if [ -n "$MACOS_CERT_P12" ]; then
+            codesign --force --timestamp --sign "$identity" "$dmg"
+            xcrun notarytool submit "$dmg" --key notary.p8 --key-id "$NOTARY_KEY_ID" --issuer "$NOTARY_ISSUER_ID" --wait
+            xcrun stapler staple "$dmg"
+            spctl -a -t open --context context:primary-signature -v "$dmg"
+            rm -f cert.p12 notary.p8
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: job-command-center-${{ runner.os }}
