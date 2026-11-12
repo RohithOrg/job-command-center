@@ -124,10 +124,28 @@ pub fn header(p: &Profile) -> Header {
 }
 
 /// Roles from CV headings like "### Data Scientist — Acme, Germany".
+/// (role, company) for each "### " heading of the CV. Headings come in several shapes:
+/// "Role — Company", "Role, Company, City (2022 – present)", "Role at Company | 2019–2022".
 fn base_roles(cv: &str) -> Vec<(String, String)> {
     cv.lines().filter_map(|l| {
         let l = l.trim().strip_prefix("### ")?;
-        let (role, company) = l.split_once(" — ").or_else(|| l.split_once(" – ")).or_else(|| l.split_once(" - "))?;
+        // Drop anything in parentheses and anything after a pipe (dates, places), so a dash
+        // inside "2022 – present" is never mistaken for the role/company separator.
+        let mut head = String::new();
+        let mut depth = 0;
+        for c in l.chars() {
+            match c {
+                '(' => depth += 1,
+                ')' => depth = (depth - 1).max(0),
+                '|' if depth == 0 => break,
+                _ if depth == 0 => head.push(c),
+                _ => {}
+            }
+        }
+        let head = head.trim();
+        let (role, company) = [" — ", " – ", " - ", " at ", ", "].iter()
+            .find_map(|sep| head.split_once(sep))?;
+        let company = company.split([',', '|']).next().unwrap_or(company);
         Some((role.trim().to_string(), company.trim().to_string()))
     }).collect()
 }
@@ -699,6 +717,13 @@ mod tests {
         let cv = "### Data Scientist — Acme, Germany\n\n### ML Intern – Globex";
         let r = Resume { experience: vec![crate::resume::Experience { role: "Data Scientist".into(), company: "Acme GmbH".into(), ..Default::default() }], ..Default::default() };
         assert_eq!(missing_roles(&r, cv), vec!["ML Intern — Globex"]);
+        // Dates in parentheses and comma-separated headings are not split on the date's dash.
+        let cv = "### Senior Machine Learning Engineer, Helvetia Analytics GmbH, Munich (2022 – present)\n### Data Scientist at Baltic Insights | 2018 – 2019";
+        let r = Resume { experience: vec![
+            crate::resume::Experience { role: "Senior Machine Learning Engineer".into(), company: "Helvetia Analytics GmbH".into(), ..Default::default() },
+            crate::resume::Experience { role: "Data Scientist".into(), company: "Baltic Insights".into(), ..Default::default() },
+        ], ..Default::default() };
+        assert!(missing_roles(&r, cv).is_empty(), "{:?}", missing_roles(&r, cv));
     }
 
     #[test]
