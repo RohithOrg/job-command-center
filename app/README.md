@@ -20,6 +20,7 @@ Download one file, open it, done. Nothing else to install.
 1. Download [Job Command Center for Linux](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.1/job-command-center-0.1.1-linux-x86_64.AppImage).
 2. Right-click the file → Properties → allow it to run as a program (or in a terminal: `chmod +x` the file).
 3. Double-click it. On Ubuntu 22.04 or newer, if nothing happens, run `sudo apt install libfuse2` once.
+4. Your API key is kept in the desktop's password store (GNOME Keyring or KWallet). Ubuntu, Fedora, Mint and other desktops have one already; if you use a bare window manager without one, install `gnome-keyring` first.
 
 All downloads: [github.com/RohithOrg/releases](https://github.com/RohithOrg/releases/releases). Or install **Hangar**, which installs and updates this app and the rest of the suite for you.
 
@@ -29,7 +30,7 @@ On first launch the app sets itself up (about a minute), then asks you to connec
 - **Paste an API key** from Anthropic (Claude), OpenAI or Google Gemini. A key is a long password you create on their website; the app has a "Get a key" button that takes you there. It is paid per use, usually cents per resume, and is **not** the same as a ChatGPT or Claude subscription.
 - **Free, no account:** install [Ollama](https://ollama.com/download), download a model in it (for example llama3.1), then choose Ollama in the app. Slower and less polished than the paid services.
 
-Your key stays in your computer's password store, and your resume goes only to the service you chose.
+**Your data stays on your computer.** Your resume, profile, applications and generated PDFs live in one folder on your disk (see "Where your data lives"). The API key goes into the operating system's password store (Keychain, Windows Credential Manager, GNOME Keyring / KWallet), never into a file. The only things that ever leave the computer are the job postings you add and the text the AI needs to read them, and those go only to the AI service you chose. There is no account with this app, no analytics, no server of ours, and nothing is uploaded anywhere else. If you pick Ollama or LM Studio, nothing leaves the computer at all.
 
 Not yet available: Intel Macs.
 
