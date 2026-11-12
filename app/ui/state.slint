@@ -219,6 +219,17 @@ export global App {
     callback finish-setup();
     callback setup-connect-ai();              // save + test the AI; moves to the next step only if it answers
     in property <string> ai-problem;          // why the saved AI isn't working right now ("" when fine)
+    // updates (see src/update.rs)
+    in property <string> app-version;
+    in property <string> update-version;      // a newer version with an installer for this computer ("" when none)
+    in property <string> update-notes;
+    in property <string> update-status;       // what the updater is doing, or why it stopped
+    in property <float> update-progress;
+    in property <bool> update-busy;
+    in-out property <bool> update-check: true; // ask once a day
+    callback install-update();
+    callback check-updates();
+    callback set-update-check(bool);
 
     // navigation
     callback go(int);

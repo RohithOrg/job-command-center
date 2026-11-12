@@ -144,6 +144,18 @@ export component SettingsPage inherits Rectangle {
                         ActionButton { text: "Move to another folder…"; small: true; clicked => { App.move-data-folder(); } } } }
             }
             Card {
+                height: up.preferred-height;
+                up := VerticalLayout { padding: 24px; spacing: 10px;
+                    SectionTitle { text: "Updates"; }
+                    Text { text: "You have version " + App.app-version + ". Once a day the app asks GitHub whether a newer version exists; nothing about you is sent. Installing replaces the app and restarts it.";
+                           wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; }
+                    Toggle { text: "Check for updates once a day"; checked: App.update-check; toggled(v) => { App.set-update-check(v); } }
+                    if App.update-status != "" : Text { text: App.update-status; wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.ink; }
+                    HorizontalLayout { spacing: 10px; alignment: start;
+                        if App.update-version != "" : ActionButton { text: App.update-busy ? "Installing…" : "Install version " + App.update-version + " and restart"; small: true; primary: true; enabled: !App.update-busy; clicked => { App.install-update(); } }
+                        ActionButton { text: "Check now"; small: true; enabled: !App.update-busy; clicked => { App.check-updates(); } } } }
+            }
+            Card {
                 height: ap.preferred-height;
                 ap := VerticalLayout { padding: 24px; spacing: 10px;
                     SectionTitle { text: "Appearance"; }

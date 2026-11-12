@@ -18,6 +18,7 @@ mod rag;
 mod resume;
 mod scanner;
 mod ui;
+mod update;
 mod web;
 
 use anyhow::Result;
@@ -125,6 +126,7 @@ fn main() -> Result<()> {
     ui::start_scheduler(&window, &wiring);
     ui::start_setup(&window, &wiring, startup);
     ui::check_ai(&window, &wiring);
+    ui::start_updates(&window, &wiring);
     if imported > 0 {
         window.global::<App>().set_toast(format!("Imported {imported} applications").into());
     }

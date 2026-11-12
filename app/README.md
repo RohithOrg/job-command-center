@@ -7,17 +7,17 @@ A native app for Mac, Windows and Linux that turns job postings into honest, tai
 Download one file, open it, done. Nothing else to install.
 
 **Mac (Apple silicon: M1 or newer; check under  → About This Mac, "Chip")**
-1. Download [Job Command Center for Mac](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.3/job-command-center-0.1.3-macos-aarch64.dmg).
+1. Download [Job Command Center for Mac](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.4/job-command-center-0.1.4-macos-aarch64.dmg).
 2. Open the downloaded file and drag **Job Command Center** onto **Applications**.
 3. Open it from Applications. The first time, macOS says it "could not verify" the app: open **System Settings → Privacy & Security**, scroll down and press **Open Anyway**. This happens once.
 
 **Windows 10 / 11**
-1. Download [Job Command Center for Windows](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.3/job-command-center-0.1.3-windows-x86_64.exe).
+1. Download [Job Command Center for Windows](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.4/job-command-center-0.1.4-windows-x86_64.exe).
 2. Open it. If Windows shows "Windows protected your PC", press **More info**, then **Run anyway**. This happens once.
 3. The app opens by itself and appears in the Start menu.
 
 **Linux (Ubuntu, Fedora, most others)**
-1. Download [Job Command Center for Linux](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.3/job-command-center-0.1.3-linux-x86_64.AppImage).
+1. Download [Job Command Center for Linux](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.4/job-command-center-0.1.4-linux-x86_64.AppImage).
 2. Right-click the file → Properties → allow it to run as a program (or in a terminal: `chmod +x` the file).
 3. Double-click it. On Ubuntu 22.04 or newer, if nothing happens, run `sudo apt install libfuse2` once.
 4. Your API key is kept in the desktop's password store (GNOME Keyring or KWallet). Ubuntu, Fedora, Mint and other desktops have one already; if you use a bare window manager without one, install `gnome-keyring` first.
@@ -37,7 +37,7 @@ Steps 2 to 4 can be skipped and filled in later under Profile, which also holds 
 - **Paste an API key** from Anthropic (Claude), OpenAI or Google Gemini. A key is a long password you create on their website; the app has a "Get a key" button that takes you there. It is paid per use, usually cents per resume, and is **not** the same as a ChatGPT or Claude subscription.
 - **Free, no account:** install [Ollama](https://ollama.com/download), download a model in it (for example llama3.1), then choose Ollama in the app. Slower and less polished than the paid services.
 
-**Your data stays on your computer.** Your resume, profile, applications and generated PDFs live in one folder on your disk (see "Where your data lives"). The API key goes into the operating system's password store (Keychain, Windows Credential Manager, GNOME Keyring / KWallet), never into a file. The only things that ever leave the computer are the job postings you add and the text the AI needs to read them, and those go only to the AI service you chose. There is no account with this app, no analytics, no server of ours, and nothing is uploaded anywhere else. If you pick Ollama or LM Studio, nothing leaves the computer at all.
+**Your data stays on your computer.** Your resume, profile, applications and generated PDFs live in one folder on your disk (see "Where your data lives"). The API key goes into the operating system's password store (Keychain, Windows Credential Manager, GNOME Keyring / KWallet), never into a file. The only things that ever leave the computer are the job postings you add and the text the AI needs to read them, and those go only to the AI service you chose. Once a day the app asks GitHub whether a newer version exists (one small public file, nothing about you in the request; you can turn it off in Settings), and installs a new version only when you press Install. There is no account with this app, no analytics, no server of ours, and nothing is uploaded anywhere else. If you pick Ollama or LM Studio, nothing leaves the computer at all.
 
 Not yet available: Intel Macs.
 
@@ -97,6 +97,7 @@ Screenshots from a demo profile ("Maya Lindqvist" and the companies she applied 
 - **Resume versions**: every draft, revision and design change is kept. Preview the pages in the app, switch between four designs, or tell the agent what to change.
 - **Application Q&A**: paste a question from an application form and get an answer from your profile and that job's resume. Save good answers; later applications reuse them.
 - **Discover and Companies**: the app checks your favourite companies' job pages for roles that match your titles and places.
+- **Updates**: when a new version is out, Today shows an "Install and restart" button. The download is checked against the release key built into the app before anything is replaced.
 - **History**: close applications instead of deleting them. If the same job comes back, by link or by a near-identical description, the app tells you.
 
 ## AI providers

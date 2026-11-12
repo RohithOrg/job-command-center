@@ -49,6 +49,16 @@ export component TodayPage inherits Rectangle {
                            font-family: Theme.body; font-size: Theme.fs-md; color: Theme.muted; }
                 }
             }
+            if App.update-version != "" : Rectangle {
+                background: Theme.surface; border-radius: Theme.r-panel; border-width: 1px; border-color: Theme.line; height: upd.preferred-height;
+                upd := HorizontalLayout {
+                    padding: 16px; spacing: 12px;
+                    Text { text: App.update-status != "" ? App.update-status
+                                 : "Version " + App.update-version + " of Job Command Center is ready. Installing takes under a minute and restarts the app.";
+                           wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.ink; horizontal-stretch: 1; vertical-alignment: center; }
+                    ActionButton { text: App.update-busy ? "Installing…" : "Install and restart"; small: true; primary: true; enabled: !App.update-busy; clicked => { App.install-update(); } }
+                }
+            }
             if !App.ai-connected || App.ai-problem != "" : Rectangle {
                 background: Theme.marigold-soft; border-radius: Theme.r-panel; height: warn.preferred-height;
                 warn := HorizontalLayout {

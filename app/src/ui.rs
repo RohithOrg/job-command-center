@@ -1046,6 +1046,38 @@ pub fn wire(ui: &AppWindow, w: Rc<Wiring>) {
             _ => { view(|v| v.post_page = page); refresh_companies(&ui, &w.store); }
         }
     });
+    on!(on_check_updates, |ui, w| { check_updates(&ui, w, true); });
+    on!(on_set_update_check, |ui, w, on| {
+        let _ = db::lock(&w.store).set_setting("update_check", &json!(on));
+        ui.global::<App>().set_update_check(on);
+        if on { check_updates(&ui, w, true); }
+    });
+    on!(on_install_update, |ui, w| {
+        let app = ui.global::<App>();
+        if app.get_update_busy() { return; }
+        let Some(a) = PENDING_UPDATE.with(|p| p.borrow().clone()) else { return };
+        app.set_update_busy(true);
+        app.set_update_status(format!("Downloading version {}…", a.version).into());
+        let (weak, dir) = (ui.as_weak(), w.data_dir.clone());
+        let pw = weak.clone();
+        let progress = move |f: f32| {
+            let _ = pw.upgrade_in_event_loop(move |ui| {
+                let app = ui.global::<App>();
+                app.set_update_progress(f);
+                app.set_update_status(if f >= 1.0 { "Checking the download and installing…".into() } else { format!("Downloading… {:.0}%", f * 100.0).into() });
+            });
+        };
+        w.rt.spawn(async move {
+            let r = crate::update::install(dir, a, progress).await;
+            let _ = weak.upgrade_in_event_loop(move |ui| {
+                let app = ui.global::<App>();
+                match r {
+                    Ok(()) => { app.set_update_status("Installed. Restarting…".into()); let _ = slint::quit_event_loop(); }
+                    Err(e) => { app.set_update_busy(false); app.set_update_status(format!("The update didn't install: {e:#}").into()); }
+                }
+            });
+        });
+    });
     on!(on_open_url, |ui, w, url| {
         let _ = w;
         if let Err(e) = open::that_detached(url.as_str()) {
@@ -2253,4 +2285,48 @@ fn wire_web(ui: &AppWindow, w: &Rc<Wiring>) {
     if saved["enabled"] == json!(true) {
         web_start(ui, w, saved["remote"] == json!(true));
     }
+}
+
+thread_local! {
+    static PENDING_UPDATE: std::cell::RefCell<Option<crate::update::Available>> = const { std::cell::RefCell::new(None) };
+}
+
+/// Once a day (if allowed in Settings), ask the catalog whether a newer version exists.
+pub fn start_updates(ui: &AppWindow, w: &Wiring) {
+    let app = ui.global::<App>();
+    app.set_app_version(crate::update::VERSION.into());
+    let db = db::lock(&w.store);
+    let enabled = db.setting("update_check").ok().and_then(|v| v.as_bool()).unwrap_or(true);
+    let last = db.setting("update_checked_at").ok().and_then(|v| v.as_str().map(String::from)).unwrap_or_default();
+    drop(db);
+    app.set_update_check(enabled);
+    let due = chrono::DateTime::parse_from_rfc3339(&last).map(|t| chrono::Utc::now().signed_duration_since(t).num_hours() >= 24).unwrap_or(true);
+    if enabled && due {
+        check_updates(ui, w, false);
+    }
+}
+
+fn check_updates(ui: &AppWindow, w: &Wiring, by_hand: bool) {
+    let (store, weak) = (w.store.clone(), ui.as_weak());
+    if by_hand {
+        ui.global::<App>().set_update_status("Checking…".into());
+    }
+    w.rt.spawn(async move {
+        let r = crate::update::check().await;
+        let _ = db::lock(&store).set_setting("update_checked_at", &json!(chrono::Utc::now().to_rfc3339()));
+        let _ = weak.upgrade_in_event_loop(move |ui| {
+            let app = ui.global::<App>();
+            match r {
+                Ok(Some(a)) => {
+                    app.set_update_version(a.version.clone().into());
+                    app.set_update_notes(a.notes.clone().into());
+                    app.set_update_status(SharedString::new());
+                    toast(&ui, format!("Version {} is available. Install it from Today or Settings.", a.version));
+                    PENDING_UPDATE.with(|p| *p.borrow_mut() = Some(a));
+                }
+                Ok(None) => { if by_hand { app.set_update_status(format!("You have the latest version ({}).", crate::update::VERSION).into()); } }
+                Err(e) => { if by_hand { app.set_update_status(format!("Couldn't check: {e:#}").into()); } }
+            }
+        });
+    });
 }
