@@ -209,7 +209,10 @@ impl Ai {
             match extract_json(&text) {
                 Ok(v) => return Ok((v, model)),
                 Err(e) => {
-                    last = e.to_string();
+                    // Keep the start of what the model said: it is usually the real reason
+                    // (a provider notice, a refusal, a quota message), not a formatting slip.
+                    let said: String = text.split_whitespace().collect::<Vec<_>>().join(" ").chars().take(160).collect();
+                    last = if said.is_empty() { e.to_string() } else { format!("{e}. It said: “{said}”") };
                     msgs.push(Msg::assistant(text));
                     msgs.push(Msg::user("That was not valid JSON. Reply with ONLY the JSON object, no prose."));
                 }
