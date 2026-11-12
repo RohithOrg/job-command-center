@@ -2,19 +2,86 @@
 
 A native app for Mac, Windows and Linux that turns job postings into honest, tailored applications. Everything runs on your computer; the only thing that goes online is the AI service you connect.
 
-## Install
+## Get the app (no coding needed)
 
-Download the installer for your computer from the project's Releases page:
+Download one file, open it, done. Nothing else to install.
 
-| Computer | File |
-|---|---|
-| Mac (Apple silicon or Intel, macOS 11+) | `Job-Command-Center-<version>-macos.dmg`: open it and drag the app to Applications |
-| Windows 10/11 | `Job Command Center_<version>_x64-setup.exe` |
-| Linux | `.deb` (Ubuntu, Debian) or `.AppImage` (any distribution) |
+**Mac (Apple silicon: M1 or newer; check under  → About This Mac, "Chip")**
+1. Download [Job Command Center for Mac](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.0/job-command-center-0.1.0-macos-aarch64.dmg).
+2. Open the downloaded file and drag **Job Command Center** onto **Applications**.
+3. Open it from Applications. The first time, macOS says it "could not verify" the app: open **System Settings → Privacy & Security**, scroll down and press **Open Anyway**. This happens once.
 
-Nothing else needs installing. The search model, PDF designs, fonts and company list are inside the app.
+**Windows 10 / 11**
+1. Download [Job Command Center for Windows](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.0/job-command-center-0.1.0-windows-x86_64.exe).
+2. Open it. If Windows shows "Windows protected your PC", press **More info**, then **Run anyway**. This happens once.
+3. The app opens by itself and appears in the Start menu.
 
-On first launch the app sets up its private folder, then walks you through four steps you can skip: connect your AI, import your resume, say what you're looking for, and star your favourite companies.
+**Linux (Ubuntu, Fedora, most others)**
+1. Download [Job Command Center for Linux](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.0/job-command-center-0.1.0-linux-x86_64.AppImage).
+2. Right-click the file → Properties → allow it to run as a program (or in a terminal: `chmod +x` the file).
+3. Double-click it. On Ubuntu 22.04 or newer, if nothing happens, run `sudo apt install libfuse2` once.
+
+All downloads: [github.com/RohithOrg/releases](https://github.com/RohithOrg/releases/releases). Or install **Hangar**, which installs and updates this app and the rest of the suite for you.
+
+On first launch the app sets itself up (about a minute), then asks you to connect an AI. After that, importing your resume, saying what you're looking for and starring companies are optional.
+
+**Connecting an AI**, two ways:
+- **Paste an API key** from Anthropic (Claude), OpenAI or Google Gemini. A key is a long password you create on their website; the app has a "Get a key" button that takes you there. It is paid per use, usually cents per resume, and is **not** the same as a ChatGPT or Claude subscription.
+- **Free, no account:** install [Ollama](https://ollama.com/download), download a model in it (for example llama3.1), then choose Ollama in the app. Slower and less polished than the paid services.
+
+Your key stays in your computer's password store, and your resume goes only to the service you chose.
+
+Not yet available: Intel Macs.
+
+## What it looks like
+
+Screenshots from a demo profile ("Maya Lindqvist" and the companies she applied to are made up; the Discover roles are real postings found by the scanner).
+
+**Today**: what needs you, oldest first. Interviews that are due, resumes ready to send, agents that stopped.
+
+![Today](docs/screenshots/today.png)
+
+**Applications**: every job on one line from Found to Offer, with the fit score and the ATS score of the current resume.
+
+![Applications](docs/screenshots/applications.png)
+
+**One application**: why it fits or doesn't, strengths and gaps with evidence from your profile, and your own status, next step and notes.
+
+![Application overview](docs/screenshots/job.png)
+
+**Resume versions**: the real PDF, its ATS score, four designs to switch between, and a box to tell the agent what to change. Every version is kept.
+
+![Resume versions](docs/screenshots/job-resume.png)
+
+**Q&A**: paste a question from an application form; the answer uses only your profile and that job's resume. Save the good ones and later applications reuse them.
+
+![Q&A](docs/screenshots/job-qa.png)
+
+**Activity**: what each agent did, step by step.
+
+![Activity](docs/screenshots/job-activity.png)
+
+**Discover and Companies**: star companies, and the app checks their job pages for roles that match your titles and places.
+
+![Discover](docs/screenshots/discover.png)
+
+![Companies](docs/screenshots/companies.png)
+
+**Profile**: the only source the agents may state facts from.
+
+![Profile](docs/screenshots/profile.png)
+
+**First run**: connecting an AI.
+
+![Connect your AI](docs/screenshots/setup-ai.png)
+
+## How it works
+
+1. Paste a job link (or the posting text). The **Reader** fetches the page; the **Extractor** turns it into requirements and keywords.
+2. The **Evaluator** scores the fit against your profile, 1 to 5, with strengths, gaps and red flags. Below 3.0 it stops and tells you why (you can still ask it to tailor anyway).
+3. The **Tailor** rewrites your resume for that posting using only facts from your profile. Skills you don't have are never added.
+4. The **ATS critic** renders the real PDF, reads it back like an applicant tracking system, and sends it back to the Tailor until the keyword score passes the target (default 85) or three rounds are up.
+5. You review, apply, and track the next step. Q&A and the cover-letter writer draw on the same profile and resume.
 
 ## What it does
 
@@ -27,6 +94,8 @@ On first launch the app sets up its private folder, then walks you through four 
 ## AI providers
 
 Anthropic (Claude), OpenAI, Google Gemini, OpenRouter, Groq, Ollama or LM Studio on your computer, or any OpenAI-compatible URL. API keys are stored in the operating system's password store (Keychain, Windows Credential Manager, Secret Service), never in the app's files.
+
+**Using a gateway (advanced).** Because the app accepts any OpenAI-compatible URL, it also works behind a local AI gateway such as [OmniRoute](https://github.com/cheaper-inference/OmniRoute) (MIT, third party, not affiliated with this project): choose "Custom OpenAI-compatible URL", enter the gateway's address (OmniRoute's default is `http://localhost:20128/v1`) and its key. The gateway then decides which account or provider answers. Check the terms of service of each provider you connect through a gateway; some do not allow their consumer subscriptions to be used from third-party programs, and that is between you and the provider. This app does not include, require or endorse any gateway.
 
 ## Use it on your phone
 
@@ -43,6 +112,16 @@ To reach it from anywhere, paste an ngrok authtoken and turn on "From anywhere";
 | Linux | `~/.local/share/jobcommandcenter/` |
 
 It holds one SQLite database and the generated PDFs. Back it up by copying the folder.
+
+## Run from source
+
+No installer needed; one command fetches the Rust toolchain (and on Linux the build libraries) and starts the app. The first build takes a few minutes, later starts a few seconds.
+
+```bash
+git clone https://github.com/RohithOrg/job-command-center.git && cd job-command-center/app
+make up                        # macOS and Linux (or ./scripts/start.sh)
+powershell -ExecutionPolicy Bypass -File scripts\start.ps1   # Windows
+```
 
 ## For developers
 

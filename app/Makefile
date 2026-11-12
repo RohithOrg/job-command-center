@@ -1,5 +1,8 @@
 # Developer shortcuts for the desktop app.
-.PHONY: run test mac tidy
+.PHONY: up run test mac tidy
+
+up:             ## install what's missing, build and launch (Windows: scripts\start.ps1)
+	./scripts/start.sh
 
 run:            ## debug build and launch
 	cargo run

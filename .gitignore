@@ -5,6 +5,7 @@
 !/.github/
 !/README.md
 !/.gitignore
+!/LICENSE
 *.db
 *.db-*
 .env

@@ -98,7 +98,7 @@ export component SetupPage inherits Rectangle {
                         VerticalLayout { spacing: 6px;
                             Text { text: App.setup-ready ? "All set" : "Getting things ready"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xxl; color: Theme.ink; letter-spacing: -0.5px; }
                             Text { text: "This takes about a minute. Nothing needs to be downloaded, and your information stays on this computer. The only thing that goes online is the AI service you connect in the next step.";
-                                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
+                                   wrap: word-wrap; width: parent.width; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
                         Progress { value: App.setup-progress; }
                         VerticalLayout { spacing: 14px; for s in App.setup-steps : StepLine { s: s; } }
                         HorizontalLayout { alignment: end;
@@ -109,22 +109,31 @@ export component SetupPage inherits Rectangle {
                         spacing: 16px;
                         VerticalLayout { spacing: 6px;
                             Text { text: "Connect your AI"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xxl; color: Theme.ink; letter-spacing: -0.5px; }
-                            Text { text: "The assistant uses an AI service to read job posts and write your resumes. Pick the one you have an account with and paste its key (a long password the service gives you). The key is stored safely in this computer's password store.";
-                                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
+                            Text { text: "The app needs an AI service to read job posts and write your resumes. Pick one and paste its API key: a long password you create on the service's website (press \"Get a key\"). Keys are paid per use and are not the same as a ChatGPT or Claude subscription. No key? Choose Ollama: free, runs on this computer, slower.";
+                                   wrap: word-wrap; width: parent.width; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
                         VerticalLayout { spacing: 6px;
                             Text { text: "Provider"; font-family: Theme.body; font-size: Theme.fs-xs; font-weight: 700; color: Theme.muted; }
                             Select { model: App.provider-labels; current-index: App.ai.provider-index; selected => { App.provider-changed(self.current-index); } } }
-                        if App.providers.length > 0 && App.providers[App.ai.provider-index].needs-key : Field {
-                            label: "API key"; password: true; text <=> App.ai.new-key;
-                            placeholder: App.ai.key-status != "" ? "Saved (" + App.ai.key-status + ")" : App.providers[App.ai.provider-index].key-hint; }
+                        if App.providers.length > 0 && App.providers[App.ai.provider-index].needs-key : HorizontalLayout { spacing: 12px;
+                            Field { label: "API key"; password: true; text <=> App.ai.new-key;
+                                placeholder: App.ai.key-status != "" ? "Saved (" + App.ai.key-status + ")" : App.providers[App.ai.provider-index].key-hint; }
+                            VerticalLayout { alignment: end; padding-bottom: 6px;
+                                if App.providers[App.ai.provider-index].key-url != "" : LinkButton { text: "Get a key"; clicked => { App.open-url(App.providers[App.ai.provider-index].key-url); } } } }
+                        if App.providers.length > 0 && App.providers[App.ai.provider-index].id == "ollama" : VerticalLayout { spacing: 4px;
+                            Text { text: "Ollama is a free program. Install it from ollama.com, open it, and download a model in it (for example llama3.1). Then type that model's name below and press Check.";
+                                   wrap: word-wrap; width: parent.width; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; }
+                            HorizontalLayout { alignment: start; LinkButton { text: "Get Ollama"; clicked => { App.open-url("https://ollama.com/download"); } } } }
+                        if App.providers.length > 0 && App.providers[App.ai.provider-index].id == "lmstudio" : Text {
+                            text: "LM Studio is a free program. Install it from lmstudio.ai, download a model in it and start its local server. Then type that model's name below and press Check.";
+                            wrap: word-wrap; width: parent.width; font-family: Theme.body; font-size: Theme.fs-xs; color: Theme.muted; }
                         if App.providers.length > 0 && App.providers[App.ai.provider-index].key-url == "" : Field { label: "Endpoint URL"; text <=> App.ai.base-url; }
                         Field { label: "Model"; hint: "Add fallbacks after a comma."; text <=> App.ai.models; }
                         HorizontalLayout { spacing: 10px;
                             if App.ai-busy : Working { }
                             Text { text: App.ai-status; wrap: word-wrap; horizontal-stretch: 1; vertical-alignment: center; font-family: Theme.body; font-size: Theme.fs-xs;
                                    color: App.ai-ok ? Theme.good : Theme.risk; } }
-                        Text { text: "The app needs a working AI to read postings and write; this step can't be skipped. No key yet? Choose Ollama to run a free model on this computer.";
-                               wrap: word-wrap; font-family: Theme.body; font-size: 12px; color: Theme.faint; }
+                        Text { text: "Your key stays in this computer's password store. Check sends one tiny test message; this step can't be skipped.";
+                               wrap: word-wrap; width: parent.width; font-family: Theme.body; font-size: 12px; color: Theme.faint; }
                         HorizontalLayout { alignment: end;
                             ActionButton { text: App.ai-busy ? "Checking…" : "Check and continue"; primary: true; enabled: !App.ai-busy;
                                            clicked => { App.setup-connect-ai(); } } }
@@ -135,7 +144,7 @@ export component SetupPage inherits Rectangle {
                         VerticalLayout { spacing: 6px;
                             Text { text: "Your resume"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xxl; color: Theme.ink; letter-spacing: -0.5px; }
                             Text { text: "Every resume the app writes uses only facts from here, so start with your full, current resume. The app reads it and fills in your details; you can correct anything.";
-                                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
+                                   wrap: word-wrap; width: parent.width; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
                         HorizontalLayout { spacing: 10px; alignment: start;
                             ActionButton { text: "Import a PDF or text file"; primary: App.profile.cv-md == ""; clicked => { App.import-cv(); } }
                             if App.profile-busy : Working { } }
@@ -153,7 +162,7 @@ export component SetupPage inherits Rectangle {
                         VerticalLayout { spacing: 6px;
                             Text { text: "What you want"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xxl; color: Theme.ink; letter-spacing: -0.5px; }
                             Text { text: "The app looks for jobs with these titles in these places. You can change this any time in your profile.";
-                                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
+                                   wrap: word-wrap; width: parent.width; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
                         SetupChips { field: "target-roles"; label: "Job titles"; placeholder: "e.g. Data Scientist"; items: App.profile.target-roles; }
                         SetupChips { field: "countries"; label: "Countries"; placeholder: "e.g. Netherlands"; hint: "Leave empty to keep every place."; items: App.profile.countries; }
                         SetupChips { field: "exclude-words"; label: "Words that rule a job out"; placeholder: "e.g. Intern"; items: App.profile.exclude-words; }
@@ -167,7 +176,7 @@ export component SetupPage inherits Rectangle {
                         VerticalLayout { spacing: 6px;
                             Text { text: "Your companies"; font-family: Theme.display; font-weight: 700; font-size: Theme.fs-xxl; color: Theme.ink; letter-spacing: -0.5px; }
                             Text { text: "Star the companies you'd like to work for. The app checks their job pages and shows matching jobs in Discover. You can add any other company later.";
-                                   wrap: word-wrap; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
+                                   wrap: word-wrap; width: parent.width; font-family: Theme.body; font-size: Theme.fs-sm; color: Theme.muted; } }
                         ListView {
                             height: 300px;
                             for c in App.setup-companies : CompanyPick { c: c; }
