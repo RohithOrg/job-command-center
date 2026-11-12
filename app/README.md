@@ -158,4 +158,4 @@ Debug builds accept `JCC_DATA_DIR=<folder>` to use a separate data folder, and `
 
 ## Licenses
 
-App: MIT. The agent rules in `rules/` are adapted from [career-ops](https://github.com/career-ops-hq/career-ops) by Santiago Fernández de Valderrama (MIT; see `rules/LICENSE-career-ops`). Bundled: all-MiniLM-L6-v2 (Apache-2.0), Source Sans 3, IBM Plex Sans, Libertinus Serif, Bricolage Grotesque, Atkinson Hyperlegible Next (SIL OFL 1.1). Job titles and skills suggestions come from ESCO (European Commission); city suggestions from Open-Meteo.
+App: MIT. Bundled: all-MiniLM-L6-v2 (Apache-2.0), Source Sans 3, IBM Plex Sans, Libertinus Serif, Bricolage Grotesque, Atkinson Hyperlegible Next (SIL OFL 1.1). Job titles and skills suggestions come from ESCO (European Commission); city suggestions from Open-Meteo.

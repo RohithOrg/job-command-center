@@ -21,7 +21,7 @@ use std::sync::Arc;
 use tokio::sync::Semaphore;
 
 pub const ATS_TARGET: i64 = 85;
-/// Below this fit score the agents stop after evaluating (career-ops: under 3.5 "only with a reason").
+/// Below this fit score the agents stop after evaluating (under 3.5 is "only with a reason").
 const MIN_FIT_TO_TAILOR: f64 = 3.0;
 const MAX_ROUNDS: usize = 3;
 const MIN_FETCHED_CHARS: usize = 700;

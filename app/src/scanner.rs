@@ -85,7 +85,7 @@ pub fn save_prefs(db: &Db, p: &SearchPrefs) -> Result<()> {
     p.title_positive = clean(&p.title_positive);
     p.locations_allow = clean(&p.locations_allow);
     p.locations_block = clean(&p.locations_block);
-    // A trailing space on an excluded word means "whole word only" (career-ops convention).
+    // A trailing space on an excluded word means "whole word only" (whole-word convention).
     p.title_negative = p.title_negative.iter().filter(|x| !x.trim().is_empty()).map(|x| x.trim_start().to_string()).collect();
     p.auto_process_limit = p.auto_process_limit.clamp(1, 100);
     p.scan_interval_hours = p.scan_interval_hours.clamp(0.0, 168.0);
@@ -134,7 +134,7 @@ pub fn in_favorites(name: &str, favs: Option<&HashSet<String>>) -> bool {
     !n.is_empty() && favs.iter().any(|f| n == *f || n.starts_with(&format!("{f} ")) || f.starts_with(&format!("{n} ")))
 }
 
-// ---------- filters (career-ops title_filter / location_filter semantics) ----------
+// ---------- filters (title and location filter semantics) ----------
 
 /// Python's `[a-z0-9]` boundary class (ASCII only, applied to lowercased text).
 fn is_word_char(c: char) -> bool {
@@ -1011,7 +1011,7 @@ async fn api_providers(http: &reqwest::Client, c: &Board) -> Result<Option<(Vec<
     Ok(None)
 }
 
-/// career-ops discover-ats: a branded careers page often fronts a Greenhouse board with far
+/// ATS discovery: a branded careers page often fronts a Greenhouse board with far
 /// more postings than the page shows. Probe slugs from the company name and accept a board
 /// only if its registered company name matches.
 async fn discover_board(http: &reqwest::Client, name: &str) -> Option<String> {
