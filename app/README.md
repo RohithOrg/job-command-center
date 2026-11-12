@@ -7,17 +7,17 @@ A native app for Mac, Windows and Linux that turns job postings into honest, tai
 Download one file, open it, done. Nothing else to install.
 
 **Mac (Apple silicon: M1 or newer; check under  → About This Mac, "Chip")**
-1. Download [Job Command Center for Mac](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.5/job-command-center-0.1.5-macos-aarch64.dmg).
+1. Download [Job Command Center for Mac](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.6/job-command-center-0.1.6-macos-aarch64.dmg).
 2. Open the downloaded file and drag **Job Command Center** onto **Applications**.
 3. Open it from Applications. The first time, macOS says it "could not verify" the app: open **System Settings → Privacy & Security**, scroll down and press **Open Anyway**. This happens once.
 
 **Windows 10 / 11**
-1. Download [Job Command Center for Windows](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.5/job-command-center-0.1.5-windows-x86_64.exe).
+1. Download [Job Command Center for Windows](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.6/job-command-center-0.1.6-windows-x86_64.exe).
 2. Open it. If Windows shows "Windows protected your PC", press **More info**, then **Run anyway**. This happens once.
 3. The app opens by itself and appears in the Start menu.
 
 **Linux (Ubuntu, Fedora, most others)**
-1. Download [Job Command Center for Linux](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.5/job-command-center-0.1.5-linux-x86_64.AppImage).
+1. Download [Job Command Center for Linux](https://github.com/RohithOrg/releases/releases/download/job-command-center-v0.1.6/job-command-center-0.1.6-linux-x86_64.AppImage).
 2. Right-click the file → Properties → allow it to run as a program (or in a terminal: `chmod +x` the file).
 3. Double-click it. On Ubuntu 22.04 or newer, if nothing happens, run `sudo apt install libfuse2` once.
 4. Your API key is kept in the desktop's password store (GNOME Keyring or KWallet). Ubuntu, Fedora, Mint and other desktops have one already; if you use a bare window manager without one, install `gnome-keyring` first.
