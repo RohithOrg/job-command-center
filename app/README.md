@@ -24,7 +24,14 @@ Download one file, open it, done. Nothing else to install.
 
 All downloads: [github.com/RohithOrg/releases](https://github.com/RohithOrg/releases/releases). Or install **Hangar**, which installs and updates this app and the rest of the suite for you.
 
-On first launch the app sets itself up (about a minute), then asks you to connect an AI. After that, importing your resume, saying what you're looking for and starring companies are optional.
+On first launch the app sets itself up (about a minute), then walks you through four things:
+
+1. **Connect an AI** (below).
+2. **Your resume**: import your current resume as a PDF or text file. This is the only place the app takes facts from. Every tailored resume, cover letter and answer is built from it, and nothing you don't have is ever added. You can edit it any time under Profile.
+3. **What you want**: job titles, countries or cities, and words that rule a job out (for example "Intern"). The fit score and the Discover page use these.
+4. **Your companies**: star the companies you'd like to work for. The app checks their job pages for roles that match.
+
+Steps 2 to 4 can be skipped and filled in later under Profile, which also holds work authorisation and visa, salary, languages, your strengths, and extra documents the AI may draw on.
 
 **Connecting an AI**, two ways:
 - **Paste an API key** from Anthropic (Claude), OpenAI or Google Gemini. A key is a long password you create on their website; the app has a "Get a key" button that takes you there. It is paid per use, usually cents per resume, and is **not** the same as a ChatGPT or Claude subscription.
